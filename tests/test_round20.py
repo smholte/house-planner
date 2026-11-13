@@ -92,8 +92,10 @@ with sync_playwright() as p:
     # the graphics card stops in the middle of a path traced render
     pg.evaluate("() => { const a = window.__hp.app; a._renderOpts = { q: 'quick', size: 'screen', method: 'pt', passes: 400, W: 120, H: 80 }; window.__oldView = a.panes[0].view; a.renderSheet(); }")
     pg.wait_for_selector('#rn-start', timeout=60000); pg.click('#rn-start')
-    st = wait_status(pg, ['Sample 1 ', 'Sample 2 ', 'Sample 3 '], 400)
-    check('(a path traced render under way)', 'Sample' in st, st)
+    # (sample 1 or later under way: a fast machine is past the first few before a look every few seconds – 0008a)
+    pg.wait_for_function("() => /Sample [1-9][0-9]* of /.test((document.querySelector('#rn-status') || {}).textContent || '')", timeout=400000)
+    st = pg.evaluate(STATUS)
+    check('(a path traced render under way)', 'Sample' in st and 'samples in' not in st, st)
     pg.evaluate("() => window.__oldView.renderer.getContext().getExtension('WEBGL_lose_context').loseContext()")
     st = wait_status(pg, ['graphics card stopped', 'render stopped'], 60)
     check('graphics card stops mid-render: a clear message (not a black picture "finished")', 'graphics card stopped' in st and 'samples in' not in st, st)

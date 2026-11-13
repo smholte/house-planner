@@ -27,18 +27,29 @@ SCENE = """window.__dnScene = () => {
 };""" % V
 # a picture as grey values (linear-ish 0…255 per pixel)
 GREY = "(cv) => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, o = []; for (let i = 0; i < d.length; i += 4) o.push((d[i] + d[i + 1] + d[i + 2]) / 3); return o; }"
-RUN = """async ([n, dn, W, H]) => { const A = window.__hp, f = window.__dnScene(); const tex0 = f.renderer.info.memory.textures;
+# (the app's own 3D view shares the renderer: paused meanwhile, as a real render pauses it – else its automatic
+#  exposure changes the renderer's exposure between samples, and the pictures differ by the machine's speed – 0008a)
+# (and the path tracer's random numbers from one seeded sequence, carried on from render to render: the same pictures on
+#  every run and machine – it draws new ones each time, and a picture of 8 or 64 samples varied so much that a check
+#  passed or failed by chance)
+SEED = int(os.environ.get('HP_R26_SEED', '1'))
+HOLD = "const v0 = %s; v0.rendering = true; f.renderer.toneMappingExposure = 1; const rnd0 = Math.random; Math.random = window.__dnRnd;" % V
+FREE = "Math.random = rnd0; v0.rendering = false; v0.resize(); v0.needs = true;"
+RUN = """async ([n, dn, W, H]) => { const A = window.__hp, f = window.__dnScene(); const tex0 = f.renderer.info.memory.textures; %s
   // (one fixed exposure for all: the pictures compared as they are)
-  const res = await A.renderPathTraced(f, { W, H, passes: n, denoise: dn, meter: false }); %s.resize(); %s.needs = true;
+  let res; try { res = await A.renderPathTraced(f, { W, H, passes: n, denoise: dn, meter: false }); } finally { %s }
   window.__dnShots = window.__dnShots || {}; window.__dnShots[n + (dn ? 'dn' : '')] = res.canvas.toDataURL();
-  return { g: (%s)(res.canvas), denoised: !!res.denoised, n: res.n, texDiff: f.renderer.info.memory.textures - tex0 }; }""" % (V, V, GREY)
+  return { g: (%s)(res.canvas), denoised: !!res.denoised, n: res.n, texDiff: f.renderer.info.memory.textures - tex0 }; }""" % (HOLD, FREE, GREY)
 # the same samples taken twice: as they are, then cleaned (the render kept open, its picture taken again)
-PAIR = """async ([n, W, H]) => { const A = window.__hp, f = window.__dnScene(); const tex0 = f.renderer.info.memory.textures;
-  const res = await A.renderPathTraced(f, { W, H, passes: n, denoise: false, meter: false, keep: true });
-  const raw = (%s)(res.canvas); res.redraw(true); const dn = (%s)(res.canvas), denoised = !!res.denoised;
-  window.__dnShots = window.__dnShots || {}; window.__dnShots[n + 'dn'] = res.canvas.toDataURL();
-  res.end(); %s.resize(); %s.needs = true;
-  return { raw, dn, denoised, n: res.n, texDiff: f.renderer.info.memory.textures - tex0 }; }""" % (GREY, GREY, V, V)
+PAIR = """async ([n, W, H]) => { const A = window.__hp, f = window.__dnScene(); const tex0 = f.renderer.info.memory.textures; %s
+  let raw, dn, denoised, res;
+  try {
+    res = await A.renderPathTraced(f, { W, H, passes: n, denoise: false, meter: false, keep: true });
+    raw = (%s)(res.canvas); res.redraw(true); dn = (%s)(res.canvas); denoised = !!res.denoised;
+    window.__dnShots = window.__dnShots || {}; window.__dnShots[n + 'dn'] = res.canvas.toDataURL();
+    res.end();
+  } finally { %s }
+  return { raw, dn, denoised, n: res.n, texDiff: f.renderer.info.memory.textures - tex0 }; }""" % (HOLD, GREY, GREY, FREE)
 
 lin = lambda v: (v / 255) / 12.92 if v / 255 <= 0.04045 else ((v / 255 + 0.055) / 1.055) ** 2.4
 
@@ -57,6 +68,7 @@ with sync_playwright() as p:
     open_example(pg)
     pg.evaluate("() => { const a = window.__hp.app; a.setDim('3d'); a.setScope('house'); }"); pg.wait_for_timeout(9000); still(pg)
     pg.evaluate("() => { " + SCENE + " }")
+    pg.evaluate("(s) => { let a = s >>> 0; window.__dnRnd = () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }", SEED)
     pair = pg.evaluate(PAIR, [8, 96, 60])
     r64 = pg.evaluate(RUN, [64, False, 96, 60])
     ref = pg.evaluate(RUN, [256, False, 96, 60])
