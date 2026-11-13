@@ -435,7 +435,8 @@ Object.assign(app, {
         h('button', { class: 'chip', 'aria-pressed': String(prop), disabled: ro, onclick: () => this.updateFurn(f.id, x => { x.free = !x.free || undefined; }) }, t('Keep proportions')),
         info ? h('button', { class: 'btn sm', disabled: ro, title: t('Back to the size of the model'), onclick: () => this.updateFurn(f.id, x => { x.w = info.size[0]; x.d = info.size[1]; x.h = info.size[2]; }) }, icon('restore'), t('Model size')) : null,
         info && !info.lib && !ro ? h('button', { class: 'btn sm', onclick: () => this.modelSettingsDialog(this.project.models[info.rec.id]) }, icon('gear'), t('Model settings')) : null));
-      if (!info) sec.appendChild(h('p', { class: 'note-muted' }, t('The model of this piece is missing (deleted from your models).')));
+      if (!info && (f.model || '').startsWith('l:')) sec.appendChild(h('p', { class: 'note-muted lib-missing' }, t('This model is in the model library, which is not on this device yet: it shows as a plain box. Load the library in Settings → Library.')));
+      else if (!info) sec.appendChild(h('p', { class: 'note-muted' }, t('The model of this piece is missing (deleted from your models).')));
     }
     const row2 = [];
     // (below zero: lower it into the floor – for a model whose underside is not where its shape starts)

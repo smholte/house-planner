@@ -83,6 +83,10 @@
   "3D-model",
   "3D-modell"
  ],
+ "3D model (library not loaded)": [
+  "3D-model (bibliotheek niet geladen)",
+  "3D-modell (biblioteket er ikke lastet inn)"
+ ],
  "3D model (missing)": [
   "3D-model (ontbreekt)",
   "3D-modell (mangler)"
@@ -1010,6 +1014,10 @@
  "Built with three.js (MIT) and pdf.js (Apache 2.0). 3D furniture models: Furniture Kit by Kenney (www.kenney.nl), CC0. Font: Barlow (OFL).": [
   "Gemaakt met three.js (MIT) en pdf.js (Apache 2.0). 3D-meubelmodellen: Furniture Kit van Kenney (www.kenney.nl), CC0. Lettertype: Barlow (OFL).",
   "Laget med three.js (MIT) og pdf.js (Apache 2.0). 3D-møbelmodeller: Furniture Kit fra Kenney (www.kenney.nl), CC0. Skrift: Barlow (OFL)."
+ ],
+ "Built-in pictures only. The library (sharper skies, more pictures and models) is not on this device: load it from the library zip of a release.": [
+  "Alleen de ingebouwde afbeeldingen. De bibliotheek (scherpere luchten, meer afbeeldingen en modellen) staat niet op dit apparaat: laad hem uit het bibliotheek-zipbestand van een release.",
+  "Bare de innebygde bildene. Biblioteket (skarpere himmel, flere bilder og modeller) er ikke på denne enheten: last det inn fra bibliotek-zipfilen i en utgivelse."
  ],
  "Bulkhead up to the ceiling": [
   "Passtuk tot het plafond",
@@ -3735,6 +3743,14 @@
   "Lengte",
   "Lengde"
  ],
+ "Library": [
+  "Bibliotheek",
+  "Bibliotek"
+ ],
+ "Library loaded: {n} items, {b}.": [
+  "Bibliotheek geladen: {n} onderdelen, {b}.",
+  "Biblioteket er lastet inn: {n} elementer, {b}."
+ ],
  "Light": [
   "Licht",
   "Lys"
@@ -3806,6 +3822,10 @@
  "Load drawing": [
   "Tekening laden",
   "Last inn tegning"
+ ],
+ "Load library…": [
+  "Bibliotheek laden…",
+  "Last inn bibliotek…"
  ],
  "Load the builder's drawing for this storey (PDF or photo) and trace over it, or start drawing walls straight away.": [
   "Laad de tekening van de bouwer voor deze verdieping (PDF of foto) en teken eroverheen, of begin meteen met muren tekenen.",
@@ -5431,6 +5451,10 @@
   "Afbeelding opgeslagen: {n}",
   "Bilde lagret: {n}"
  ],
+ "Pictures and models outside the app file, kept on this device once. Your houses never depend on it: what is not here shows plainer.": [
+  "Afbeeldingen en modellen buiten het app-bestand, één keer op dit apparaat bewaard. Je huizen hangen er nooit van af: wat er niet is, wordt eenvoudiger getoond.",
+  "Bilder og modeller utenfor app-filen, lagret én gang på denne enheten. Husene dine er aldri avhengige av det: det som mangler, vises enklere."
+ ],
  "Piece": [
   "Meubel",
   "Møbel"
@@ -5695,6 +5719,10 @@
   "Projecten",
   "Prosjekter"
  ],
+ "Public library": [
+  "Openbare bibliotheek",
+  "Offentlig bibliotek"
+ ],
  "Pure green": [
   "Zuiver groen",
   "Rent grønn"
@@ -5794,6 +5822,10 @@
  "Reading the PDF…": [
   "PDF wordt gelezen…",
   "Leser PDF-en…"
+ ],
+ "Reading the library… {a} of {b}": [
+  "Bibliotheek lezen… {a} van {b}",
+  "Leser biblioteket… {a} av {b}"
  ],
  "Reading {0}…": [
   "{0} wordt gelezen…",
@@ -5898,6 +5930,10 @@
  "Remove stop": [
   "Stop verwijderen",
   "Fjern stopp"
+ ],
+ "Remove the library from this device?": [
+  "De bibliotheek van dit apparaat verwijderen?",
+  "Fjerne biblioteket fra denne enheten?"
  ],
  "Remove the plot": [
   "Kavel verwijderen",
@@ -7747,6 +7783,18 @@
   "De laatste kopie in je back-upmap (of Gepauzeerd: klik om door te gaan); klik voor Nu back-up maken.",
   "Siste kopi til sikkerhetskopimappen (eller På pause: klikk for å fortsette); klikk for Sikkerhetskopier nå."
  ],
+ "The library could not be loaded": [
+  "De bibliotheek kon niet worden geladen",
+  "Biblioteket kunne ikke lastes inn"
+ ],
+ "The library is loaded from the web address as it is needed.": [
+  "De bibliotheek wordt van het webadres geladen zodra die nodig is.",
+  "Biblioteket lastes fra nettadressen etter hvert som det trengs."
+ ],
+ "The library list in this zip file can't be read.": [
+  "De lijst van de bibliotheek in dit zipbestand kan niet worden gelezen.",
+  "Bibliotekslisten i denne zipfilen kan ikke leses."
+ ],
  "The light is followed as it really goes – bouncing off walls, floors and furniture, through the glass, from the sky and the sun. The picture gets cleaner with every sample; stop when you like it. On a computer with a good graphics chip.": [
   "Het licht wordt gevolgd zoals het echt gaat – het kaatst op muren, vloeren en meubels, door het glas, van de lucht en de zon. Het beeld wordt bij elke sample schoner; stop als je het mooi vindt. Op een computer met een goede grafische chip.",
   "Lyset følges slik det virkelig går – det spretter på vegger, gulv og møbler, gjennom glasset, fra himmelen og solen. Bildet blir renere for hver prøve; stopp når du liker det. På en datamaskin med god grafikkbrikke."
@@ -7918,6 +7966,14 @@
  "The whole house in 3D": [
   "Het hele huis in 3D",
   "Hele huset i 3D"
+ ],
+ "The zip file is damaged.": [
+  "Het zipbestand is beschadigd.",
+  "Zipfilen er skadet."
+ ],
+ "The zip file is packed in a way the app can't read.": [
+  "Het zipbestand is ingepakt op een manier die de app niet kan lezen.",
+  "Zipfilen er pakket på en måte appen ikke kan lese."
  ],
  "Their copy is the same as yours: nothing to merge.": [
   "Hun kopie is hetzelfde als die van jou: er valt niets samen te voegen.",
@@ -8099,6 +8155,10 @@
   "Dit is geen House Planner-bestand.",
   "Dette er ikke en House Planner-fil."
  ],
+ "This is not a zip file.": [
+  "Dit is geen zipbestand.",
+  "Dette er ikke en zipfil."
+ ],
  "This is not an IFC file.": [
   "Dit is geen IFC-bestand.",
   "Dette er ikke en IFC-fil."
@@ -8110,6 +8170,10 @@
  "This model is compressed in a way the app cannot read (Draco / meshopt). Export it again without compression.": [
   "Dit model is gecomprimeerd op een manier die de app niet kan lezen (Draco / meshopt). Exporteer het opnieuw zonder compressie.",
   "Denne modellen er komprimert på en måte appen ikke kan lese (Draco / meshopt). Eksporter den på nytt uten komprimering."
+ ],
+ "This model is in the model library, which is not on this device yet: it shows as a plain box. Load the library in Settings → Library.": [
+  "Dit model staat in de modellenbibliotheek, die nog niet op dit apparaat staat: het wordt als een gewoon blok getoond. Laad de bibliotheek via Instellingen → Bibliotheek.",
+  "Denne modellen er i modellbiblioteket, som ennå ikke er på denne enheten: den vises som en enkel boks. Last inn biblioteket under Innstillinger → Bibliotek."
  ],
  "This moves the drawing so that corner is the reference point. Walls already drawn on this storey stay where they are, so they may no longer line up with the drawing.": [
   "De tekening wordt zo verplaatst dat die hoek het referentiepunt wordt. Muren die al op deze verdieping getekend zijn, blijven waar ze zijn, dus die liggen misschien niet meer gelijk met de tekening.",
@@ -8166,6 +8230,14 @@
  "This wall is too short for a": [
   "Deze muur is te kort voor een",
   "Denne veggen er for kort for"
+ ],
+ "This zip file is not a House Planner library (no library.json in it).": [
+  "Dit zipbestand is geen House Planner-bibliotheek (er zit geen library.json in).",
+  "Denne zipfilen er ikke et House Planner-bibliotek (den har ingen library.json)."
+ ],
+ "This zip file is not a House Planner library.": [
+  "Dit zipbestand is geen House Planner-bibliotheek.",
+  "Denne zipfilen er ikke et House Planner-bibliotek."
  ],
  "Through the whole outside wall: the same opening is in {n} more layers (insulation, brick); they move and change with it.": [
   "Door de hele buitenmuur: dezelfde opening zit in nog {n} lagen (isolatie, metselwerk); die verschuiven en veranderen mee.",
@@ -9443,9 +9515,17 @@
   "Je huizen worden op dit apparaat bewaard. De browser kan websitegegevens wissen als het apparaat vol raakt, dus exporteer af en toe een kopie.",
   "Husene dine lagres på denne enheten. Nettleseren kan slette nettstedsdata når enheten går tom for plass, så eksporter en kopi innimellom."
  ],
+ "Your houses stay as they are. Models of the library show as plain boxes until you load it again.": [
+  "Je huizen blijven zoals ze zijn. Modellen uit de bibliotheek worden gewone blokken tot je hem opnieuw laadt.",
+  "Husene dine forblir som de er. Modeller fra biblioteket vises som enkle bokser til du laster det inn igjen."
+ ],
  "Your last backup of “{n}” is {d} days old. Export a copy to keep it safe.": [
   "Je laatste back-up van “{n}” is {d} dagen oud. Exporteer een kopie om het veilig te bewaren.",
   "Siste sikkerhetskopi av “{n}” er {d} dager gammel. Eksporter en kopi for å ta vare på det."
+ ],
+ "Your library": [
+  "Jouw bibliotheek",
+  "Ditt bibliotek"
  ],
  "Your name": [
   "Je naam",
@@ -10087,6 +10167,14 @@
   "{a} muur, {r} m² per liter",
   "{a} vegg, {r} m² per liter"
  ],
+ "{a} of {b} on this device, the rest when it is needed": [
+  "{a} van {b} op dit apparaat, de rest zodra het nodig is",
+  "{a} av {b} på denne enheten, resten når det trengs"
+ ],
+ "{a} on this device": [
+  "{a} op dit apparaat",
+  "{a} på denne enheten"
+ ],
  "{a} over the budget": [
   "{a} boven het budget",
   "{a} over budsjettet"
@@ -10190,6 +10278,10 @@
  "{n} houses copied into the folder.": [
   "{n} huizen naar de map gekopieerd.",
   "{n} hus kopiert til mappen."
+ ],
+ "{n} items ({s} picture sets, {m} models)": [
+  "{n} onderdelen ({s} sets afbeeldingen, {m} modellen)",
+  "{n} elementer ({s} bildesett, {m} modeller)"
  ],
  "{n} lengths": [
   "{n} lengtes",

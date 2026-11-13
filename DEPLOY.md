@@ -31,7 +31,8 @@ it. Settings → Pages → Source must be "GitHub Actions" (once).
 1. Make a GitHub account if you don't have one, and a new repository, e.g. `house-planner` (it can be public; it
    contains only the app).
 2. Upload all files from `house-planner-web.zip` (unzipped) to the repository: "Add file → Upload files", drag the
-   files in, "Commit changes".
+   files in, "Commit changes". Keep the folder `lib/` (the asset library: pictures, skies, furniture models) as it is,
+   next to `index.html`.
 3. Settings → Pages → Build and deployment → Source: "Deploy from a branch", Branch: `main`, folder `/ (root)`,
    Save.
 4. After a minute the app is at `https://<your-user-name>.github.io/house-planner/`.

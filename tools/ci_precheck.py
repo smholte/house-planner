@@ -52,6 +52,13 @@ def checks() -> list[str]:
     for p in PRIVATE:
         if os.path.exists(os.path.join(ROOT, p)):
             bad.append(f'{p} is in the public repository: it belongs in the private one (it names the owner\'s house)')
+    # the public asset library (task 0009): whole, every item CC0 / CC BY, and no model file anywhere else
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('build_library', os.path.join(ROOT, 'tools', 'build-library.py'))
+    bl = importlib.util.module_from_spec(spec); spec.loader.exec_module(bl)
+    if os.path.isdir(os.path.join(ROOT, 'build', 'library')):
+        bad += ['build/library: ' + x for x in bl.check()]
+    bad += [f'{x}: a model file outside the public library (build/library)' for x in bl.stray_models(ROOT)]
     util = open(os.path.join(ROOT, 'src', 'util.js'), encoding='utf-8').read()
     m = re.search(r"APP_VERSION\s*=\s*\{\s*n:\s*(\d+),\s*date:\s*'([^']+)',\s*build:\s*'__BUILD__'", util)
     if not m:

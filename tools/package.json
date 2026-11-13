@@ -1,0 +1,14 @@
+{
+  "name": "house-planner-tools",
+  "private": true,
+  "description": "Node tools for the asset library (task 0009): KTX2 pictures (tools/lib-ktx2.mjs) and packed models (tools/glb-pack.mjs). Install: npm ci --prefix tools",
+  "type": "module",
+  "dependencies": {
+    "@gltf-transform/core": "4.5.1",
+    "@gltf-transform/extensions": "4.5.1",
+    "@gltf-transform/functions": "4.5.1",
+    "ktx2-encoder": "0.6.0",
+    "meshoptimizer": "1.3.0",
+    "sharp": "0.35.5"
+  }
+}

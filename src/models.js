@@ -2,6 +2,11 @@
    1. The built-in library: 113 pieces of the Kenney Furniture Kit 2.0 (CC0 1.0, www.kenney.nl), packed by
       tools/pack-models.mjs into MODEL_LIB: names, real sizes, flags and top-view outlines (always there), and one
       gzip'd blob of geometry that is unpacked the first time a model is shown in 3D (a few milliseconds).
+      The single file has the blob inside (MODEL_LIB_BLOB); the hosted versions take it from the asset library (library.js,
+      item 'pack:kenney') the first time a model is shown.
+   1b. Models of the asset library (task 0009; the owner's models in his library): key 'l:<name>', a .glb (meshopt-packed
+      geometry) loaded the first time it is shown. On a device without that library a piece of it is a plain box in its
+      colour, and its panel says the library is not loaded – the piece itself stays as it was saved.
    2. Your own models: .glb / .gltf, .obj (+ .mtl and pictures) and .ifc files. They are kept with the house as a
       .glb asset (project.models[id] = { name, cat, asset, file, fix: {ry, zup, unit}, size, o, u, rev }), so they
       travel with an export.
@@ -33,6 +38,7 @@ const MODEL_PALETTE = {
 };
 const MODELS = {
   blob: null, blobP: null,     // the unpacked library geometry (ArrayBuffer)
+  lib: new Map(),              // asset library model id ('l:…') → { state, obj (unit-box template), p }
   geo: new Map(),              // library id → [{ geo, mat }] (shared by every piece, never disposed)
   user: new Map(),             // your model id → { sig, state, obj (unit-box template), p }
   types: new Map(),            // furniture type objects of models (see modelType)
@@ -40,9 +46,13 @@ const MODELS = {
 
 function loadModelLib() {
   if (!MODELS.blobP) {
-    MODELS.blobP = (typeof MODEL_LIB !== 'undefined' && MODEL_LIB ? gunzipBase64Bytes(MODEL_LIB.blob) : Promise.reject(new Error('no library')))
+    const inside = typeof MODEL_LIB_BLOB !== 'undefined' && MODEL_LIB_BLOB;
+    MODELS.blobP = (inside ? gunzipBase64Bytes(MODEL_LIB_BLOB)
+      : typeof MODEL_LIB !== 'undefined' && MODEL_LIB ? libraryInit().then(() => { const it = libItem(MODEL_LIB.pack); return it ? libGunzip(it.files[0].f) : null; })
+        .then(buf => { if (!buf) throw new Error('the models\' geometry is not in the library on this device'); return buf; })
+        : Promise.reject(new Error('no library')))
       .then(buf => { MODELS.blob = buf; modelsLoaded(); return buf; })
-      .catch(e => { console.warn('model library', e); return null; });
+      .catch(e => { console.warn('model library', e); MODELS.blobP = null; return null; });
   }
   return MODELS.blobP;
 }
@@ -87,6 +97,12 @@ function modelInfo(key) {
     if (!m) return null;
     return m._info || (m._info = { key, lib: true, name: m.n, cat: m.c, size: m.s, flags: m.f || {}, o: m.o || [], u: m.u || [], main: m.main, color: m.col || MODEL_PALETTE[m.main] || '#B7B2A8' });
   }
+  if (key.startsWith('l:')) {
+    // (on a device without that library: unknown – a plain box, see modelMesh)
+    const it = libItem(key);
+    if (!it || it.kind !== 'model') return null;
+    return it._info || (it._info = { key, lib: true, asset: true, name: it.name, cat: it.cat || 'other', size: it.size, flags: it.flags || {}, o: it.o || [], u: it.u || [], color: it.color || '#B7B2A8' });
+  }
   if (key.startsWith('u:')) {
     const rec = app.project && app.project.models && app.project.models[key.slice(2)];
     if (!rec) return null;
@@ -103,7 +119,7 @@ function modelType(item) {
   if (!T) {
     const f = (info && info.flags) || {};
     T = {
-      id: 'model', kind: 'model', isModel: true, cat: info ? info.cat : 'other', name: info ? info.name : '3D model (missing)',
+      id: 'model', kind: 'model', isModel: true, cat: info ? info.cat : 'other', name: info ? info.name : (item.model || '').startsWith('l:') ? '3D model (library not loaded)' : '3D model (missing)',
       w: info ? info.size[0] : 1, d: info ? info.size[1] : 1, h: info ? info.size[2] : 1, color: info ? info.color : '#B7B2A8',
       wall: !!f.wall, front: f.front, sides: f.sides, tuck: !!f.tuck, flat: !!f.flat, high: !!f.high, z: f.z,
       ceiling: !!f.ceiling, light: !!f.light, lamp: f.light || null,
@@ -166,6 +182,12 @@ function modelMesh(it, ceilingH, evening) {
         inner.add(me);
       }
     }
+  } else if (key.startsWith('l:') && info) {
+    const tpl = libModelTemplate(key);
+    if (tpl) {
+      inner = tpl.clone(true);
+      inner.traverse(o => { if (o.isMesh) { o.userData.keep = true; o.castShadow = true; o.receiveShadow = true; } });
+    }
   } else if (key.startsWith('u:') && info) {
     const tpl = userModelTemplate(key.slice(2));
     if (tpl) {
@@ -174,7 +196,14 @@ function modelMesh(it, ceilingH, evening) {
     }
   }
   if (inner) { inner.scale.set(Math.max(0.005, it.w), Math.max(0.005, it.h), Math.max(0.005, it.d)); g.add(inner); }
-  else {
+  else if (key.startsWith('l:') && (!info || (MODELS.lib.get(key) || {}).state === 'error')) {
+    // a model of a library that is not on this device: a plain box of the piece's size, in its colour
+    const me = new THREE.Mesh(new THREE.BoxGeometry(it.w, Math.max(0.01, it.h), it.d), fmat(it.color || '#B7B2A8'));
+    me.position.y = Math.max(0.01, it.h) / 2;
+    me.castShadow = me.receiveShadow = true;
+    me.userData.libMissing = key;
+    g.add(me);
+  } else {
     // still unpacking (or missing): a see-through box of the right size
     const me = new THREE.Mesh(new THREE.BoxGeometry(it.w, Math.max(0.01, it.h), it.d), fmat(info ? '#9AA3A6' : '#C0504D', { opacity: 0.35 }));
     me.position.y = Math.max(0.01, it.h) / 2;
@@ -194,10 +223,56 @@ function modelsLoaded() {
   }, 30);
 }
 
+/** a library came or went (Settings → Library): the pictures this device asks for, and the pieces of its models
+ *  again (boxes become models, or the other way round) */
+function libAfterLoad() {
+  libUpgrade();
+  MODELS.lib.clear();
+  MODELS.types.clear();
+  if (!MODELS.blob) MODELS.blobP = null;
+  for (const it of LIB.items.values()) delete it._info;
+  if (app.project) { app.refreshViews(false); if (app.renderInspector) app.renderInspector(); }
+}
+
+/** the Kenney models' packed geometry as base64, for a copy for viewing made from a hosted version (which has it in its
+ *  library only); null where the app has it inside or it can't be had */
+async function modelPackB64() {
+  if ((typeof MODEL_LIB_BLOB !== 'undefined' && MODEL_LIB_BLOB) || typeof MODEL_LIB === 'undefined' || !MODEL_LIB) return null;
+  if (MODELS.packB64) return MODELS.packB64;
+  try {
+    await libraryInit();
+    const it = libItem(MODEL_LIB.pack), b = it && await libBlob(it.files[0].f);
+    MODELS.packB64 = b ? await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(b); }) : null;
+  } catch (e) { MODELS.packB64 = null; }
+  return MODELS.packB64;
+}
+
 /* ───────── your own models ───────── */
 async function parseGlbBytes(buf) {
   const { GLTFLoader } = await addon('loaders/GLTFLoader.js');
-  return await new Promise((res, rej) => new GLTFLoader().parse(buf, '', g => res(g.scene), e => rej(e && e.message ? new Error(e.message) : new Error('The model could not be read.'))));
+  // (the library's models have their geometry packed with meshopt)
+  const { MeshoptDecoder } = await addon('libs/meshopt_decoder.module.js');
+  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  return await new Promise((res, rej) => loader.parse(buf, '', g => res(g.scene), e => rej(e && e.message ? new Error(e.message) : new Error('The model could not be read.'))));
+}
+/** the unit-box template of a model of the asset library ('l:…'); null while it is being read (or not on this device) */
+function libModelTemplate(key) {
+  const cur = MODELS.lib.get(key);
+  if (cur) return cur.state === 'ready' ? cur.obj : null;
+  const entry = { state: 'loading', obj: null };
+  entry.p = (async () => {
+    try {
+      const it = libItem(key);
+      const b = it && await libBlob(it.files[0].f);
+      if (!b) throw new Error('not on this device');
+      entry.obj = unitTemplate(await parseGlbBytes(await b.arrayBuffer()));
+      entry.state = 'ready';
+    } catch (e) { entry.state = 'error'; entry.err = e; console.warn('library model', key, e); }
+    modelsLoaded();
+    return entry;
+  })();
+  MODELS.lib.set(key, entry);
+  return null;
 }
 
 /** the model turned upright and facing the front, centred, standing on y = 0, squeezed into the unit box:
@@ -246,6 +321,7 @@ function userModelTemplate(id) {
 }
 async function modelReady(key) {
   if (key.startsWith('k:')) { await loadModelLib(); return; }
+  if (key.startsWith('l:')) { libModelTemplate(key); const e = MODELS.lib.get(key); if (e && e.p) await e.p; return; }
   const id = key.slice(2);
   userModelTemplate(id);
   const e = MODELS.user.get(id);

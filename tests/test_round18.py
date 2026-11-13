@@ -5,7 +5,7 @@ the sun with two shadow maps that follow the view (sharper shadows close by); th
 (dark plinth, normal, whiteish) by the brick colours of the builder's model, the roof tiles, floors cut plank by plank
 and tile by tile from the pictures in the chosen colours, plaster relief under the paint, bathroom tiles, the
 kitchen's marble worktop and wooden fronts, black metal for door handles and the sink, sofa fabric, grass, garden
-tiles, gravel, asphalt, tree bark. The hosted versions load textures.json; the single file has them inside.
+tiles, gravel, asphalt, tree bark. The hosted versions load them from the asset library lib/ (task 0009); the single file has them inside.
 PC (light) and phone (dark)."""
 from common import *
 
@@ -23,7 +23,7 @@ with sync_playwright() as p:
     check('three.js r187', pg.evaluate("() => window.__hp.THREE.REVISION") == '187', pg.evaluate("() => window.__hp.THREE.REVISION"))
     pg.wait_for_function(READY, timeout=60000)
     info = pg.evaluate("() => { const T = window.__hp.TEXLIB; return [Object.keys(T.data.sets).length, Object.keys(T.sky), T.sky.day && T.sky.day.userData.avg, T.img.size]; }")
-    check('the material pictures arrive (hosted: textures.json): 25 sets, decoded', info[0] == 25 and info[3] >= 25 * 3, info)
+    check('the material pictures arrive (hosted: from lib/): 25 sets, decoded', info[0] == 25 and info[3] >= 25 * 3, info)
     check('… and the two skies (day, sunset), high dynamic range', sorted(info[1]) == ['day', 'sunset'] and info[2] > 0, info)
     open_example(pg)
     # (on the owner's build his floor is a photo of his own plank; here the library's oak, as the example had before)
@@ -90,7 +90,7 @@ with sync_playwright() as p:
     check('no page errors, no shader errors (PC)', not pg.errors and not [l for l in logs if 'Shader' in l or 'WebGLProgram' in l], (pg.errors[:3], logs[:3]))
     b.close()
 
-    # the single file has the pictures inside (no textures.json next to it)
+    # the single file has the pictures inside (no lib/ next to it)
     single = os.path.join(ROOT, 'dist', 'house-planner.html')
     if os.path.exists(single):
         b2 = p.chromium.launch(args=GL)
@@ -98,12 +98,12 @@ with sync_playwright() as p:
         errs = []
         pg2.on('pageerror', lambda e: errs.append(str(e)))
         pg2.goto('file://' + single); pg2.wait_for_function(READY, timeout=60000)
-        check('the single file: the pictures are inside (works opened from the device, no textures.json)', pg2.evaluate("() => Object.keys(window.__hp.TEXLIB.data.sets).length") == 25 and not errs, errs[:2])
+        check('the single file: the pictures are inside (works opened from the device, no library)', pg2.evaluate("() => Object.keys(window.__hp.TEXLIB.data.sets).length") == 25 and not errs, errs[:2])
         b2.close()
     web = os.path.join(ROOT, 'dist', 'web')
     if os.path.isdir(web):
         sw = open(os.path.join(web, 'sw.js')).read()
-        check('the web version: textures.json next to index.html, kept offline by the service worker', os.path.exists(os.path.join(web, 'textures.json')) and './textures.json' in sw and 'TEXLIB_DATA = null' in open(os.path.join(web, 'index.html')).read()[:200000] or 'TEXLIB_DATA = null' in open(os.path.join(web, 'index.html')).read())
+        check('the web version: the pictures in lib/ next to index.html (the app keeps them on the device), not inside the page', os.path.exists(os.path.join(web, 'lib', 'library.json')) and 'TEXLIB_DATA = null' in open(os.path.join(web, 'index.html')).read())
 
     # ───────── phone (dark) ─────────
     b, pg = open_app(p, phone=True, theme='dark')

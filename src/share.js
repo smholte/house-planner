@@ -106,6 +106,8 @@ Object.assign(app, {
     const data = await this.buildViewerData(p, o);
     const base = slugify(p.name) + '_' + t('viewer') + '_' + todayStamp();
     if (format === 'json') return { name: base + '.house.json', blob: new Blob([JSON.stringify(data)], { type: 'application/json' }) };
+    // (made from the web version: the furniture models' geometry is in its library – the copy gets it inside)
+    await modelPackB64();
     return { name: base + '.html', blob: new Blob([viewerPage(data)], { type: 'text/html' }) };
   },
 
@@ -241,6 +243,7 @@ function viewerPage(data) {
  *  copy for viewing has no documents; they would only make it big and carry your drawings along unseen). build.py puts
  *  them between these two marks; HOUSE.viewerStub takes their place. */
 function viewerScript(src) {
+  if (MODELS.packB64) src = src.replace('const MODEL_LIB_BLOB = null;', () => "const MODEL_LIB_BLOB = '" + MODELS.packB64 + "';");
   const bar = '─'.repeat(9), a = '/* ' + bar + ' the big files of the house ' + bar + ' */', z = '/* ' + bar + ' end of the big files of the house ' + bar + ' */';
   const i = src.indexOf(a), j = i < 0 ? -1 : src.indexOf(z, i);
   return i < 0 || j < 0 ? src : src.slice(0, i) + HOUSE.viewerStub + src.slice(j + z.length);

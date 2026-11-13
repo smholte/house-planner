@@ -9,15 +9,16 @@ which brick, the brick's own light and dark) – the app colours it (texlib.js).
 also the metalness; its size in metres (how much of a wall, floor or garden one picture covers); for floors laid in
 planks or tiles where one plank or tile may be cut from it ("pieces": rows of planks between their joints, the cells of a
 tile grid, or squares without a joint). The skies (Poly Haven, CC0) are made smaller (1024 × 512, Radiance .hdr without run-length coding, gzip + base64).
-The source pictures come from ambientcg.com (CC0) – the ids below – and are not kept in the source zip (≈ 200 MB);
-build/textures.json is. """
+The source pictures come from ambientcg.com (CC0) – the ids below – and are not kept in the source zip (≈ 200 MB).
+Since task 0009 the result goes into the asset library (build/library/, tools/build-library.py); then make its KTX2
+copies: python3 tools/build-library.py --gpu """
 import base64, io, json, os, sys
 import numpy as np
 from PIL import Image
 
 SRC = sys.argv[1]
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, 'build', 'textures.json')
+OUT = os.path.join(ROOT, 'dist', 'textures.json')   # (a copy; the library is what the app uses)
 
 # id: size (m) of one picture, and what can be cut out of it
 SETS = {
@@ -209,6 +210,12 @@ if len(sys.argv) >= 4:
         print(f"sky {key}: {size} {len(b64) / 1024:.0f} KB")
 
 out = {'v': 1, 'source': 'ambientCG (CC0): ambientcg.com; skies: Poly Haven (CC0): polyhaven.com', 'sets': sets, 'skies': skies}
+os.makedirs(os.path.dirname(OUT), exist_ok=True)
 with open(OUT, 'w') as f:
     json.dump(out, f, separators=(',', ':'))
 print('written', OUT, f'{os.path.getsize(OUT) / 1024 / 1024:.1f} MB')
+import importlib.util
+_spec = importlib.util.spec_from_file_location('build_library', os.path.join(ROOT, 'tools', 'build-library.py'))
+BL = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(BL)
+BL.import_textures(out)
+print('into the library: build/library (now: python3 tools/build-library.py --gpu)')

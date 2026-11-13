@@ -1,6 +1,8 @@
-/* House Planner service worker: keeps the app available offline. Your data is not here; it lives in IndexedDB. */
+/* House Planner service worker: keeps the app available offline. Your data is not here; it lives in IndexedDB.
+   The asset library (lib/, task 0009) is left alone: the app keeps what it fetched from there in its own database
+   (house-planner-lib), so a new version of the app does not download the pictures and models again. */
 const CACHE = 'hp-__VERSION__';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './textures.json'];
+const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });
@@ -16,6 +18,7 @@ self.addEventListener('fetch', e => {
   const same = url.origin === self.location.origin;
   const cdn = url.hostname === 'cdnjs.cloudflare.com';   // pdf.js, only loaded when a PDF is imported
   if (!same && !cdn) return;
+  if (same && url.pathname.startsWith(new URL('lib/', self.registration.scope).pathname)) return;
   e.respondWith(caches.open(CACHE).then(async cache => {
     const key = req.mode === 'navigate' ? './index.html' : req;
     const cached = await cache.match(key, { ignoreSearch: same });

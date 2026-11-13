@@ -940,6 +940,7 @@ Object.assign(app, {
       this.pipSettings(),
       this.qualitySettings ? this.qualitySettings() : null,
       this.walkSettings(),
+      h('div', { class: 'field', id: 'set-library' }, h('span', { class: 'flabel' }, t('Library')), this.librarySettings()),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, 'Storage'),
         h('p', null, DB.memory ? 'This browser does not allow the app to store data here. Use Export to keep your work.' :
           (persisted ? 'Your houses are stored on this device and protected from automatic clean-up.' : 'Your houses are stored on this device. The browser may clear site data when the device runs out of space, so export a copy now and then.') + (est && est.usage != null ? ` Using ${fmtBytes(est.usage)}.` : '')),
@@ -949,6 +950,47 @@ Object.assign(app, {
         h('p', null, 'House Planner works offline. Nothing is uploaded: your data only leaves this device when you export a file.'),
         h('p', { class: 'note-muted' }, 'Built with three.js (MIT) and pdf.js (Apache 2.0). 3D furniture models: Furniture Kit by Kenney (www.kenney.nl), CC0. Font: Barlow (OFL).')));
     await UI.dialog({ title: 'Settings', body, actions: [{ label: 'Done', value: null, kind: 'primary' }] });
+  },
+
+  /** Settings → Library (task 0009): what of the asset library is on this device, Load library… (a library zip: the
+   *  single file's way to get it), Remove */
+  librarySettings() {
+    const box = h('div', { class: 'lib-settings', style: { display: 'grid', gap: '8px' } });
+    const fill = async () => {
+      let st = [];
+      try { st = await libStatus(); } catch (e) { /* none */ }
+      const lines = [];
+      if (!st.length) lines.push(h('p', { class: 'lib-status' }, libHosted()
+        ? t('The library is loaded from the web address as it is needed.')
+        : t('Built-in pictures only. The library (sharper skies, more pictures and models) is not on this device: load it from the library zip of a release.')));
+      for (const l of st) {
+        const what = l.name === 'public' ? t('Public library') : t('Your library');
+        lines.push(h('div', { class: 'row-inline lib-row', 'data-lib': l.name, style: { justifyContent: 'space-between', gap: '8px' } },
+          h('p', { class: 'lib-status' }, what + ': ' + t('{n} items ({s} picture sets, {m} models)', { n: l.items, s: l.sets, m: l.models }) + ' · ' +
+            (l.from === 'web' ? t('{a} of {b} on this device, the rest when it is needed', { a: fmtBytes(l.have), b: fmtBytes(l.total) }) : t('{a} on this device', { a: fmtBytes(l.have) }))),
+          h('button', { class: 'btn sm ghost', onclick: async () => {
+            if (!await UI.confirm({ title: t('Remove the library from this device?'), message: t('Your houses stay as they are. Models of the library show as plain boxes until you load it again.'), confirmLabel: t('Remove') })) return;
+            await libRemove(l.name); libAfterLoad(); fill();
+          } }, icon('trash'), t('Remove'))));
+      }
+      const inp = h('input', { type: 'file', accept: '.zip,application/zip', style: { display: 'none' }, id: 'lib-file' });
+      const prog = h('p', { class: 'note-muted lib-progress' });
+      inp.addEventListener('change', async () => {
+        const file = inp.files && inp.files[0];
+        if (!file) return;
+        try {
+          const r = await libLoadZip(file, (a, b) => { prog.textContent = t('Reading the library… {a} of {b}', { a, b }); });
+          prog.textContent = '';
+          this.toast(t('Library loaded: {n} items, {b}.', { n: r.items, b: fmtBytes(r.bytes) }));
+          libAfterLoad();
+        } catch (e) { prog.textContent = ''; UI.dialog({ title: t('The library could not be loaded'), body: h('p', null, e.message || String(e)) }); }
+        fill();
+      });
+      box.replaceChildren(...lines, h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'lib-load', onclick: () => inp.click() }, icon('upload'), t('Load library…'))), inp, prog,
+        h('p', { class: 'note-muted' }, t('Pictures and models outside the app file, kept on this device once. Your houses never depend on it: what is not here shows plainer.')));
+    };
+    fill();
+    return box;
   },
 
   /** Settings: looking around with the mouse while walking */

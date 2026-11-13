@@ -1,0 +1,2182 @@
+{
+ "v": 1,
+ "kind": "house-planner-library",
+ "name": "public",
+ "source": "ambientCG (CC0): ambientcg.com; skies: Poly Haven (CC0): polyhaven.com",
+ "items": [
+  {
+   "id": "Asphalt033",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 2.5,
+    "avg": [
+     0.338,
+     0.321,
+     0.281
+    ],
+    "roughAvg": 0.745
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Asphalt033.color.512.36af6b778666.jpg",
+      "b": 24118
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Asphalt033.normal.512.b87f8a5baf97.jpg",
+      "b": 62907
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Asphalt033.rough.256.a7f16d9b1949.jpg",
+      "b": 5496
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Asphalt033.color.512.63f285abb644.ktx2",
+      "b": 47726,
+      "from": "tex/Asphalt033.color.512.36af6b778666.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Asphalt033.normal.512.42f9ebcbaa8a.ktx2",
+      "b": 325719,
+      "from": "tex/Asphalt033.normal.512.b87f8a5baf97.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Asphalt033.rough.256.29a4d90ef445.ktx2",
+      "b": 12259,
+      "from": "tex/Asphalt033.rough.256.a7f16d9b1949.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Bark012",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 0.8,
+    "avg": [
+     0.541,
+     0.476,
+     0.316
+    ],
+    "roughAvg": 0.674
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Bark012.color.512.d77e7392bd51.jpg",
+      "b": 79671
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Bark012.normal.512.d54b8b328ae3.jpg",
+      "b": 122894
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Bark012.rough.256.114575750154.jpg",
+      "b": 16450
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Bark012.color.512.a69b0b3f0476.ktx2",
+      "b": 63320,
+      "from": "tex/Bark012.color.512.d77e7392bd51.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Bark012.normal.512.38c16fc8d6a4.ktx2",
+      "b": 340527,
+      "from": "tex/Bark012.normal.512.d54b8b328ae3.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Bark012.rough.256.7f06b99b6836.ktx2",
+      "b": 15654,
+      "from": "tex/Bark012.rough.256.114575750154.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Carpet003",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.0,
+    "avg": [
+     0.637,
+     0.642,
+     0.647
+    ],
+    "roughAvg": 0.872,
+    "grid": 8
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Carpet003.color.512.de63d785591a.jpg",
+      "b": 63980
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Carpet003.normal.512.a9995b56bf7c.jpg",
+      "b": 58545
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Carpet003.rough.256.e7cdf6e4ec8a.jpg",
+      "b": 1442
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Carpet003.color.512.0d0a3946c58a.ktx2",
+      "b": 59684,
+      "from": "tex/Carpet003.color.512.de63d785591a.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Carpet003.normal.512.32b4bdcd4d59.ktx2",
+      "b": 319867,
+      "from": "tex/Carpet003.normal.512.a9995b56bf7c.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Carpet003.rough.256.68b4b52340f0.ktx2",
+      "b": 3139,
+      "from": "tex/Carpet003.rough.256.e7cdf6e4ec8a.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Concrete014",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 2.4,
+    "avg": [
+     0.408,
+     0.429,
+     0.435
+    ],
+    "roughAvg": 0.781
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Concrete014.color.512.ea1fc03b1dc0.jpg",
+      "b": 32306
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Concrete014.normal.512.373330f00be0.jpg",
+      "b": 63965
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Concrete014.rough.256.62174a4edd90.jpg",
+      "b": 7940
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Concrete014.color.512.4b2a72dd89fa.ktx2",
+      "b": 51301,
+      "from": "tex/Concrete014.color.512.ea1fc03b1dc0.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Concrete014.normal.512.a801bc48b9b2.ktx2",
+      "b": 333177,
+      "from": "tex/Concrete014.normal.512.373330f00be0.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Concrete014.rough.256.41032934562b.ktx2",
+      "b": 13978,
+      "from": "tex/Concrete014.rough.256.62174a4edd90.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Concrete016",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 2.4,
+    "avg": [
+     0.493,
+     0.513,
+     0.529
+    ],
+    "roughAvg": 0.627
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Concrete016.color.512.cbfbcdb72eb5.jpg",
+      "b": 20369
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Concrete016.normal.512.15c30df30886.jpg",
+      "b": 55147
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Concrete016.rough.256.2525d86cb66b.jpg",
+      "b": 5613
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Concrete016.color.512.5835c10130a1.ktx2",
+      "b": 43689,
+      "from": "tex/Concrete016.color.512.cbfbcdb72eb5.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Concrete016.normal.512.6f602c527d92.ktx2",
+      "b": 326998,
+      "from": "tex/Concrete016.normal.512.15c30df30886.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Concrete016.rough.256.c18847db1ef0.ktx2",
+      "b": 12355,
+      "from": "tex/Concrete016.rough.256.2525d86cb66b.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Concrete034",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": [
+     2.0,
+     1.0
+    ],
+    "avg": [
+     0.723,
+     0.723,
+     0.723
+    ],
+    "roughAvg": 0.516
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Concrete034.color.512.321ec09fe1d4.jpg",
+      "b": 12456
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Concrete034.normal.512.186e3b4f6647.jpg",
+      "b": 24567
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Concrete034.rough.256.0da6c55663d5.jpg",
+      "b": 3919
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Concrete034.color.512.e5c1302e90c3.ktx2",
+      "b": 24385,
+      "from": "tex/Concrete034.color.512.321ec09fe1d4.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Concrete034.normal.512.f2e46bdf3a8d.ktx2",
+      "b": 158610,
+      "from": "tex/Concrete034.normal.512.186e3b4f6647.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Concrete034.rough.256.b948a2f16164.ktx2",
+      "b": 6903,
+      "from": "tex/Concrete034.rough.256.0da6c55663d5.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Fabric028",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 0.6,
+    "avg": [
+     0.452,
+     0.436,
+     0.37
+    ],
+    "roughAvg": 0.679
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Fabric028.color.512.895e51324b58.jpg",
+      "b": 68777
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Fabric028.normal.512.69bcbf2111e4.jpg",
+      "b": 57022
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Fabric028.rough.256.3791747a693d.jpg",
+      "b": 8503
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Fabric028.color.512.7a07a79677b6.ktx2",
+      "b": 56899,
+      "from": "tex/Fabric028.color.512.895e51324b58.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Fabric028.normal.512.929df634fd2f.ktx2",
+      "b": 254908,
+      "from": "tex/Fabric028.normal.512.69bcbf2111e4.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Fabric028.rough.256.a9f38a291764.ktx2",
+      "b": 13901,
+      "from": "tex/Fabric028.rough.256.3791747a693d.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Grass005",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 2.0,
+    "avg": [
+     0.398,
+     0.517,
+     0.171
+    ],
+    "roughAvg": 0.702
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Grass005.color.512.37d3ddb557f1.jpg",
+      "b": 66703
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Grass005.normal.512.b1d4104e296f.jpg",
+      "b": 67557
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Grass005.rough.256.653856bdcc48.jpg",
+      "b": 13888
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Grass005.color.512.0c496729f0bd.ktx2",
+      "b": 60332,
+      "from": "tex/Grass005.color.512.37d3ddb557f1.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Grass005.normal.512.d199b0a04cbb.ktx2",
+      "b": 334699,
+      "from": "tex/Grass005.normal.512.b1d4104e296f.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Grass005.rough.256.c9e383450930.ktx2",
+      "b": 15349,
+      "from": "tex/Grass005.rough.256.653856bdcc48.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Ground048",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.5,
+    "avg": [
+     0.329,
+     0.244,
+     0.2
+    ],
+    "roughAvg": 0.669
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Ground048.color.512.34100d9085dc.jpg",
+      "b": 84389
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Ground048.normal.512.9669d01428f1.jpg",
+      "b": 100307
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Ground048.rough.256.55f32296d2ec.jpg",
+      "b": 9978
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Ground048.color.512.ea7a5d53adc6.ktx2",
+      "b": 62720,
+      "from": "tex/Ground048.color.512.34100d9085dc.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Ground048.normal.512.c3e601c536ee.ktx2",
+      "b": 340465,
+      "from": "tex/Ground048.normal.512.9669d01428f1.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Ground048.rough.256.dd191a98f149.ktx2",
+      "b": 14607,
+      "from": "tex/Ground048.rough.256.55f32296d2ec.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Ground062L",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.5,
+    "avg": [
+     0.641,
+     0.552,
+     0.419
+    ],
+    "roughAvg": 0.519
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Ground062L.color.512.737e7bbbca5d.jpg",
+      "b": 79526
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Ground062L.normal.512.0270fe71be67.jpg",
+      "b": 106016
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Ground062L.rough.256.158fdd37305f.jpg",
+      "b": 12721
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Ground062L.color.512.729972279dde.ktx2",
+      "b": 63406,
+      "from": "tex/Ground062L.color.512.737e7bbbca5d.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Ground062L.normal.512.d48d3cb37a10.ktx2",
+      "b": 340347,
+      "from": "tex/Ground062L.normal.512.0270fe71be67.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Ground062L.rough.256.eb3c7895ae71.ktx2",
+      "b": 15242,
+      "from": "tex/Ground062L.rough.256.158fdd37305f.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "HouseBrick",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com), laid as waalformaat by tools/brickkit.py",
+   "base": true,
+   "meta": {
+    "size": [
+     1.32,
+     1.25
+    ],
+    "brick": true,
+    "courses": 20,
+    "units": 12,
+    "roughAvg": 0.879
+   },
+   "maps": {
+    "kit": [
+     {
+      "px": 1024,
+      "f": "tex/HouseBrick.kit.1024.2b9d1a1f405d.png",
+      "b": 7733
+     }
+    ],
+    "detail": [
+     {
+      "px": 1024,
+      "f": "tex/HouseBrick.detail.1024.0de4075a05a0.jpg",
+      "b": 121863
+     }
+    ],
+    "normal": [
+     {
+      "px": 1024,
+      "f": "tex/HouseBrick.normal.1024.068fb493db52.jpg",
+      "b": 113954
+     }
+    ],
+    "rough": [
+     {
+      "px": 512,
+      "f": "tex/HouseBrick.rough.512.409b1fc4b3ef.jpg",
+      "b": 16082
+     }
+    ]
+   },
+   "gpu": {
+    "normal": [
+     {
+      "px": 1024,
+      "f": "gpu/HouseBrick.normal.1024.3e682c49a4d9.ktx2",
+      "b": 434542,
+      "from": "tex/HouseBrick.normal.1024.068fb493db52.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 512,
+      "f": "gpu/HouseBrick.rough.512.76bcc58d245f.ktx2",
+      "b": 15071,
+      "from": "tex/HouseBrick.rough.512.409b1fc4b3ef.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Marble021",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.2,
+    "avg": [
+     0.955,
+     0.95,
+     0.943
+    ],
+    "roughAvg": 0.116
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Marble021.color.512.003b43f04ec3.jpg",
+      "b": 34752
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Marble021.normal.512.0856e93e8763.jpg",
+      "b": 2104
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Marble021.rough.256.8c703c7c3467.jpg",
+      "b": 4229
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Marble021.color.512.2b27bbd1b701.ktx2",
+      "b": 53269,
+      "from": "tex/Marble021.color.512.003b43f04ec3.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Marble021.normal.512.023e7ac8753c.ktx2",
+      "b": 685,
+      "from": "tex/Marble021.normal.512.0856e93e8763.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Marble021.rough.256.793a22f5bbf7.ktx2",
+      "b": 10924,
+      "from": "tex/Marble021.rough.256.8c703c7c3467.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Metal028",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 0.5,
+    "avg": [
+     0.112,
+     0.129,
+     0.125
+    ],
+    "roughAvg": 0.298
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Metal028.color.512.c21b71ecb43a.jpg",
+      "b": 18618
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Metal028.normal.512.7ffa94b9fd1d.jpg",
+      "b": 13635
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Metal028.rough.256.1303b1a9f323.jpg",
+      "b": 6190
+     }
+    ],
+    "metal": [
+     {
+      "px": 256,
+      "f": "tex/Metal028.metal.256.74b6841007b6.jpg",
+      "b": 668
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Metal028.color.512.3a6c06d22fa7.ktx2",
+      "b": 43811,
+      "from": "tex/Metal028.color.512.c21b71ecb43a.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Metal028.normal.512.60b8aa15235e.ktx2",
+      "b": 150054,
+      "from": "tex/Metal028.normal.512.7ffa94b9fd1d.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Metal028.rough.256.40752de87eb1.ktx2",
+      "b": 12540,
+      "from": "tex/Metal028.rough.256.1303b1a9f323.jpg"
+     }
+    ],
+    "metal": [
+     {
+      "px": 256,
+      "f": "gpu/Metal028.metal.256.55ff0def0902.ktx2",
+      "b": 789,
+      "from": "tex/Metal028.metal.256.74b6841007b6.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Metal048A",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 0.5,
+    "avg": [
+     0.997,
+     0.891,
+     0.613
+    ],
+    "roughAvg": 0.09
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Metal048A.color.512.edd7fbc1d5b2.jpg",
+      "b": 6866
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Metal048A.normal.512.559a44056e01.jpg",
+      "b": 2230
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Metal048A.rough.256.8eca172de5ef.jpg",
+      "b": 1042
+     }
+    ],
+    "metal": [
+     {
+      "px": 256,
+      "f": "tex/Metal048A.metal.256.0584c1461d1a.jpg",
+      "b": 679
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Metal048A.color.512.e6cae48fea48.ktx2",
+      "b": 8037,
+      "from": "tex/Metal048A.color.512.edd7fbc1d5b2.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Metal048A.normal.512.023e7ac8753c.ktx2",
+      "b": 685,
+      "from": "tex/Metal048A.normal.512.559a44056e01.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Metal048A.rough.256.3f6df903b2fa.ktx2",
+      "b": 2329,
+      "from": "tex/Metal048A.rough.256.8eca172de5ef.jpg"
+     }
+    ],
+    "metal": [
+     {
+      "px": 256,
+      "f": "gpu/Metal048A.metal.256.dec378466074.ktx2",
+      "b": 869,
+      "from": "tex/Metal048A.metal.256.0584c1461d1a.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Planks026A",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.6,
+    "avg": [
+     0.59,
+     0.481,
+     0.314
+    ],
+    "roughAvg": 0.849
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Planks026A.color.512.04e5fbb7f4c0.jpg",
+      "b": 45527
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Planks026A.normal.512.5b9cd0eed566.jpg",
+      "b": 48686
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Planks026A.rough.256.d585bb1350de.jpg",
+      "b": 4784
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Planks026A.color.512.f98034616da7.ktx2",
+      "b": 55887,
+      "from": "tex/Planks026A.color.512.04e5fbb7f4c0.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Planks026A.normal.512.5614511989a7.ktx2",
+      "b": 269177,
+      "from": "tex/Planks026A.normal.512.5b9cd0eed566.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Planks026A.rough.256.5ea2d98addfd.ktx2",
+      "b": 11252,
+      "from": "tex/Planks026A.rough.256.d585bb1350de.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "RoofingTiles013A",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 3.2,
+    "avg": [
+     0.194,
+     0.19,
+     0.21
+    ],
+    "roughAvg": 0.5
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/RoofingTiles013A.color.512.74984e30b19e.jpg",
+      "b": 14520
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/RoofingTiles013A.normal.512.9440b1d45f3f.jpg",
+      "b": 45673
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/RoofingTiles013A.rough.256.93254dd2f11f.jpg",
+      "b": 10035
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/RoofingTiles013A.color.512.f633d793344b.ktx2",
+      "b": 36997,
+      "from": "tex/RoofingTiles013A.color.512.74984e30b19e.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/RoofingTiles013A.normal.512.7f77b6ee8994.ktx2",
+      "b": 260643,
+      "from": "tex/RoofingTiles013A.normal.512.9440b1d45f3f.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/RoofingTiles013A.rough.256.b44f21b25ca9.ktx2",
+      "b": 14837,
+      "from": "tex/RoofingTiles013A.rough.256.93254dd2f11f.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Tiles049",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 2.0,
+    "avg": [
+     0.648,
+     0.59,
+     0.509
+    ],
+    "roughAvg": 0.561
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Tiles049.color.512.77dc367dab2b.jpg",
+      "b": 39890
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Tiles049.normal.512.9626697a9eda.jpg",
+      "b": 68806
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Tiles049.rough.256.b396ed0a925e.jpg",
+      "b": 7764
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Tiles049.color.512.15f420abe458.ktx2",
+      "b": 51838,
+      "from": "tex/Tiles049.color.512.77dc367dab2b.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Tiles049.normal.512.faf9f87d9925.ktx2",
+      "b": 320815,
+      "from": "tex/Tiles049.normal.512.9626697a9eda.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Tiles049.rough.256.3911babf56e9.ktx2",
+      "b": 13822,
+      "from": "tex/Tiles049.rough.256.b396ed0a925e.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Tiles050",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 4.2,
+    "avg": [
+     0.421,
+     0.406,
+     0.405
+    ],
+    "roughAvg": 0.558,
+    "squares": [
+     [
+      0.1719,
+      0.0078,
+      0.3145,
+      0.1504
+     ],
+     [
+      0.3047,
+      0.1719,
+      0.4473,
+      0.3145
+     ],
+     [
+      0.7266,
+      0.1719,
+      0.8691,
+      0.3145
+     ],
+     [
+      0.7266,
+      0.2734,
+      0.8691,
+      0.416
+     ],
+     [
+      0.5469,
+      0.2891,
+      0.6895,
+      0.4316
+     ],
+     [
+      0.7266,
+      0.375,
+      0.8691,
+      0.5176
+     ],
+     [
+      0.3047,
+      0.3828,
+      0.4473,
+      0.5254
+     ],
+     [
+      0.7109,
+      0.5625,
+      0.8535,
+      0.7051
+     ],
+     [
+      0.7109,
+      0.6641,
+      0.8535,
+      0.8066
+     ],
+     [
+      0.1641,
+      0.8125,
+      0.3066,
+      0.9551
+     ],
+     [
+      0.6328,
+      0.8125,
+      0.7754,
+      0.9551
+     ]
+    ]
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 1024,
+      "f": "tex/Tiles050.color.1024.e1ec612acb9e.jpg",
+      "b": 161337
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Tiles050.normal.512.a2b8e309f2b8.jpg",
+      "b": 64512
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Tiles050.rough.256.b6b858c53396.jpg",
+      "b": 7736
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 1024,
+      "f": "gpu/Tiles050.color.1024.2967371176ad.ktx2",
+      "b": 185176,
+      "from": "tex/Tiles050.color.1024.e1ec612acb9e.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Tiles050.normal.512.e3fc4d9cc7d5.ktx2",
+      "b": 326250,
+      "from": "tex/Tiles050.normal.512.a2b8e309f2b8.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Tiles050.rough.256.948bbea2f818.ktx2",
+      "b": 13921,
+      "from": "tex/Tiles050.rough.256.b6b858c53396.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Tiles052",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.6,
+    "avg": [
+     0.104,
+     0.105,
+     0.11
+    ],
+    "roughAvg": 0.557,
+    "grid": 8
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Tiles052.color.512.0513a343d6a0.jpg",
+      "b": 45669
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Tiles052.normal.512.8f8c906bfb19.jpg",
+      "b": 66394
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Tiles052.rough.256.a5730eb5c333.jpg",
+      "b": 10359
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Tiles052.color.512.0d4178f310ca.ktx2",
+      "b": 53539,
+      "from": "tex/Tiles052.color.512.0513a343d6a0.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Tiles052.normal.512.bb4eed27b77d.ktx2",
+      "b": 321828,
+      "from": "tex/Tiles052.normal.512.8f8c906bfb19.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Tiles052.rough.256.8a0e7634646c.ktx2",
+      "b": 15153,
+      "from": "tex/Tiles052.rough.256.a5730eb5c333.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Tiles107",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.6,
+    "avg": [
+     0.972,
+     0.972,
+     0.971
+    ],
+    "roughAvg": 0.054,
+    "grid": 8
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Tiles107.color.512.41706c6f8170.jpg",
+      "b": 21606
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Tiles107.normal.512.08eb89f6f997.jpg",
+      "b": 31348
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Tiles107.rough.256.aa50f799d74a.jpg",
+      "b": 9354
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Tiles107.color.512.bbd84eaae1eb.ktx2",
+      "b": 15350,
+      "from": "tex/Tiles107.color.512.41706c6f8170.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Tiles107.normal.512.bb94074b985c.ktx2",
+      "b": 208180,
+      "from": "tex/Tiles107.normal.512.08eb89f6f997.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Tiles107.rough.256.3c5253ebcd3c.ktx2",
+      "b": 7873,
+      "from": "tex/Tiles107.rough.256.aa50f799d74a.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Wood012",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": [
+     1.0,
+     0.5
+    ],
+    "avg": [
+     0.472,
+     0.478,
+     0.5
+    ],
+    "roughAvg": 0.549
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Wood012.color.512.4dfa3026d0d6.jpg",
+      "b": 24432
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Wood012.normal.512.011614891b16.jpg",
+      "b": 44408
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Wood012.rough.256.5eddb22a75b4.jpg",
+      "b": 8147
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Wood012.color.512.0b8b0fb4806c.ktx2",
+      "b": 30199,
+      "from": "tex/Wood012.color.512.4dfa3026d0d6.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Wood012.normal.512.c2320764d01b.ktx2",
+      "b": 156383,
+      "from": "tex/Wood012.normal.512.011614891b16.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Wood012.rough.256.f8fc2d19a457.ktx2",
+      "b": 7964,
+      "from": "tex/Wood012.rough.256.5eddb22a75b4.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Wood048",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.0,
+    "avg": [
+     0.69,
+     0.564,
+     0.397
+    ],
+    "roughAvg": 0.552
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Wood048.color.512.0f470a3ce367.jpg",
+      "b": 49387
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Wood048.normal.512.d41f6cb383a6.jpg",
+      "b": 42766
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Wood048.rough.256.6faf132767b6.jpg",
+      "b": 7976
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Wood048.color.512.59603707f94a.ktx2",
+      "b": 54954,
+      "from": "tex/Wood048.color.512.0f470a3ce367.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Wood048.normal.512.7fee663c01e2.ktx2",
+      "b": 281494,
+      "from": "tex/Wood048.normal.512.d41f6cb383a6.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Wood048.rough.256.904ac503bab9.ktx2",
+      "b": 12466,
+      "from": "tex/Wood048.rough.256.6faf132767b6.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Wood050",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.0,
+    "avg": [
+     0.834,
+     0.636,
+     0.492
+    ],
+    "roughAvg": 0.549
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Wood050.color.512.2b4ec2e557bc.jpg",
+      "b": 40207
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Wood050.normal.512.2746100f7cf7.jpg",
+      "b": 41916
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Wood050.rough.256.19ae5f30fa36.jpg",
+      "b": 7829
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Wood050.color.512.a84f3b9e8c0e.ktx2",
+      "b": 52058,
+      "from": "tex/Wood050.color.512.2b4ec2e557bc.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Wood050.normal.512.2cd7b2643f7c.ktx2",
+      "b": 278395,
+      "from": "tex/Wood050.normal.512.2746100f7cf7.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Wood050.rough.256.5458209eba27.ktx2",
+      "b": 12222,
+      "from": "tex/Wood050.rough.256.19ae5f30fa36.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "Wood078",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.4,
+    "avg": [
+     0.717,
+     0.452,
+     0.28
+    ],
+    "roughAvg": 0.674
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/Wood078.color.512.3be13ae3b235.jpg",
+      "b": 39918
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/Wood078.normal.512.931b9af067e8.jpg",
+      "b": 69957
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/Wood078.rough.256.6d650dcc77f9.jpg",
+      "b": 7141
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/Wood078.color.512.cc1c45d4ab3b.ktx2",
+      "b": 53101,
+      "from": "tex/Wood078.color.512.3be13ae3b235.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/Wood078.normal.512.0526492052e5.ktx2",
+      "b": 314125,
+      "from": "tex/Wood078.normal.512.931b9af067e8.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/Wood078.rough.256.98dda41f7b8d.ktx2",
+      "b": 12690,
+      "from": "tex/Wood078.rough.256.6d650dcc77f9.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "WoodFloor051",
+   "kind": "tex",
+   "licence": "CC0",
+   "source": "ambientCG (ambientcg.com)",
+   "base": true,
+   "meta": {
+    "size": 1.8,
+    "avg": [
+     0.607,
+     0.481,
+     0.367
+    ],
+    "roughAvg": 0.352,
+    "strips": [
+     [
+      0.084,
+      0.0029,
+      0.3262,
+      0.0381
+     ],
+     [
+      0.334,
+      0.0029,
+      0.5762,
+      0.0381
+     ],
+     [
+      0.584,
+      0.0029,
+      0.8262,
+      0.0381
+     ],
+     [
+      0.834,
+      0.0029,
+      0.9961,
+      0.0381
+     ],
+     [
+      0.0039,
+      0.0439,
+      0.1387,
+      0.0781
+     ],
+     [
+      0.1465,
+      0.0439,
+      0.3887,
+      0.0781
+     ],
+     [
+      0.3965,
+      0.0439,
+      0.6387,
+      0.0781
+     ],
+     [
+      0.6465,
+      0.0439,
+      0.8887,
+      0.0781
+     ],
+     [
+      0.0039,
+      0.084,
+      0.2197,
+      0.1211
+     ],
+     [
+      0.2275,
+      0.084,
+      0.4697,
+      0.1211
+     ],
+     [
+      0.4775,
+      0.084,
+      0.7197,
+      0.1211
+     ],
+     [
+      0.7275,
+      0.084,
+      0.9697,
+      0.1211
+     ],
+     [
+      0.0039,
+      0.127,
+      0.2158,
+      0.1631
+     ],
+     [
+      0.2236,
+      0.127,
+      0.4658,
+      0.1631
+     ],
+     [
+      0.4736,
+      0.127,
+      0.7158,
+      0.1631
+     ],
+     [
+      0.7236,
+      0.127,
+      0.9658,
+      0.1631
+     ],
+     [
+      0.0039,
+      0.252,
+      0.21,
+      0.2881
+     ],
+     [
+      0.2178,
+      0.252,
+      0.46,
+      0.2881
+     ],
+     [
+      0.4678,
+      0.252,
+      0.7109,
+      0.2881
+     ],
+     [
+      0.7188,
+      0.252,
+      0.96,
+      0.2881
+     ],
+     [
+      0.0039,
+      0.335,
+      0.168,
+      0.3711
+     ],
+     [
+      0.1758,
+      0.335,
+      0.418,
+      0.3711
+     ],
+     [
+      0.4258,
+      0.335,
+      0.668,
+      0.3711
+     ],
+     [
+      0.6758,
+      0.335,
+      0.918,
+      0.3711
+     ],
+     [
+      0.123,
+      0.377,
+      0.3652,
+      0.4131
+     ],
+     [
+      0.373,
+      0.377,
+      0.6152,
+      0.4131
+     ],
+     [
+      0.623,
+      0.377,
+      0.8652,
+      0.4131
+     ],
+     [
+      0.0039,
+      0.4189,
+      0.2236,
+      0.4541
+     ],
+     [
+      0.2314,
+      0.4189,
+      0.4736,
+      0.4541
+     ],
+     [
+      0.4814,
+      0.4189,
+      0.7236,
+      0.4541
+     ],
+     [
+      0.7314,
+      0.4189,
+      0.9736,
+      0.4541
+     ],
+     [
+      0.0039,
+      0.46,
+      0.1445,
+      0.4961
+     ],
+     [
+      0.1523,
+      0.46,
+      0.3945,
+      0.4961
+     ],
+     [
+      0.4023,
+      0.46,
+      0.6445,
+      0.4961
+     ],
+     [
+      0.6523,
+      0.46,
+      0.8945,
+      0.4961
+     ],
+     [
+      0.0527,
+      0.502,
+      0.2949,
+      0.5381
+     ],
+     [
+      0.3027,
+      0.502,
+      0.5449,
+      0.5381
+     ],
+     [
+      0.5527,
+      0.502,
+      0.7949,
+      0.5381
+     ],
+     [
+      0.8027,
+      0.502,
+      0.9961,
+      0.5381
+     ],
+     [
+      0.084,
+      0.627,
+      0.3262,
+      0.6631
+     ],
+     [
+      0.334,
+      0.627,
+      0.5762,
+      0.6631
+     ],
+     [
+      0.584,
+      0.627,
+      0.8262,
+      0.6631
+     ],
+     [
+      0.834,
+      0.627,
+      0.9961,
+      0.6631
+     ],
+     [
+      0.1064,
+      0.6689,
+      0.3486,
+      0.7031
+     ],
+     [
+      0.3564,
+      0.6689,
+      0.5986,
+      0.7031
+     ],
+     [
+      0.6064,
+      0.6689,
+      0.8486,
+      0.7031
+     ],
+     [
+      0.8564,
+      0.6689,
+      0.9961,
+      0.7031
+     ],
+     [
+      0.0439,
+      0.709,
+      0.2861,
+      0.7461
+     ],
+     [
+      0.2939,
+      0.709,
+      0.5361,
+      0.7461
+     ],
+     [
+      0.5439,
+      0.709,
+      0.7861,
+      0.7461
+     ],
+     [
+      0.7939,
+      0.709,
+      0.9961,
+      0.7461
+     ],
+     [
+      0.0234,
+      0.752,
+      0.2656,
+      0.7881
+     ],
+     [
+      0.2734,
+      0.752,
+      0.5156,
+      0.7881
+     ],
+     [
+      0.5234,
+      0.752,
+      0.7656,
+      0.7881
+     ],
+     [
+      0.7734,
+      0.752,
+      0.9961,
+      0.7881
+     ],
+     [
+      0.0039,
+      0.7939,
+      0.1367,
+      0.8291
+     ],
+     [
+      0.1445,
+      0.7939,
+      0.3867,
+      0.8291
+     ],
+     [
+      0.3945,
+      0.7939,
+      0.6367,
+      0.8291
+     ],
+     [
+      0.6445,
+      0.7939,
+      0.8867,
+      0.8291
+     ],
+     [
+      0.0059,
+      0.835,
+      0.248,
+      0.8711
+     ],
+     [
+      0.2559,
+      0.835,
+      0.498,
+      0.8711
+     ],
+     [
+      0.5059,
+      0.835,
+      0.748,
+      0.8711
+     ],
+     [
+      0.7559,
+      0.835,
+      0.9961,
+      0.8711
+     ],
+     [
+      0.0225,
+      0.877,
+      0.2646,
+      0.9131
+     ],
+     [
+      0.2725,
+      0.877,
+      0.5146,
+      0.9131
+     ],
+     [
+      0.5225,
+      0.877,
+      0.7646,
+      0.9131
+     ],
+     [
+      0.7725,
+      0.877,
+      0.9961,
+      0.9131
+     ]
+    ]
+   },
+   "maps": {
+    "color": [
+     {
+      "px": 512,
+      "f": "tex/WoodFloor051.color.512.c042863662bd.jpg",
+      "b": 36287
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "tex/WoodFloor051.normal.512.7d4df65cdd38.jpg",
+      "b": 12116
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "tex/WoodFloor051.rough.256.20dfa72f903a.jpg",
+      "b": 6727
+     }
+    ]
+   },
+   "gpu": {
+    "color": [
+     {
+      "px": 512,
+      "f": "gpu/WoodFloor051.color.512.755737f7080a.ktx2",
+      "b": 51228,
+      "from": "tex/WoodFloor051.color.512.c042863662bd.jpg"
+     }
+    ],
+    "normal": [
+     {
+      "px": 512,
+      "f": "gpu/WoodFloor051.normal.512.ff0ab376d7ef.ktx2",
+      "b": 108618,
+      "from": "tex/WoodFloor051.normal.512.7d4df65cdd38.jpg"
+     }
+    ],
+    "rough": [
+     {
+      "px": 256,
+      "f": "gpu/WoodFloor051.rough.256.554374d7b2a2.ktx2",
+      "b": 12264,
+      "from": "tex/WoodFloor051.rough.256.20dfa72f903a.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "sky:day",
+   "kind": "sky",
+   "licence": "CC0",
+   "source": "Poly Haven (polyhaven.com)",
+   "base": true,
+   "files": [
+    {
+     "px": 1024,
+     "f": "sky/day.1024.51274fbe95c1.hdr.gz",
+     "b": 1089867
+    },
+    {
+     "px": 512,
+     "f": "sky/day.512.5c86920cabf9.hdr.gz",
+     "b": 319191
+    }
+   ]
+  },
+  {
+   "id": "sky:sunset",
+   "kind": "sky",
+   "licence": "CC0",
+   "source": "Poly Haven (polyhaven.com)",
+   "base": true,
+   "files": [
+    {
+     "px": 1024,
+     "f": "sky/sunset.1024.753f6b7414d8.hdr.gz",
+     "b": 1251077
+    },
+    {
+     "px": 512,
+     "f": "sky/sunset.512.b895e1ad4bd3.hdr.gz",
+     "b": 326776
+    }
+   ]
+  }
+ ]
+}

@@ -28,3 +28,6 @@ Language: Settings > Language (English, Nederlands, Norsk).
 Backups: the app reminds you once a week to export; on a PC with Chrome or Edge,
 Settings > Backup > Choose folder writes a copy after each change.
 The PDF reader for builder's drawings is built in and works offline.
+The folder lib/ is the asset library (material pictures, skies, furniture models): keep it next to index.html. The
+app takes from it what it needs and keeps it on the device. house-planner.html has today's pictures inside; it takes
+the whole library from house-planner-library.zip (Settings > Library > Load library...).

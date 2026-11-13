@@ -34,6 +34,8 @@ const app = new (class App extends Emitter {
     await DB.open();
     await Settings.load();
     this.settings = Settings.values;
+    // (the pictures were chosen before the settings were read: again, if they ask for other sizes – task 0009)
+    if (TEXLIB.ready) libUpgrade(); else if (window.__hp_texlib) window.__hp_texlib.then(ok => ok && libUpgrade());
     Settings.onSave = () => this.syncViewSettings();
     // language: English, Dutch or Norwegian (Settings); ?lang=nl in the address overrides it
     const ql = new URLSearchParams(location.search).get('lang');

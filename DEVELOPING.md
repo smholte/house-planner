@@ -356,7 +356,7 @@ Lengths are metres. Plan x to the right, y towards the back of the house.
                      256 (+ metalness), size in metres, avg colour; strips (planks between joints, from the normal
                      map), grid (tile cells), squares (parts without a joint, from the height map); the two skies
                      (Poly Haven, CC0) 1024 × 512 RGBE, gzip + base64. The source zips (≈ 200 MB) are not kept.
-                     build.py: inside the single file (TEXLIB_DATA); app folder and web get textures.json (sw.js keeps it).
+                     Since task 0009 its result goes into the asset library (build/library/, below), not textures.json.
     src/texlib.js    TEXLIB (decoded at start, then TEX/MAT/KMAT/FMAT cleared and 3D built again; TEXLIB.gen is in
                      reuse.js's whole-picture signature); libTex (a picture repeating at its size: one GPU texture per
                      picture, clones repeat), libDetail/libTintCanvas/libTintTex (the picture's light and dark, soft-light
@@ -633,3 +633,48 @@ Lengths are metres. Plan x to the right, y towards the back of the house.
                    public app, the web version or DEPLOY.md (asserted).
     tools/testhouse/  the made-up house: make_ifc.py (an IFC4 file, written by hand), make_pdf.py, build.mjs (the
                    app's own IFC import + versions, furniture, electrics, plot, garden, a PDF) → build/example.json.
+
+## The asset library (task 0009, 13 Nov 2026)
+
+    build/library/   the public library, committed: library.json (items: id, kind tex / sky, licence, source, base, meta,
+                     maps / gpu / files: [{ px, f, b }]) and its files, each named <id>.<map>.<px>.<sha256:12>.<ext> (a new
+                     picture is a new name: a device never keeps an old one). tex/ the 25 picture sets (as textures.json
+                     was), sky/ the two skies at 1024 and 512, gpu/ KTX2 copies of colour, relief, gloss, metal (ETC1S;
+                     relief UASTC + zstd; turned upside down – a compressed texture can't be flipped on upload).
+    tools/build-library.py  --import <textures.json> (build-textures.py calls it), --gpu (the KTX2 copies: node
+                     tools/lib-ktx2.mjs, npm ci --prefix tools), --check (whole, hashes, no stray file, licences CC0 /
+                     CC BY – ci_precheck.py runs it, and stray_models(): no .glb / .gltf outside it except tests/fixtures),
+                     words_in() (build.py: no house word in the web version's library, list and bytes).
+    tools/package.json  the node tools, pinned: ktx2-encoder + sharp (lib-ktx2.mjs), @gltf-transform + meshoptimizer
+                     (glb-pack.mjs: a house's models – dedup, prune, WebP pictures ≤ 1024 px, meshopt geometry, the
+                     top-view outline with src/outline.js).
+    build.py         make_lib(): build/library + 'pack:kenney' (the Kenney geometry, gzip) + 'code:basis' (the basis
+                     transcoder of three.js r187, for KTX2) + a house's models ('l:<file name>', private, from
+                     house/models/contents.csv; packed copies cached in dist/.glbcache) → lib/ of the app folder (named
+                     'house' when it has private models) and of the web version (always 'public': asserted no model, all
+                     CC0 / CC BY, no house word); dist/house-planner-library.zip = the app folder's lib/ (stored, not
+                     deflated). The single file: TEXLIB_DATA = the base sets at their smallest size and the skies at 512 as
+                     data URLs, MODEL_LIB_BLOB = the Kenney geometry; hosted: both null (MODEL_LIB keeps names, sizes,
+                     outlines and pack: 'pack:kenney'). Add-ons for it: utils/WorkerPool, libs/ktx-parse, libs/zstddec,
+                     math/ColorSpaces, loaders/KTX2Loader, libs/meshopt_decoder (a minified module's export block at the
+                     end of a line is read too; import.meta.url → location.href).
+    src/library.js   LIB: a second IndexedDB database, house-planner-lib (files: { f, blob }, libs: { name, man, from })
+                     – the houses' database is never touched. libraryInit (stored libraries; hosted: lib/library.json
+                     with cache 'no-cache', kept for offline, then files no list names are pruned), libItem, libPick
+                     (largest size ≤ asked, else the smallest), libWantPx / libWantGpu (app.settings.texSize, texGpu;
+                     safe pictures – libSafe – cap them at 512 / off), libBlob (device, else fetch lib/<f> and keep),
+                     libUrl, libGunzip, libLoadZip (the zip's central directory, file by file with File.slice; stored or
+                     deflated), libRemove, libStatus.
+    src/texlib.js    texlibInit: the single file's TEXLIB_DATA or (hosted) libBaseData – the base sets from the library
+                     at the size asked – decoded at start as before (TEXLIB.ready keeps its meaning); then libUpgrade
+                     (other sizes, the 1024 skies for the single file with a library), libLoadSet (sets not in the base:
+                     on a material's first ask), libGpuTex / libKtx2 (KTX2Loader with the library's transcoder via a
+                     LoadingManager URL modifier); texlibRefresh (old textures disposed after the views are rebuilt);
+                     texlibSettingsChanged (texSize / texGpu changed). TEXLIB.px / skyPx: the widths shown.
+    src/models.js    loadModelLib: MODEL_LIB_BLOB, else the library's pack; 'l:' models (libModelTemplate: GLB with
+                     meshopt via GLTFLoader.setMeshoptDecoder, unit box as your own models); missing: a plain box in the
+                     piece's colour (userData.libMissing), the panel's note (furnish.js .lib-missing), 2D: the box symbol.
+                     libAfterLoad (a library came or went). modelPackB64: a viewer copy made from a hosted version gets
+                     the Kenney geometry inside (share.js viewerScript).
+    src/sw.js        leaves lib/ alone (the app keeps it in house-planner-lib; a new app version doesn't fetch it again).
+    src/panels.js    Settings → Library (librarySettings: status per library, Load library…, Remove).

@@ -77,9 +77,14 @@ jobs:
           import os, re, sys, json, gzip, base64
           words = [w.strip() for w in os.environ['HP_SECRET_WORDS'].splitlines() if w.strip()]
           bad = []
-          for name in sorted(os.listdir('dist/web')):
-              data = open(os.path.join('dist/web', name), 'rb').read().decode('utf-8', 'replace')
-              bad += [f'{name}: a word of the house (number {i + 1} of the list)' for i, w in enumerate(words) if w in data]
+          # (every file, the asset library in lib/ too – task 0009)
+          for dp, _, fs in sorted(os.walk('dist/web')):
+              for n in sorted(fs):
+                  name = os.path.relpath(os.path.join(dp, n), 'dist/web')
+                  raw = open(os.path.join(dp, n), 'rb').read()
+                  bad += [f'{name}: a word of the house (number {i + 1} of the list)' for i, w in enumerate(words) if w.encode('utf-8') in raw or w.encode('utf-16-le') in raw]
+          lib = json.load(open('dist/web/lib/library.json', encoding='utf-8')) if os.path.exists('dist/web/lib/library.json') else {'items': []}
+          bad += [f"lib: {it['id']} is a model or private – not for the web version" for it in lib['items'] if it.get('private') or it.get('kind') == 'model']
           html = open('dist/web/index.html', encoding='utf-8').read()
           m = re.search(r"EXAMPLE_HOUSE = \{ projectGz: '([^']+)'", html)
           ex = json.loads(gzip.decompress(base64.b64decode(m.group(1)))) if m else {}

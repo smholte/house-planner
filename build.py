@@ -66,7 +66,11 @@ ADDONS = ['utils/BufferGeometryUtils.js', 'utils/SkeletonUtils.js', 'loaders/GLT
           'shaders/PoissonDenoiseShader.js', 'math/SimplexNoise.js', 'postprocessing/Pass.js', 'postprocessing/ShaderPass.js',
           'postprocessing/MaskPass.js', 'postprocessing/EffectComposer.js', 'postprocessing/RenderPass.js',
           'postprocessing/OutputPass.js', 'postprocessing/GTAOPass.js', 'csm/CSMFrustum.js', 'csm/CSMShader.js', 'csm/CSM.js',
-          'loaders/HDRLoader.js', 'lights/SunLightShadow.js', 'lights/SunLight.js', 'gpu-pathtracer/pathtracer.js']
+          'loaders/HDRLoader.js', 'lights/SunLightShadow.js', 'lights/SunLight.js', 'gpu-pathtracer/pathtracer.js',
+          # the asset library (task 0009): GPU-compressed pictures (KTX2; the basis transcoder itself is in the library) and
+          # meshopt-packed models
+          'utils/WorkerPool.js', 'libs/ktx-parse.module.js', 'libs/zstddec.module.js', 'math/ColorSpaces.js', 'loaders/KTX2Loader.js',
+          'libs/meshopt_decoder.module.js']
 def addon_factory(rel):
     src = read(os.path.join(THREE_DIR, 'examples/jsm', rel))
     here = os.path.dirname(rel)
@@ -92,15 +96,19 @@ def addon_factory(rel):
                 exported.append(item)
         return ''
     src = re.sub(r'^export\s*\{([^}]*)\};?', exp_block, src, flags=re.M)
+    # (a minified module: its export block at the end of a line)
+    src = re.sub(r'export\s*\{([^}]*)\};?\s*$', exp_block, src)
     def exp_decl(m):
         exported.append(m.group(2))
         return m.group(1) + m.group(2)
     src = re.sub(r'^export\s+((?:async\s+)?(?:function\*?|class|const|let|var)\s+)([A-Za-z_$][\w$]*)', exp_decl, src, flags=re.M)
+    # (KTX2Loader's default path of the transcoder: not used – the app gives it the library's copy)
+    src = src.replace('import.meta.url', 'location.href')
     assert not re.search(r'^\s*(import|export)\s', src, re.M), rel + ': an import / export was left'
     return json.dumps(rel) + ': function (THREE, req) {\n' + src + '\nreturn {' + ', '.join(dict.fromkeys(exported)) + '};\n}'
 addons_js = 'return {\n' + ',\n'.join(addon_factory(r) for r in ADDONS) + '\n};\n'
 
-order = ['util.js', 'house.js', 'i18n.js', 'store.js', 'model.js', 'outline.js', 'furniture.js', 'renato.js', 'ifc.js', 'ifc2house.js', 'ui.js', 'plan2d.js', 'plan2d-x.js', 'view3d.js', 'view3d-x.js', 'texlib.js', 'sunnear.js', 'reuse.js', 'smooth.js', 'batch.js', 'app.js', 'history.js', 'search.js', 'help.js', 'panels.js', 'modes.js', 'furnish.js', 'kitchen.js', 'models.js', 'space.js', 'notes.js', 'diary.js', 'docs.js', 'share.js', 'walk.js', 'tour.js', 'ral.js', 'extras.js', 'edit.js', 'finish.js', 'materials.js', 'wallviews.js', 'quantities.js', 'install.js', 'budget.js', 'tasks.js', 'stairs.js', 'voids.js', 'openings.js', 'facade.js', 'drawings.js', 'garden.js', 'trees.js', 'around.js', 'hood.js', 'gate.js', 'sun.js', 'hq.js', 'glow.js', 'speed.js', 'autoq.js', 'autoexp.js', 'denoise.js', 'render.js', 'ar.js', 'pdfplans.js', 'merge.js', 'backup.js', 'fullscreen.js', 'main.js']
+order = ['util.js', 'house.js', 'i18n.js', 'store.js', 'library.js', 'model.js', 'outline.js', 'furniture.js', 'renato.js', 'ifc.js', 'ifc2house.js', 'ui.js', 'plan2d.js', 'plan2d-x.js', 'view3d.js', 'view3d-x.js', 'texlib.js', 'sunnear.js', 'reuse.js', 'smooth.js', 'batch.js', 'app.js', 'history.js', 'search.js', 'help.js', 'panels.js', 'modes.js', 'furnish.js', 'kitchen.js', 'models.js', 'space.js', 'notes.js', 'diary.js', 'docs.js', 'share.js', 'walk.js', 'tour.js', 'ral.js', 'extras.js', 'edit.js', 'finish.js', 'materials.js', 'wallviews.js', 'quantities.js', 'install.js', 'budget.js', 'tasks.js', 'stairs.js', 'voids.js', 'openings.js', 'facade.js', 'drawings.js', 'garden.js', 'trees.js', 'around.js', 'hood.js', 'gate.js', 'sun.js', 'hq.js', 'glow.js', 'speed.js', 'autoq.js', 'autoexp.js', 'denoise.js', 'render.js', 'ar.js', 'pdfplans.js', 'merge.js', 'backup.js', 'fullscreen.js', 'main.js']
 # the public app's modules; a house built in adds its own just before main.js (its big files between two marks, left
 # out of copies for viewing: share.js viewerScript)
 public_js = '\n'.join(read(os.path.join(SRC, f)) for f in order)
@@ -144,7 +152,12 @@ models_path = os.path.join(ROOT, 'build', 'models.json')
 def libs_block(js):
     js = "const PDFJS_GZ = { lib: '" + packed('pdf.min.js') + "', worker: '" + packed('pdf.worker.min.js') + "' };\n" + js
     js = "const ADDONS_GZ = '" + base64.b64encode(gzip.compress(addons_js.encode(), 9, mtime=0)).decode() + "';\n" + js
-    return 'const MODEL_LIB = ' + (read(models_path) if os.path.exists(models_path) else 'null') + ';\n' + js
+    # (the models' names, sizes and outlines; their geometry – the blob – is in the single file's base and in the library)
+    return 'const MODEL_LIB = ' + (json.dumps(MODEL_META, separators=(',', ':')) if MODEL_META else 'null') + ';\n' + js
+MODEL_SRC = json.loads(read(models_path)) if os.path.exists(models_path) else None
+MODEL_META = {k: v for k, v in MODEL_SRC.items() if k != 'blob'} if MODEL_SRC else None
+if MODEL_META:
+    MODEL_META['pack'] = 'pack:kenney'
 def example_block(path):
     """the example house packed (gzip + base64), unpacked only when the example is opened; with the files of its documents"""
     if not os.path.exists(path):
@@ -160,12 +173,132 @@ app_js = example_block(example_path) + libs_block(lang_block(house_js, house_tr)
 made_up_path = os.path.join(ROOT, 'build', 'example.json')
 app_js_web = example_block(made_up_path) + libs_block(lang_block(public_js))
 
-# the material pictures (tools/build-textures.py → build/textures.json): inside the single file; the hosted versions
-# (app folder, web) load textures.json next to index.html
-tex_path = os.path.join(ROOT, 'build', 'textures.json')
-tex_json = read(tex_path) if os.path.exists(tex_path) else None
+# ── the asset library (task 0009, tools/build-library.py): build/library/ (pictures, skies, their KTX2 copies) + the
+#    Kenney models' geometry + the KTX2 reader + – the owner's app only – his models (house/models/). The hosted versions
+#    (app folder, web) have it in lib/ and load from it what they need; dist/house-planner-library.zip is the same for
+#    the single file (Settings → Library → Load library…). The single file has the base inside: the picture sets at
+#    their smallest size (today's look), the skies at 512 and the Kenney geometry. ──
+sys.path.insert(0, os.path.join(ROOT, 'tools'))
+import importlib.util
+_spec = importlib.util.spec_from_file_location('build_library', os.path.join(ROOT, 'tools', 'build-library.py'))
+BL = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(BL)
+LIB_SRC = os.path.join(ROOT, 'build', 'library')
+LIB_MAN = BL.load(LIB_SRC) if os.path.exists(os.path.join(LIB_SRC, 'library.json')) else None
+if LIB_MAN:
+    # (the source copy in the app zip leaves the KTX2 copies out: an item's file that is not here is left out of the build)
+    dropped = 0
+    for it in LIB_MAN['items']:
+        for k in list((it.get('gpu') or {}).keys()):
+            if not os.path.exists(os.path.join(LIB_SRC, it['gpu'][k][0]['f'])):
+                del it['gpu'][k]; dropped += 1
+    if dropped:
+        print(f'library    : {dropped} KTX2 pictures not here (python3 tools/build-library.py --gpu makes them) – left out')
+def lib_bytes(f):
+    return open(os.path.join(LIB_SRC, f), 'rb').read()
+def base_block():
+    """the single file's built-in base, in the shape texlib.js reads (TEXLIB_DATA): each base set with its smallest
+    pictures as data URLs, the skies at their smallest size"""
+    if not LIB_MAN:
+        return None
+    mime = {'jpg': 'image/jpeg', 'png': 'image/png', 'webp': 'image/webp'}
+    sets, skies = {}, {}
+    for it in LIB_MAN['items']:
+        if not it.get('base'):
+            continue
+        if it['kind'] == 'tex':
+            e = dict(it['meta'])
+            for k, files in it['maps'].items():
+                v = min(files, key=lambda x: x['px'])
+                e[k] = 'data:' + mime[v['f'].rsplit('.', 1)[1]] + ';base64,' + base64.b64encode(lib_bytes(v['f'])).decode()
+            sets[it['id']] = e
+        elif it['kind'] == 'sky':
+            v = min(it['files'], key=lambda x: x['px'])
+            skies[it['id'].split(':', 1)[1]] = {'hdr': base64.b64encode(lib_bytes(v['f'])).decode(), 'size': [v['px'], v['px'] // 2]}
+    return json.dumps({'v': 1, 'base': True, 'source': LIB_MAN.get('source', ''), 'sets': sets, 'skies': skies}, separators=(',', ':'))
+tex_json = base_block()
+
+def house_models():
+    """the owner's models (house/models: contents.csv + .glb) as library items, never public: packed for phones by
+    node tools/glb-pack.mjs when it can run here (npm ci --prefix tools), else as they are; packed copies are kept in
+    dist/.glbcache by the source file's hash"""
+    if not HOUSE_CFG:
+        return []
+    mdir = os.path.join(HOUSE_DIR, 'models')
+    csv_path = os.path.join(mdir, 'contents.csv')
+    if not os.path.exists(csv_path):
+        return []
+    import csv
+    rows = [r for r in csv.DictReader(open(csv_path, encoding='utf-8')) if r.get('file', '').endswith('.glb')]
+    cache = os.path.join(DIST, '.glbcache')
+    os.makedirs(cache, exist_ok=True)
+    jobs, info = [], {}
+    for r in rows:
+        src = os.path.join(mdir, r['file'])
+        h = hashlib.sha256(open(src, 'rb').read()).hexdigest()[:16]
+        out = os.path.join(cache, h + '.glb')
+        info[r['file']] = (h, out)
+        if not os.path.exists(out + '.json'):
+            jobs.append({'in': src, 'out': out})
+    packer = os.path.join(ROOT, 'tools', 'node_modules', '@gltf-transform', 'core')
+    if jobs and os.path.isdir(packer) and shutil.which('node'):
+        import subprocess
+        r = subprocess.run(['node', os.path.join(ROOT, 'tools', 'glb-pack.mjs')], input=json.dumps(jobs), capture_output=True, text=True)
+        if r.returncode == 0:
+            for line in r.stdout.splitlines():
+                if line.startswith('{'):
+                    d = json.loads(line)
+                    open(d['out'] + '.json', 'w').write(json.dumps(d))
+        else:
+            print('house models: packing failed – kept as they are\n' + r.stderr[-800:])
+    items, raw = [], 0
+    for r in rows:
+        h, out = info[r['file']]
+        src = os.path.join(mdir, r['file'])
+        packed = os.path.exists(out + '.json')
+        d = json.load(open(out + '.json')) if packed else {}
+        slug = os.path.splitext(os.path.basename(r['file']))[0]
+        size = [round(float(r[k]) / 100, 4) for k in ('width cm', 'depth cm', 'height cm')]
+        items.append({'id': 'l:' + slug, 'kind': 'model', 'private': True, 'licence': r.get('licence', ''), 'source': r.get('source', ''),
+                      'name': r['name'], 'cat': r.get('room', ''), 'size': size, 'o': d.get('o', []), 'u': d.get('u', []),
+                      '_src': out if packed else src, '_name': f'models/{slug}'})
+        raw += os.path.getsize(src)
+    if items:
+        print(f"house models: {len(items)} ({raw / 1e6:.1f} MB as they are; " + ('packed' if all(os.path.exists(info[r['file']][1] + '.json') for r in rows) else 'NOT packed: npm ci --prefix tools') + ')')
+    return items
+
+def make_lib(dst, extra=()):
+    """a whole library folder at dst: build/library + the Kenney pack + the KTX2 reader + extra items; returns its manifest"""
+    if not LIB_MAN:
+        return None
+    shutil.rmtree(dst, ignore_errors=True)
+    os.makedirs(dst)
+    man = json.loads(json.dumps(LIB_MAN))
+    for f in BL.files_of(man):
+        os.makedirs(os.path.dirname(os.path.join(dst, f['f'])), exist_ok=True)
+        shutil.copyfile(os.path.join(LIB_SRC, f['f']), os.path.join(dst, f['f']))
+    def put(stem, ext, data):
+        return BL.put(dst, os.path.dirname(stem), os.path.basename(stem), ext, data)
+    if MODEL_SRC:
+        man['items'].append({'id': 'pack:kenney', 'kind': 'pack', 'licence': 'CC0', 'source': MODEL_SRC.get('source', 'Kenney'), 'base': True,
+                             'files': [put('models/kenney', 'bin.gz', base64.b64decode(MODEL_SRC['blob']))]})
+    basis = os.path.join(THREE_DIR, 'examples', 'jsm', 'libs', 'basis')
+    man['items'].append({'id': 'code:basis', 'kind': 'code', 'licence': 'Apache-2.0 (code, not a picture or model)', 'source': 'Basis Universal transcoder (three.js r187)',
+                         'files': [dict(name=n, **put('code/' + n.split('.')[0], n.split('.', 1)[1], open(os.path.join(basis, n), 'rb').read())) for n in ('basis_transcoder.js', 'basis_transcoder.wasm')]})
+    for it in extra:
+        it = dict(it)
+        src, stem = it.pop('_src'), it.pop('_name')
+        it['files'] = [put(stem, 'glb', open(src, 'rb').read())]
+        man['items'].append(it)
+    man['name'] = 'house' if any(it.get('private') for it in man['items']) else 'public'
+    man['build'] = ver
+    BL.save(man, dst)
+    return man
+
 def wrap(body, inline_tex):
     pre = ('const TEXLIB_DATA = ' + tex_json + ';\n') if (inline_tex and tex_json) else 'const TEXLIB_DATA = null;\n'
+    pre += ("const MODEL_LIB_BLOB = '" + MODEL_SRC['blob'] + "';\n") if (inline_tex and MODEL_SRC) else 'const MODEL_LIB_BLOB = null;\n'
+    # (the KTX2 transcoder is taken from the library only when it is exactly this app's copy)
+    pre += 'const LIB_CODE_SHA = ' + json.dumps({n: hashlib.sha256(open(os.path.join(THREE_DIR, 'examples', 'jsm', 'libs', 'basis', n), 'rb').read()).hexdigest() for n in ('basis_transcoder.js', 'basis_transcoder.wasm')}) + ';\n'
     return ("(function(){\n'use strict';\n" + pre + three_js + orbit_js + body + '\n})();\n').replace('</script', '<\\/script')
 js = wrap(app_js, True)
 js_hosted = wrap(app_js, False)
@@ -188,7 +321,7 @@ html = html_src.replace('__JS__', js)
 html_hosted = html_src.replace('__JS__', js_hosted)
 # the build code: made from the app itself (with the placeholder still in it), so the same app gives the same code; the
 # app shows it at the bottom of the projects page (APP_VERSION in util.js) and the offline copy's cache carries it (sw.js)
-ver = hashlib.sha1((html + (tex_json or '')).encode()).hexdigest()[:10]
+ver = hashlib.sha1((html + json.dumps(LIB_MAN or {}, sort_keys=True)).encode()).hexdigest()[:10]
 assert html.count("'__BUILD__'") == 1, 'APP_VERSION.build placeholder'
 html = html.replace("'__BUILD__'", "'" + ver + "'")
 html_hosted = html_hosted.replace("'__BUILD__'", "'" + ver + "'")
@@ -204,9 +337,8 @@ shutil.rmtree(app_dir, ignore_errors=True)
 os.makedirs(app_dir)
 with open(os.path.join(app_dir, 'index.html'), 'w', encoding='utf-8') as f:
     f.write(html_hosted)
-if tex_json:
-    with open(os.path.join(app_dir, 'textures.json'), 'w', encoding='utf-8') as f:
-        f.write(tex_json)
+HOUSE_MODELS = house_models()
+app_lib = make_lib(os.path.join(app_dir, 'lib'), HOUSE_MODELS)
 
 def draw_icon(size, maskable=False):
     s = size / 48.0
@@ -260,8 +392,13 @@ shutil.copy(os.path.join(VENDOR, 'LICENSE-pathtracer.txt'), os.path.join(app_dir
 
 zpath = os.path.join(DIST, 'house-planner-app.zip')
 with zipfile.ZipFile(zpath, 'w', zipfile.ZIP_DEFLATED) as z:
-    for name in sorted(os.listdir(app_dir)):
-        z.write(os.path.join(app_dir, name), arcname='house-planner/' + name)
+    # (the library in lib/ too: stored, its pictures and models are packed already)
+    for dirpath, dirs, files in os.walk(app_dir):
+        dirs.sort()
+        for name in sorted(files):
+            full = os.path.join(dirpath, name)
+            rel = os.path.relpath(full, app_dir).replace(os.sep, '/')
+            z.write(full, arcname='house-planner/' + rel, compress_type=zipfile.ZIP_STORED if rel.startswith('lib/') else zipfile.ZIP_DEFLATED)
     # the source, so the app can be changed later
     for name in sorted(os.listdir(SRC)):
         z.write(os.path.join(SRC, name), arcname='house-planner-source/src/' + name)
@@ -275,15 +412,26 @@ with zipfile.ZipFile(zpath, 'w', zipfile.ZIP_DEFLATED) as z:
             continue
         for dirpath, _, files in os.walk(base):
             for name in sorted(files):
-                if (name.endswith('.png') and sub != 'tools') or '__pycache__' in dirpath or os.sep + 'shots' in dirpath:
+                if (name.endswith('.png') and sub != 'tools') or '__pycache__' in dirpath or os.sep + 'shots' in dirpath or 'node_modules' in dirpath:
                     continue
                 full = os.path.join(dirpath, name)
                 z.write(full, arcname='house-planner-source/' + os.path.relpath(full, ROOT))
     # the packed example house and model library, so the app can be rebuilt without the IFC files or the kit
-    for name in ('example.json', 'models.json', 'textures.json'):
+    for name in ('example.json', 'models.json'):
         full = os.path.join(ROOT, 'build', name)
         if os.path.exists(full):
             z.write(full, arcname='house-planner-source/build/' + name)
+    # the library's sources (without the KTX2 copies: python3 tools/build-library.py --gpu makes them again)
+    for f in (['library.json'] + [v['f'] for v in BL.files_of(LIB_MAN) if not v['f'].startswith('gpu/')] if LIB_MAN else []):
+        z.write(os.path.join(LIB_SRC, f), arcname='house-planner-source/build/library/' + f, compress_type=zipfile.ZIP_STORED)
+
+# the library as one zip, for the single file (Settings → Library → Load library…): the app folder's lib/ (the owner's
+# app: with his models)
+lzip = os.path.join(DIST, 'house-planner-library.zip')
+if app_lib:
+    with zipfile.ZipFile(lzip, 'w', zipfile.ZIP_STORED) as z:
+        for f in ['library.json'] + [v['f'] for v in BL.files_of(app_lib)]:
+            z.write(os.path.join(app_dir, 'lib', f), arcname=f)
 
 
 # ── a web version for a fixed web address (GitHub Pages: the "Publish web version" workflow, task 0008) ──
@@ -319,7 +467,17 @@ for w in SECRET_WORDS:
     assert w not in _public_text, 'the public app holds a word of the house: ' + w
 web_dir = os.path.join(DIST, 'web')
 shutil.rmtree(web_dir, ignore_errors=True)
-shutil.copytree(app_dir, web_dir)
+shutil.copytree(app_dir, web_dir, ignore=shutil.ignore_patterns('lib'))
+# the web version's library: the public one only – never the owner's models; every item CC0 / CC BY, no house word in
+# its list or in any of its files
+web_lib = make_lib(os.path.join(web_dir, 'lib'))
+if web_lib:
+    assert not any(it.get('private') or it['kind'] == 'model' for it in web_lib['items']), 'a private model in the web version\'s library'
+    assert not [p for p in BL.check(os.path.join(web_dir, 'lib'), public=False) if 'licence' not in p], BL.check(os.path.join(web_dir, 'lib'), public=False)
+    for it in web_lib['items']:
+        assert it['kind'] == 'code' or str(it.get('licence', '')).startswith(BL.PUBLIC_LICENCES), 'the web version\'s library: not CC0 / CC BY: ' + it['id']
+    _found = BL.words_in(os.path.join(web_dir, 'lib'), SECRET_WORDS)
+    assert not _found, 'the web version\'s library holds a word of the house: ' + str(_found[:3])
 with open(os.path.join(web_dir, 'index.html'), 'w', encoding='utf-8') as f:
     f.write(web_html)
 shutil.copy(os.path.join(ROOT, 'DEPLOY.md'), os.path.join(web_dir, 'DEPLOY.md'))
@@ -327,10 +485,16 @@ if os.path.exists(os.path.join(web_dir, 'README.txt')):
     os.remove(os.path.join(web_dir, 'README.txt'))  # that one is about the version with the example house
 wzip = os.path.join(DIST, 'house-planner-web.zip')
 with zipfile.ZipFile(wzip, 'w', zipfile.ZIP_DEFLATED) as z:
-    for name in sorted(os.listdir(web_dir)):
-        z.write(os.path.join(web_dir, name), arcname=name)
+    for dirpath, dirs, files in os.walk(web_dir):
+        dirs.sort()
+        for name in sorted(files):
+            full = os.path.join(dirpath, name)
+            rel = os.path.relpath(full, web_dir).replace(os.sep, '/')
+            z.write(full, arcname=rel, compress_type=zipfile.ZIP_STORED if rel.startswith('lib/') else zipfile.ZIP_DEFLATED)
 print('web version:', wzip, f'{os.path.getsize(wzip)/1024:.0f} KB')
 print('single file:', single, f'{os.path.getsize(single)/1024:.0f} KB')
 print('app zip    :', zpath, f'{os.path.getsize(zpath)/1024:.0f} KB', 'version', ver)
+if app_lib:
+    print('library    :', lzip, f'{os.path.getsize(lzip)/1024:.0f} KB', f"({len(app_lib['items'])} items, '{app_lib['name']}')")
 print('house words:', f'{len(SECRET_WORDS)} checked against the public app and the web version' if SECRET_WORDS else 'none known here (no house/house.json, no HP_SECRET_WORDS) – not checked')
 print('house      :', (HOUSE_CFG.get('name', '?') + ' (' + os.path.relpath(HOUSE_DIR, ROOT) + ')') if HOUSE_CFG else 'none – the public app, with the made-up example house')

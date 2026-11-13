@@ -826,7 +826,7 @@ class View3D extends Emitter {
     this.ok = true;
     const r = this.renderer;
     GPU_INFO = gpuName(r);
-    if (!SAFE_TEX && needSafeTex(GPU_INFO, app.settings)) SAFE_TEX = true;
+    if (!SAFE_TEX && needSafeTex(GPU_INFO, app.settings)) { SAFE_TEX = true; if (TEXLIB.ready) texlibSettingsChanged(); }
     // the graphics card was reset (Windows resets a card that is busy for 2 s with one piece of work; the browser then
     // loses every 3D picture of the page): this view is started again, looking where it looked (app.view3dLost)
     r.domElement.addEventListener('webglcontextlost', () => { if (this.destroyed) return; this.lost = true; app.view3dLost(this); });

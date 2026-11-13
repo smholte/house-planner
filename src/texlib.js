@@ -1,10 +1,14 @@
 /* ───────────── texlib.js — real material pictures: bricks, roof tiles, floors, garden, kitchen, fabric, metal ─────────────
-   build/textures.json (tools/build-textures.py, from ambientCG – CC0): per set the colour picture, its relief (normal
-   map) and gloss (roughness, for metals also the metalness), its size in metres and what one plank or tile can be cut
-   from (rows of planks between their joints, the cells of a tile grid, squares without a joint). The single file has it
-   inside (TEXLIB_DATA); the hosted versions load textures.json next to index.html (the service worker keeps it offline).
-   The pictures are decoded once at start; until then – and if they can't be had – the drawn textures are used, as
-   before. When they arrive, the 3D views are built again with them.
+   The picture sets (tools/build-textures.py, from ambientCG – CC0) are in the asset library (library.js, task 0009):
+   per set the colour picture, its relief (normal map) and gloss (roughness, for metals also the metalness), its size in
+   metres and what one plank or tile can be cut from (rows of planks between their joints, the cells of a tile grid,
+   squares without a joint). The single file has the base inside (TEXLIB_DATA: every set at its smallest size, the skies
+   at 512); the hosted versions take the base from lib/ next to index.html (library.js keeps it on the device).
+   The base pictures are decoded once at start; until then – and if they can't be had – the drawn textures are used, as
+   before. When they arrive, the 3D views are built again with them. After that, only when this device asks for them
+   (app.settings.texSize, texGpu – task 0010 sets them by device) and the library has them: a larger size, KTX2 copies
+   (GPU-compressed: far less memory on the graphics card), the larger skies; sets that are not in the base load the first
+   time a material needs them. Each arrival builds the 3D views again.
    The bricks: one waalformaat wall in wildverband, coloured from a palette – the builder's three bricks as they are on
    the photo of the house, other brick colours (other houses, the neighbours) around their own colour (libBrick).
    Used as they are: the roof, the grass, gravel, bark, asphalt, decking, the kitchen's worktops and fronts, black metal (door handles,
@@ -12,46 +16,231 @@
    stone, concrete, carpet), roofs of the neighbours, the sofa fabric.
    Fast quality: colour only (no relief and gloss maps). */
 
-const TEXLIB = { data: null, img: new Map(), ready: false, gen: 0, base: new Map(), detail: new Map(), sky: {} };
+const TEXLIB = { data: null, img: new Map(), ready: false, gen: 0, base: new Map(), detail: new Map(), sky: {},
+  px: new Map(),        // set|map → the width of the picture decoded (to know when the library has a better one)
+  skyPx: {},            // day / sunset → the width of the sky decoded
+  gpu: new Map(),       // set|map → a KTX2 texture ('loading', 'failed' while there is none)
+  lazy: new Map(),      // set id → null (not asked for yet), a Promise (loading) or true (here)
+  source: '' };         // 'built-in' (the single file's base) or 'library'
+const LIB_MAPS = ['color', 'normal', 'rough', 'metal', 'kit', 'detail'];
+const LIB_GPU_MAPS = ['color', 'normal', 'rough', 'metal'];
+
+function libDecode(src) {
+  const im = new Image();
+  im.decoding = 'async';
+  im.src = src;
+  return im.decode().then(() => im, () => null);
+}
+/** the hosted versions' base, in the shape of TEXLIB_DATA: the base sets at the size this device asks for (object
+ *  URLs of the library's files), the other sets as their description only (loaded when a material needs them) */
+async function libBaseData() {
+  const want = libWantPx(), sets = {}, skies = {};
+  const jobs = [];
+  for (const it of LIB.items.values()) {
+    if (it.kind === 'tex' && it.base) {
+      const e = sets[it.id] = Object.assign({}, it.meta);
+      for (const [k, list] of Object.entries(it.maps)) {
+        const v = libPick(list, want);
+        jobs.push(libUrl(v.f).then(u => { if (u) { e[k] = u; TEXLIB.px.set(it.id + '|' + k, v.px); } }));
+      }
+    } else if (it.kind === 'sky' && it.base) {
+      const v = libPick(it.files, want * 2);
+      jobs.push(libBlob(v.f).then(b => { if (b) skies[it.id.slice(4)] = { blob: b, size: [v.px, v.px / 2] }; }));
+    }
+  }
+  await Promise.all(jobs);
+  if (!Object.keys(sets).length) return null;
+  return { v: 1, source: (LIB.served || {}).source || '', sets, skies };
+}
+/** the sets of the library that are not in the base: known (their size, colour …), their pictures loaded on demand */
+function libAddLazySets() {
+  for (const it of LIB.items.values()) {
+    if (it.kind !== 'tex' || TEXLIB.data.sets[it.id]) continue;
+    TEXLIB.data.sets[it.id] = Object.assign({ lazy: true }, it.meta);
+    TEXLIB.lazy.set(it.id, null);
+  }
+}
 
 async function texlibInit() {
   try {
     let data = typeof TEXLIB_DATA !== 'undefined' ? TEXLIB_DATA : null;
-    if (!data && /^https?:$/.test(location.protocol)) {
-      const r = await fetch('textures.json');
-      if (r.ok) data = await r.json();
-    }
+    try { await libraryInit(); } catch (e) { console.warn('library', e); }
+    TEXLIB.source = data ? 'built-in' : 'library';
+    if (!data && libHosted()) data = await libBaseData();
     if (!data || !data.sets) return false;
     TEXLIB.data = data;
     const jobs = [];
     for (const [id, s] of Object.entries(data.sets)) {
-      for (const k of ['color', 'normal', 'rough', 'metal', 'kit', 'detail']) {
+      for (const k of LIB_MAPS) {
         if (!s[k]) continue;
-        const im = new Image();
-        im.decoding = 'async';
-        im.src = s[k];
-        TEXLIB.img.set(id + '|' + k, im);
-        jobs.push(im.decode().catch(() => null));
+        const key = id + '|' + k;
+        jobs.push(libDecode(s[k]).then(im => {
+          if (!im) return;
+          TEXLIB.img.set(key, im);
+          if (!TEXLIB.px.has(key)) TEXLIB.px.set(key, im.naturalWidth);
+        }));
       }
     }
     await Promise.all(jobs);
     // the skies (Poly Haven, CC0): day and sunset, high dynamic range
     for (const which of Object.keys(data.skies || {})) {
-      try { TEXLIB.sky[which] = await libSkyDecode(data.skies[which]); } catch (e) { console.warn('sky', which, e); }
+      try { TEXLIB.sky[which] = await libSkyDecode(data.skies[which]); TEXLIB.skyPx[which] = data.skies[which].size[0]; } catch (e) { console.warn('sky', which, e); }
     }
+    libAddLazySets();
     TEXLIB.ready = true;
     TEXLIB.gen++;
     // everything drawn before is made again with the pictures
     TEX.clear(); MAT.clear(); KMAT.clear(); FMAT.clear();
     if (app.project && app.panes && app.panes.some(p => p.kind === '3d')) app.refreshViews(false);
+    TEXLIB.upgraded = libUpgrade();
+    // (hosted: files no list names any more go – only now that the base of the new list is on the device)
+    if (libHosted() && LIB.served) Promise.all([LIB.kept, TEXLIB.upgraded]).then(() => libPrune()).catch(() => {});
     return true;
   } catch (e) {
     console.warn('material pictures', e);
     return false;
   }
 }
+/** the pictures again from the library where it has the size this device asks for and it isn't the one shown (the
+ *  single file with a library: the larger skies; a device that asks for 1K: the 1K pictures …); then the 3D views are
+ *  built again. Returns the number of pictures changed. */
+async function libUpgrade() {
+  try {
+    await libraryInit();
+    if (!TEXLIB.data) return 0;
+    libAddLazySets();
+    const want = libWantPx(), changed = [], jobs = [];
+    for (const [id, s] of Object.entries(TEXLIB.data.sets)) {
+      const it = libItem(id);
+      if (!it || it.kind !== 'tex' || s.lazy) continue;
+      for (const [k, list] of Object.entries(it.maps)) {
+        const v = libPick(list, want), key = id + '|' + k;
+        if (!v || v.px === TEXLIB.px.get(key)) continue;
+        jobs.push(libUrl(v.f).then(u => u && libDecode(u)).then(im => {
+          if (!im) return;
+          TEXLIB.img.set(key, im); TEXLIB.px.set(key, v.px); s[k] = im.src; changed.push(key);
+        }));
+      }
+    }
+    for (const which of ['day', 'sunset']) {
+      const it = libItem('sky:' + which), v = it && libPick(it.files, want * 2);
+      if (!v || v.px === TEXLIB.skyPx[which]) continue;
+      jobs.push(libBlob(v.f).then(b => b && libSkyDecode({ blob: b })).then(t => {
+        if (!t) return;
+        if (TEXLIB.sky[which]) TEXLIB.sky[which].dispose();
+        TEXLIB.sky[which] = t; TEXLIB.skyPx[which] = v.px;
+        if (TEXLIB.skyNS && TEXLIB.skyNS[which]) { TEXLIB.skyNS[which].dispose(); delete TEXLIB.skyNS[which]; }
+        changed.push('sky|' + which);
+      }).catch(e => console.warn('sky', which, e)));
+    }
+    await Promise.all(jobs);
+    if (changed.length) texlibRefresh(changed);
+    return changed.length;
+  } catch (e) { console.warn('library pictures', e); return 0; }
+}
+/** pictures changed (set|map keys): their textures go, the 3D views are built again (a little later: several
+ *  arrivals at once give one rebuild) */
+let _texRefreshT = 0, _texRefreshIds = new Set(), _texOld = [];
+function texlibRefresh(keys) {
+  for (const key of keys) {
+    _texRefreshIds.add(key.split('|')[0]);
+    const id = key.split('|')[0];
+    for (const [k, t] of [...TEXLIB.base]) if (k === key || k.startsWith('d|' + id + '|')) { _texOld.push(t); TEXLIB.base.delete(k); }
+    for (const k of [...TEXLIB.detail.keys()]) if (k.startsWith(id + '|')) TEXLIB.detail.delete(k);
+  }
+  TEXLIB.gen++;
+  clearTimeout(_texRefreshT);
+  _texRefreshT = setTimeout(() => {
+    // (the old copies of those pictures off the graphics card once the views are built again with the new ones – before
+    // that a frame of the old view would only put them back)
+    const old = _texOld.concat([...TEX.values()].filter(t => t && t.isTexture && t.userData && _texRefreshIds.has(t.userData.lib)));
+    _texRefreshIds = new Set(); _texOld = [];
+    TEX.clear(); MAT.clear(); KMAT.clear(); FMAT.clear();
+    if (app.project && app.panes && app.panes.some(p => p.kind === '3d')) app.refreshViews(false);
+    setTimeout(() => { for (const t of old) t.dispose(); }, 2500);
+  }, 60);
+}
+/** this device's picture settings changed (app.settings.texSize, texGpu – task 0010): every picture again as asked
+ *  (KTX2 copies on or off, the size from the library); returns how many pictures came anew */
+function texlibSettingsChanged() {
+  const keys = [...TEXLIB.base.keys()].filter(k => !k.startsWith('d|'));
+  for (const [k, t] of [...TEXLIB.gpu]) if (!(t && t.isTexture)) TEXLIB.gpu.delete(k);
+  texlibRefresh(keys.length ? keys : ['-|-']);
+  return libUpgrade();
+}
+/** a set that is not in the base: its pictures (the size this device asks for), once; the views are built again */
+function libLoadSet(id) {
+  if (TEXLIB.lazy.get(id) !== null) return TEXLIB.lazy.get(id);
+  const it = libItem(id), s = TEXLIB.data.sets[id];
+  if (!it || !s) return null;
+  const want = libWantPx();
+  const p = Promise.all(Object.entries(it.maps || {}).map(([k, list]) => {
+    const v = libPick(list, want);
+    if (!v) return null;
+    return libUrl(v.f).then(u => u && libDecode(u)).then(im => { if (im) { TEXLIB.img.set(id + '|' + k, im); TEXLIB.px.set(id + '|' + k, v.px); s[k] = im.src; } });
+  })).then(() => {
+    const ok = !!TEXLIB.img.get(id + '|color');
+    if (ok) { s.lazy = false; TEXLIB.lazy.set(id, true); texlibRefresh([id + '|color']); }
+    else TEXLIB.lazy.set(id, 'missing');
+    return ok;
+  });
+  TEXLIB.lazy.set(id, p);
+  return p;
+}
+/** a KTX2 copy of a set's picture (GPU-compressed), when this device asks for them and the library has it: null until
+ *  it is here (then the views are built again) */
+function libGpuTex(id, kind) {
+  if (!libWantGpu() || !LIB_GPU_MAPS.includes(kind)) return null;
+  const key = id + '|' + kind, have = TEXLIB.gpu.get(key);
+  if (have && have.isTexture) return have;
+  if (have) return null;
+  const it = libItem(id), v = it && it.gpu && libPick(it.gpu[kind], libWantPx());
+  if (!v) { TEXLIB.gpu.set(key, 'none'); return null; }
+  TEXLIB.gpu.set(key, 'loading');
+  libKtx2(v.f).then(t => {
+    if (!t) { TEXLIB.gpu.set(key, 'failed'); return; }
+    TEXLIB.gpu.set(key, t);
+    texlibRefresh([key]);
+  });
+  return null;
+}
+/** the KTX2 reader (three.js' KTX2Loader with the basis transcoder of the library), made once with a 3D view's renderer */
+async function libKtx2(f) {
+  try {
+    if (!TEXLIB.ktx) TEXLIB.ktx = (async () => {
+      const r = (app.panes || []).map(p => p.view && p.view.renderer).find(Boolean) || (app.pip && app.pip.renderer);
+      const code = libItem('code:basis');
+      if (!r || !code) return null;
+      // (the transcoder runs as code in this page: only the very files this app was built with – their SHA-256 is
+      // built in – never one a library brings along)
+      const urls = {};
+      for (const v of code.files) {
+        const want = (typeof LIB_CODE_SHA !== 'undefined' && LIB_CODE_SHA) ? LIB_CODE_SHA[v.name] : null, b = await libBlob(v.f);
+        if (!want || !b || !crypto.subtle) return null;
+        const got = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', await b.arrayBuffer()))).map(x => x.toString(16).padStart(2, '0')).join('');
+        if (got !== want) { console.warn('KTX2: the transcoder in the library is not the one of this app'); return null; }
+        urls[v.name] = await libUrl(v.f);
+      }
+      if (!urls['basis_transcoder.js'] || !urls['basis_transcoder.wasm']) return null;
+      const { KTX2Loader } = await addon('loaders/KTX2Loader.js');
+      const mgr = new THREE.LoadingManager();
+      mgr.setURLModifier(u => urls[u.split('/').pop()] || u);
+      return new KTX2Loader(mgr).setTranscoderPath('lib/code/').setWorkerLimit(2).detectSupport(r);
+    })();
+    const loader = await TEXLIB.ktx;
+    const b = loader && await libBlob(f);
+    if (!b) return null;
+    const buf = await b.arrayBuffer();
+    return await new Promise((res, rej) => loader.parse(buf, res, rej));
+  } catch (e) { console.warn('KTX2', f, e); return null; }
+}
 const libOn = () => TEXLIB.ready && !(app.settings && app.settings.realTex === false);
-function libSet(id) { return libOn() ? TEXLIB.data.sets[id] || null : null; }
+function libSet(id) {
+  if (!libOn()) return null;
+  const s = TEXLIB.data.sets[id];
+  if (s && s.lazy) { libLoadSet(id); return null; }
+  return s || null;
+}
 function libImg(id, kind = 'color') { const im = TEXLIB.img.get(id + '|' + kind); return im && im.complete && im.naturalWidth ? im : null; }
 const libFast = () => quality3d(app.settings || {}) === 'fast';
 /** a phone (or Fast): the pictures that are made in the app are made smaller – less memory (1 Nov) */
@@ -70,9 +259,11 @@ function libTex(id, kind = 'color', size = null, rot = 0) {
   // one texture per picture on the graphics card; the copies only repeat differently (they share the picture)
   let base = TEXLIB.base.get(id + '|' + kind);
   if (!base) {
-    base = new THREE.Texture(im);
+    // (a KTX2 copy when this device asks for them and it is here: the same picture, compressed on the graphics card)
+    const g = libGpuTex(id, kind);
+    base = g ? g.clone() : new THREE.Texture(im);
     base.wrapS = base.wrapT = THREE.RepeatWrapping;
-    if (kind === 'color') base.colorSpace = THREE.SRGBColorSpace;
+    if (kind === 'color' && !g) base.colorSpace = THREE.SRGBColorSpace;
     base.anisotropy = MAX_ANISO;
     base.needsUpdate = true;
     TEXLIB.base.set(id + '|' + kind, base);
@@ -418,8 +609,9 @@ function libPieceTex(id, key, cols, rows, sz, joint = 0.004, tint = null) {
 /** a packed sky (gzip + base64 of a Radiance .hdr) → an equirectangular texture; userData: its mean brightness (without
  *  the sun) and where its sun is (u across, v up) */
 async function libSkyDecode(sk) {
-  const bin = Uint8Array.from(atob(sk.hdr), ch => ch.charCodeAt(0));
-  const buf = await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+  // (the single file: base64 inside; from the library: the file itself)
+  const gz = sk.blob || new Blob([Uint8Array.from(atob(sk.hdr), ch => ch.charCodeAt(0))]);
+  const buf = await new Response(gz.stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
   const { HDRLoader } = await addon('loaders/HDRLoader.js');
   const d = new HDRLoader().setDataType(THREE.HalfFloatType).parse(buf);
   const t = new THREE.DataTexture(d.data, d.width, d.height, THREE.RGBAFormat, d.type);
