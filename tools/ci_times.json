@@ -167,16 +167,16 @@
    "set": "public"
   },
   "test_library.py": {
-   "seconds": 480.0,
+   "seconds": 140.0,
    "ok": true,
    "checks": 28,
    "made_up": {
-    "seconds": 480.0,
+    "seconds": 140.0,
     "ok": true,
     "checks": 28
    },
    "set": "public",
-   "note": "task 0009: estimated from two local runs (~7–8 min)"
+   "note": "task 0009: GitHub run 43458937542, 138 s"
   },
   "test_materials.py": {
    "seconds": 61.0,

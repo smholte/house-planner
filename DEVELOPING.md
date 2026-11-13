@@ -664,7 +664,11 @@ Lengths are metres. Plan x to the right, y towards the back of the house.
                      (largest size ≤ asked, else the smallest), libWantPx / libWantGpu (app.settings.texSize, texGpu;
                      safe pictures – libSafe – cap them at 512 / off), libBlob (device, else fetch lib/<f> and keep),
                      libUrl, libGunzip, libLoadZip (the zip's central directory, file by file with File.slice; stored or
-                     deflated), libRemove, libStatus.
+                     deflated; sizes checked against the list before anything is unpacked; a failed or replaced load
+                     is pruned), libRemove, libStatus. libValid: a list (served or from a zip or kept) whose items lack
+                     their files is refused. The list is fetched with a 6 s timeout (then the kept one); files of an
+                     old list are pruned only after the new base is kept (texlibInit). The KTX2 transcoder is used only
+                     when its SHA-256 equals LIB_CODE_SHA (build.py builds the hashes of vendor/…/basis into the app).
     src/texlib.js    texlibInit: the single file's TEXLIB_DATA or (hosted) libBaseData – the base sets from the library
                      at the size asked – decoded at start as before (TEXLIB.ready keeps its meaning); then libUpgrade
                      (other sizes, the 1024 skies for the single file with a library), libLoadSet (sets not in the base:
