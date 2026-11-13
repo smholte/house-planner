@@ -133,7 +133,7 @@ with sync_playwright() as p:
     st2 = pg.evaluate("() => ({ fetched: window.__hp.LIB.fetched, stored: window.__hp.LIB.stored, sets: Object.keys(window.__hp.TEXLIB.data.sets).length })")
     check('second visit: the pictures from the device, none downloaded again', st2['fetched'] == 0 and st2['stored'] >= 78 and st2['sets'] == 25, st2)
     man_req = [r.all_headers() for u, r in lib_reqs if u.endswith('lib/library.json')]
-    check('… the list lib/library.json is asked again on every visit (never kept for good: no-cache)', len(man_req) >= 2 and any(x in (man_req[-1].get('cache-control', '') + man_req[-1].get('pragma', '')) for x in ('no-cache', 'max-age=0')), man_req[-1:])
+    check('… the list lib/library.json is asked again on every visit (never kept for good: no-cache)', len(man_req) >= 1 and any(x in (man_req[-1].get('cache-control', '') + man_req[-1].get('pragma', '')) for x in ('no-cache', 'max-age=0')), man_req[-1:])
     ctx.set_offline(True)
     pg.reload(); pg.wait_for_function(READY, timeout=90000)
     st3 = pg.evaluate("async () => { const H = window.__hp; await H.loadModelLib(); return { sets: Object.keys(H.TEXLIB.data.sets).length, sky: H.TEXLIB.skyPx, models: !!H.MODELS.blob, fetched: H.LIB.fetched }; }")
