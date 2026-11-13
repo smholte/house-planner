@@ -1,0 +1,4 @@
+newmtl oak
+Kd 0.78 0.6 0.4
+newmtl black
+Kd 0.1 0.1 0.1

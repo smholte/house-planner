@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>House Planner</title>
+<meta name="description" content="Floor plans, versions and changes for your house. Works offline; everything stays on this device.">
+<meta name="theme-color" content="#FBFCFC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A2224" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="House Planner">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,__FAVICON__">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+__CSS__
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ───────── projects ───────── -->
+  <section id="home" class="screen">
+    <div class="home-inner">
+      <header class="home-head">
+        <div class="brand">
+          <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="1" y="1" width="46" height="46" rx="7" fill="var(--ink)"/>
+            <path d="M10 37V21L24 10l14 11v16" fill="none" stroke="var(--paper)" stroke-width="3.2" stroke-linejoin="round"/>
+            <path d="M10 37h28" stroke="var(--paper)" stroke-width="3.2"/>
+            <path d="M24 37V27h7" fill="none" stroke="var(--new)" stroke-width="3.2"/>
+            <path d="M17 27h4" stroke="var(--demo)" stroke-width="3.2" stroke-dasharray="2.2 1.6"/>
+          </svg>
+          <div>
+            <h1>House Planner</h1>
+            <p>Plans, versions and changes for your house. Everything is stored on this device.</p>
+          </div>
+        </div>
+        <div class="home-actions">
+          <button class="btn" id="btn-import"></button>
+          <button class="btn primary" id="btn-new"></button>
+        </div>
+      </header>
+
+      <div class="intro" id="intro">
+        <div class="intro-step"><span class="step-n">1</span><b>New project</b><span>One project per house. Give each storey a name.</span></div>
+        <div class="intro-step"><span class="step-n">2</span><b>Bring in the house</b><span>Import the builder's IFC model (walls, doors, windows, roof in one go), or load a PDF or photo per storey and set the scale.</span></div>
+        <div class="intro-step"><span class="step-n">3</span><b>Trace</b><span>Draw walls, doors, windows and rooms over it. This is your locked <i>Original</i>.</span></div>
+        <div class="intro-step"><span class="step-n">4</span><b>Plan and compare</b><span>Make named versions, change walls, floors and colours, and see what differs from the original.</span></div>
+        <div class="intro-foot">
+          <span class="note-muted" id="intro-example">Want to look around first? The example is a made-up house with three storeys, an original and two planned versions.</span>
+          <div class="actions"><button class="btn sm" id="btn-example"></button><button class="btn ghost sm" id="btn-hide-intro">Hide</button></div>
+        </div>
+      </div>
+
+      <div class="section-head"><h2>Projects</h2><span class="note-muted" id="project-count"></span></div>
+      <div id="project-list" class="project-list"></div>
+
+      <footer class="home-foot">
+        <div class="storage-note" id="storage-note"><span class="dot"></span><span class="txt">Checking storage…</span></div>
+        <div class="links">
+          <button class="btn ghost sm" id="btn-install" hidden></button>
+          <button class="btn ghost sm" id="btn-trash"></button>
+          <button class="btn ghost sm" id="btn-backup"></button>
+          <button class="btn ghost sm" id="btn-settings"></button>
+        </div>
+      </footer>
+      <p class="app-version" id="app-version"></p>
+    </div>
+  </section>
+
+  <!-- ───────── editor ───────── -->
+  <section id="editor" class="screen" hidden>
+    <header class="topbar">
+      <button class="btn ghost icon" id="btn-back" aria-label="All projects"></button>
+      <div class="title-block">
+        <button class="project-name" id="btn-project-name" title="Rename project"></button>
+        <button class="version-pill" id="btn-version" aria-label="Versions"><span class="vp-kind"></span><span class="vp-name"></span></button>
+      </div>
+      <div class="seg mode-switch" id="mode-switch" role="group" aria-label="Mode">
+        <button data-mode="build"></button>
+        <button data-mode="furnish"></button>
+        <button data-mode="view"></button>
+      </div>
+      <div class="save-status" id="save-status" data-state="saved" title=""><span class="dot"></span><span class="txt">Saved</span></div>
+      <button class="folder-status" id="folder-status" type="button" hidden></button>
+      <div class="top-actions">
+        <button class="btn hide-sm" id="btn-savepoint"></button>
+        <button class="btn" id="btn-share"></button>
+        <button class="btn ghost icon" id="btn-search" aria-label="Search" title="Search (Ctrl+K)"></button>
+        <button class="btn ghost icon" id="btn-menu" aria-label="More"></button>
+        <button class="btn ghost icon hide-sm" id="btn-fullscreen" aria-label="Full screen" hidden></button>
+      </div>
+      <button class="bars-pull" id="bars-pull" type="button" aria-label="Show the bars" title="Show the bars"><span class="bp-pill"></span></button>
+    </header>
+    <div class="viewbar">
+      <div class="seg display" id="display-toggle" role="group" aria-label="Show">
+        <button data-mode="original">Original</button>
+        <button data-mode="plan">Planned</button>
+        <button data-mode="diff">Changes</button>
+      </div>
+      <button class="btn sm" id="btn-display" aria-haspopup="menu" aria-label="Show: original, planned or changes"></button>
+      <span class="vsep"></span>
+      <div class="storey-scroll"><div class="seg storey-tabs" id="storey-tabs" role="group" aria-label="Storey"></div></div>
+      <span class="vsep"></span>
+      <div class="seg" id="dim-toggle" role="group" aria-label="2D or 3D">
+        <button data-dim="2d">2D</button>
+        <button data-dim="3d">3D</button>
+      </div>
+      <button class="btn sm" id="btn-compare" aria-label="Side by side" title="Side by side: two versions next to each other"></button>
+      <button class="btn sm" id="btn-swipe" aria-label="Compare" title="Compare: the original and your plan on top of each other, drag the line across"></button>
+      <span class="spacer"></span>
+      <button class="btn sm" id="btn-viewopts" title="View options"></button>
+      <button class="btn sm icon" id="btn-fit" title="Home view (F, middle click, or double tap)"></button>
+      <span class="vbreak"></span>
+    </div>
+    <div class="workspace">
+      <nav class="toolrail" id="toolrail" aria-label="Tools"></nav>
+      <div class="stage" id="stage"></div>
+      <aside class="inspector" id="inspector" aria-label="Details"></aside>
+    </div>
+  </section>
+
+  <div id="sheet-root"></div>
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</div>
+<script>
+__JS__
+</script>
+</body>
+</html>

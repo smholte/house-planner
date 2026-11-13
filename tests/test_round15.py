@@ -1,0 +1,203 @@
+"""Fifteenth round (31 Oct): faster and easier. P2 – after an edit or an undo only the storey that changed is built
+again in 3D (the others and the garden are kept as they were; undo and redo no longer make new 3D views); P3 – phones
+draw a little less sharp while you turn or walk and sharp again when you stop, and the 3D shaders are prepared before
+the first picture; graphics – the quality chosen per device the first time, lamp glow in the evening; U5 – a named
+undo history to jump back several steps; U1 – a search box for rooms, notes, versions and actions (Ctrl+K); U6 – a
+help overlay that says what every button on the screen does, with the keys. PC (light) and phone (dark)."""
+from common import *
+
+V3 = "window.__hp.app.panes.find(p => p.kind === '3d').view"
+FP = "() => { const v = " + V3 + "; return v.group.children.map(r => { let n = 0, tri = 0; r.traverse(o => { if (o.isMesh) { n++; const g = o.geometry; tri += g.index ? g.index.count / 3 : g.attributes.position.count / 3; } }); return [r.userData.storeyId || (r.userData.garden ? 'garden' : '?'), n, Math.round(tri)]; }); }"
+SPY = "() => { const v = " + V3 + "; v.__tag = 'v1'; window.__builds = []; const ob = v.build; v.build = function (s) { ob.call(this, s); window.__builds.push([!!s.reuse, this.reused ? [this.reused.kept, this.reused.built, this.reused.garden] : null]); this.reused = null; }; window.__roots = () => v.group.children.slice(); }"
+ROOTS = "() => { const v = " + V3 + "; window.__r0 = v.group.children.slice(); return v.group.children.length; }"
+SAME = "() => { const v = " + V3 + "; return v.group.children.map(r => window.__r0.includes(r)); }"
+REG = "() => { const v = " + V3 + "; return [v.pickables.length, v.doorMap.size, [...v.doorMap.values()].reduce((s, l) => s + l.length, 0), v.lightSpots.length, v.furnPick.length]; }"
+
+def edit_wall(pg, h):
+    return pg.evaluate("(h) => { const a = window.__hp.app; const sid = a.project.storeys.find(s => s.name === 'Begane grond').id; const w = a.shownVersion().plan.walls.find(w => w.kind === 'interior' && w.storey === sid); a.mutate(pl => { pl.walls.find(x => x.id === w.id).h = h; }); return w.id; }", h)
+
+def settle(pg, ms=3500):
+    pg.wait_for_timeout(ms)
+
+def settle_built(pg, ms=3500):
+    """as settle, and until the 3D view was built again (a busy test computer can take longer than the usual moment)"""
+    pg.wait_for_timeout(ms)
+    try: pg.wait_for_function("() => window.__builds && window.__builds.length > 0", timeout=30000)
+    except Exception: pass
+    pg.wait_for_timeout(500)
+
+with sync_playwright() as p:
+    b, pg = open_app(p)
+    open_example(pg)
+    pg.evaluate("() => { const a = window.__hp.app; a.setMode('build'); a.setScope('house'); a.setDim('3d'); }"); settle(pg, 6000)
+    pg.evaluate(SPY)
+    # (the first edit may build everything once: models arriving in between change the whole picture)
+    edit_wall(pg, 2.4); settle(pg)
+    fp0 = pg.evaluate(FP); reg0 = pg.evaluate(REG); pg.evaluate(ROOTS)
+    pg.evaluate("() => { window.__builds = []; }")
+    wid = edit_wall(pg, 2.2); settle_built(pg)
+    bl = pg.evaluate("() => window.__builds")
+    check('P2: an edit on the ground floor: one storey built again, the other two storeys and the garden kept', bl and bl[-1] == [True, [2, 1, 'kept']], bl)
+    same = pg.evaluate(SAME)
+    check('… the kept storeys and the garden are the same pieces as before (not built, not merged again)', same == [False, True, True, True], same)
+    hh = pg.evaluate("(id) => { const v = " + V3 + "; let top = 0; v.group.children[0].traverse(o => { if (o.isMesh && o.userData.wallId === id) { const T = window.__hp.THREE; top = Math.max(top, new T.Box3().setFromObject(o).max.y); } }); return top; }", wid)
+    check('… and the changed wall really changed (2.2 m high)', near(hh, 2.2, 0.03), hh)
+    check('… picking, doors, lamps and furniture still all there (the lists of the kept storeys put back)', pg.evaluate(REG) == reg0, (reg0, pg.evaluate(REG)))
+    pg.evaluate("() => { window.__builds = []; }")
+    pg.evaluate("() => window.__hp.app.undo()"); settle_built(pg)
+    bl = pg.evaluate("() => window.__builds")
+    check('Undo: the same 3D view (no new one), and again only the changed storey built', pg.evaluate("() => " + V3 + ".__tag") == 'v1' and bl and bl[-1] == [True, [2, 1, 'kept']], bl)
+    check('… the picture exactly as before the edit (pieces and triangles per storey)', pg.evaluate(FP) == fp0, (fp0, pg.evaluate(FP)))
+    pg.evaluate("() => { window.__builds = []; }")
+    pg.evaluate("() => window.__hp.app.redo()"); settle_built(pg)
+    bl = pg.evaluate("() => window.__builds")
+    check('Redo: likewise', pg.evaluate("() => " + V3 + ".__tag") == 'v1' and bl and bl[-1] == [True, [2, 1, 'kept']], bl)
+    # the garden changes: it is built again; the storeys stay
+    pg.evaluate("() => { window.__builds = []; }")
+    pg.evaluate("() => { const a = window.__hp.app; a.mutate(pl => { const ar = pl.garden.areas[0]; ar.poly = ar.poly.map(([x, y]) => [x + 0.05, y]); }); }"); settle_built(pg)
+    bl = pg.evaluate("() => window.__builds")
+    check('a change in the garden: the garden built again, the three storeys kept', bl and bl[-1] == [True, [3, 0, 'built']] and pg.evaluate("() => " + V3 + ".group.children[3].userData.garden") is True, bl)
+    # a change of the whole picture: everything again (as before)
+    pg.evaluate("() => { window.__builds = []; }")
+    pg.evaluate("() => { const a = window.__hp.app; a.settings.light = 'evening'; a.refreshViews(false); }"); settle_built(pg)
+    bl = pg.evaluate("() => window.__builds")
+    check('Evening light (not an edit): everything built again', bl and bl[-1][1] is None, bl)
+    pg.evaluate("() => { window.__builds = []; }")
+    edit_wall(pg, 2.3); settle_built(pg)
+    bl = pg.evaluate("() => window.__builds")
+    check('… and the next edit in the evening keeps the others again', bl and bl[-1] == [True, [2, 1, 'kept']], bl)
+    pg.evaluate("() => { const a = window.__hp.app; a.settings.light = 'day'; a.refreshViews(false); }"); settle(pg)
+    # storey view: tapping still works on a kept storey (its pick pieces)
+    pg.evaluate("() => { const a = window.__hp.app; a.setScope('storey', a.project.storeys.find(s => s.name === 'Begane grond').id); }"); settle(pg, 5000)
+    # graphics: lamp glow in the evening
+    pg.evaluate("() => { const a = window.__hp.app; a.settings.light = 'evening'; a.refreshViews(false); }"); settle(pg, 5000)
+    gl = pg.evaluate("() => { const v = " + V3 + "; return v.glowGroup ? [v.glowGroup.children.length, v.lightSpots.length, v.glowGroup.children.every(s => s.material.blending === window.__hp.THREE.AdditiveBlending)] : null; }")
+    check('Evening: a soft warm glow at every lamp and ceiling light (added to the picture)', gl and gl[0] > by_house(pg, 6, 10) and gl[0] <= gl[1] and gl[2], gl)   # (owner's ground floor: over 10 lights; made-up: 10)
+    pg.screenshot(path=SHOTS + 'r15-evening-glow.png')
+    pg.evaluate("() => { const a = window.__hp.app; a.settings.light = 'day'; a.refreshViews(false); }"); settle(pg, 4000)
+    check('… by day no glow', pg.evaluate("() => " + V3 + ".glowGroup") is None)
+    # graphics: the quality chosen for the device the first time
+    pg.evaluate("() => window.__hp.Settings.set('autoQ', null)")
+    pg.evaluate("() => { window.__hp.app.autoQualityOnce(" + V3 + ", { fps: 12 }); }"); pg.wait_for_timeout(1500)
+    q = pg.evaluate("() => [window.__hp.app.settings.quality, window.__hp.app.settings.autoQ]")
+    toast = pg.inner_text('#toasts')
+    check('first 3D on a slow device (12 pictures a second): Fast, and it says so (with Undo)', q[0] == 'fast' and q[1]['fps'] == 12 and 'Fast' in toast and pg.locator('#toasts button:has-text("Undo")').count() == 1, (q, toast))
+    pg.click('#toasts button:has-text("Undo")'); pg.wait_for_timeout(2500)
+    check('… Undo: back to Beautiful (and not asked again)', pg.evaluate("() => window.__hp.app.settings.quality") == 'beautiful' and pg.evaluate("() => !!window.__hp.app.settings.autoQ"))
+    pg.evaluate("() => window.__hp.Settings.set('autoQ', null)")
+    pg.evaluate("() => { window.__hp.app.autoQualityOnce(" + V3 + ", { fps: 58 }); }"); pg.wait_for_timeout(1200)
+    check('a fast computer: High offered (not switched by itself)', pg.evaluate("() => window.__hp.app.settings.quality") == 'beautiful' and pg.locator('#toasts button:has-text("Use High")').count() == 1)
+    pg.click('#toasts button:has-text("Use High")'); pg.wait_for_timeout(3500)
+    check('… “Use High”: High', pg.evaluate("() => window.__hp.app.settings.quality") == 'high')
+    pg.evaluate("() => window.__hp.app.setQuality('beautiful')"); settle(pg, 4000)
+    fps = pg.evaluate("() => window.__hp.app.measureStill(" + V3 + ")")
+    check('… the quiet measurement itself: pictures a second of the still view', fps and fps > 0, fps)
+    # P3 on a computer: always sharp; the shaders prepared after every build
+    pr = pg.evaluate("() => { const v = " + V3 + "; return [v._adapt, v.renderer.getPixelRatio(), v.warmCount || 0, !!v._warming]; }")
+    check('P3: a computer keeps its full sharpness while moving; every build prepares its shaders first (and is done)', pr[0] is False and pr[2] >= 1 and pr[3] is False, pr)
+    check('no page errors (P2, P3 on a computer)', not pg.errors, pg.errors[:3])
+    b.close()
+
+    # ───────── U5 undo history, U1 search, U6 help (PC) ─────────
+    b, pg = open_app(p)
+    open_example(pg)
+    pg.evaluate("() => { const a = window.__hp.app; a.setMode('build'); }"); pg.wait_for_timeout(800)
+    base = pg.evaluate("() => { const a = window.__hp.app, pl = a.shownVersion().plan; return { notes: a.project.notes.length }; }")
+    wid = edit_wall(pg, 2.25); pg.wait_for_timeout(500)
+    pg.evaluate("() => { const a = window.__hp.app; a.mutate(p => { p.notes.push({ id: 'n_hist', type: 'todo', status: 'open', text: 'Tegels kiezen', created: Date.now(), updated: Date.now(), photos: [], room: null, storey: a.view.storeyId, at: null }); }, { project: true }); }"); pg.wait_for_timeout(500)
+    oid = pg.evaluate("() => { const a = window.__hp.app; const o = a.shownVersion().plan.openings.find(o => o.kind === 'door'); a.mutate(pl => { pl.openings.find(x => x.id === o.id).w = o.w + 0.1; }); return o.id; }"); pg.wait_for_timeout(800)
+    check('U5: a History button next to Undo and Redo', pg.locator('#btn-history').count() == 1 and pg.is_enabled('#btn-history'))
+    pg.click('#btn-history'); pg.wait_for_timeout(1000)
+    rows = pg.evaluate("() => [...document.querySelectorAll('#hist-body .hist-row:not(.fwd) .hist-d')].map(e => e.textContent)")
+    check('… every step of this session, newest first, with what changed', len(rows) == 3 and 'Door' in rows[0] and 'Note added' in rows[1] and 'Wall changed' in rows[2] and 'Begane grond' in rows[2], rows)
+    check('… with the time of the change', all(':' in x for x in pg.evaluate("() => [...document.querySelectorAll('#hist-body .hist-t')].map(e => e.textContent)")))
+    pg.click('#hist-body .hist-row[data-n="3"]'); pg.wait_for_timeout(1500)
+    st = pg.evaluate("([wid, oid]) => { const a = window.__hp.app, pl = a.shownVersion().plan; return [pl.walls.find(w => w.id === wid).h || null, a.project.notes.length, a.undoStack.length, a.redoStack.length]; }", [wid, oid])
+    check('… tap the oldest: three steps back at once (the wall, the note and the door as before)', st[0] != 2.25 and st[1] == base['notes'] and st[2] == 0 and st[3] == 3, st)
+    pg.keyboard.press('Control+h'); pg.wait_for_timeout(1000)
+    fw = pg.evaluate("() => [document.querySelectorAll('#hist-body .hist-row.fwd').length, !!document.querySelector('#hist-now')]")
+    check('Ctrl+H: the steps you went back over above “Now”, to go forward to again', fw == [3, True], fw)
+    pg.click('#hist-body .hist-row.fwd[data-n="-2"]'); pg.wait_for_timeout(1500)
+    st = pg.evaluate("([wid, oid]) => { const a = window.__hp.app, pl = a.shownVersion().plan; return [pl.walls.find(w => w.id === wid).h, a.project.notes.length, a.undoStack.length, a.redoStack.length]; }", [wid, oid])
+    check('… forward two steps: the wall and the note back, the door not yet', st[0] == 2.25 and st[1] == base['notes'] + 1 and st[2] == 2 and st[3] == 1, st)
+    # U1 search
+    pg.keyboard.press('Control+k'); pg.wait_for_timeout(700)
+    check('U1: Ctrl+K opens the search box, ready to type', pg.locator('#search-q').count() == 1 and pg.evaluate("() => document.activeElement && document.activeElement.id") == 'search-q')
+    pg.keyboard.type('keuk'); pg.wait_for_timeout(400)
+    first = pg.evaluate("() => { const r = document.querySelector('#search-list .search-row'); return r ? [r.dataset.kind, r.querySelector('.sr-label').textContent, r.querySelector('.sr-sub').textContent] : null; }")
+    check('… “keuk”: the room Keuken first, with its storey and area', first and first[0] == 'room' and first[1] == 'Keuken' and 'Begane grond' in first[2] and 'm²' in first[2], first)
+    pg.keyboard.press('Enter'); pg.wait_for_timeout(1200)
+    sel = pg.evaluate("() => { const a = window.__hp.app; const r = a.selection && a.shownVersion().plan.rooms.find(r => r.id === a.selection.id); return [a.selection && a.selection.type, r && r.name, a.view.scope]; }")
+    check('… Enter: the room selected on its storey, its details open', sel == ['room', 'Keuken', 'storey'], sel)
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
+    pg.keyboard.press('/'); pg.wait_for_timeout(600)
+    pg.keyboard.type('photo render'); pg.wait_for_timeout(300)
+    r = pg.evaluate("() => [...document.querySelectorAll('#search-list .search-row')].map(x => [x.dataset.kind, x.querySelector('.sr-label').textContent])")
+    check('“/” opens it too; actions are found (“photo render”)', r and r[0] == ['action', 'Photo render of this view'], r)
+    pg.fill('#search-q', 'kosten'); pg.wait_for_timeout(300)
+    r = pg.evaluate("() => [...document.querySelectorAll('#search-list .search-row')].map(x => x.querySelector('.sr-label').textContent)")
+    check('… also by other words, Dutch too (“kosten” → Budget)', any('Budget' in x for x in r), r)
+    pg.fill('#search-q', 'tegels kiezen'); pg.wait_for_timeout(300)
+    r = pg.evaluate("() => [...document.querySelectorAll('#search-list .search-row')].map(x => [x.dataset.kind, x.querySelector('.sr-label').textContent])")
+    check('… notes by their text', ['note', 'Tegels kiezen'] in r, r)
+    pg.fill('#search-q', 'slaap'); pg.wait_for_timeout(300)
+    n1 = pg.evaluate("() => document.querySelectorAll('#search-list .search-row').length")
+    pg.keyboard.press('ArrowDown'); pg.keyboard.press('ArrowDown'); pg.wait_for_timeout(200)
+    cur = pg.evaluate("() => [...document.querySelectorAll('#search-list .search-row')].findIndex(x => x.getAttribute('aria-selected') === 'true')")
+    check('… rooms on other storeys (“slaap”: the bedrooms), ↑ ↓ to choose', n1 >= 3 and cur == 2, (n1, cur))
+    pg.fill('#search-q', 'xyzzy'); pg.wait_for_timeout(300)
+    check('… nothing found: it says so', 'Nothing found' in pg.inner_text('#search-list'))
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
+    check('the magnifier in the top bar opens it as well', pg.locator('#btn-search').count() == 1)
+    # U6 help
+    pg.evaluate("() => window.__hp.app.select(null)"); pg.wait_for_timeout(400)
+    pg.keyboard.press('?'); pg.wait_for_timeout(800)
+    hv = pg.evaluate("() => [document.querySelectorAll('.help-badge').length, document.querySelectorAll('#help-list li').length, document.querySelector('#help-list').textContent, document.querySelectorAll('.help-keys dt').length]")
+    check('U6: “?”: a numbered badge on every button on the screen, the same numbers in the list', hv[0] >= 15 and hv[0] == hv[1], hv[:2])
+    check('… saying what they do (Undo, Search, Wall, 3D …) and the keys', all(w in hv[2] for w in ['Undo', 'Search', 'Wall', '3D', 'Export']) and hv[3] >= 10, hv[2][:300])
+    inside = pg.evaluate("() => [...document.querySelectorAll('.help-badge')].every(b => { const r = b.getBoundingClientRect(); return r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight; })")
+    check('… all badges on the screen', inside)
+    pg.locator('.help-badge').nth(2).click(); pg.wait_for_timeout(300)
+    on = pg.evaluate("() => [document.querySelectorAll('.help-box.on').length, document.querySelectorAll('#help-list li.on').length, document.querySelector('.help-badge.on').dataset.n]")
+    check('… tap a number: that button and its line light up', on == [1, 1, '3'], on)
+    pg.screenshot(path=SHOTS + 'r15-help.png')
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
+    check('… Esc: gone', pg.locator('.help-ov').count() == 0)
+    check('no page errors (U5, U1, U6)', not pg.errors, pg.errors[:3])
+    b.close()
+
+    # ───────── phone, dark ─────────
+    b, pg = open_app(p, phone=True, theme='dark')
+    open_example(pg)
+    pg.evaluate("() => { const a = window.__hp.app; a.setDim('3d'); }"); settle(pg, 5000)
+    st = pg.evaluate("() => { const v = " + V3 + "; return [v._adapt, v.renderer.getPixelRatio(), v._fullPR]; }")
+    check('P3 phone: a sharp phone screen (2×) is drawn sharp when still', st == [True, 2, 2], st)
+    MOVE = """(ms) => new Promise(res => { const v = window.__hp.app.panes.find(p => p.kind === '3d').view; let lo = 9, t0 = performance.now();
+      const f = () => { v.camMoved = true; lo = Math.min(lo, v.renderer.getPixelRatio()); if (performance.now() - t0 < ms) requestAnimationFrame(f); else res(lo); }; requestAnimationFrame(f); })"""
+    lo = pg.evaluate(MOVE, 600)
+    check('… while turning: 60 % of the sharpness (1.2×), a third of the pixels', near(lo, 1.2, 1e-6), lo)
+    # (a moment: the next drawn frame after it stops – on the test computer, which draws in software, a frame of the
+    # whole neighbourhood takes a few seconds)
+    try: pg.wait_for_function("() => " + V3 + ".renderer.getPixelRatio() === 2", timeout=15000)
+    except Exception: pass
+    pr = pg.evaluate("() => " + V3 + ".renderer.getPixelRatio()")
+    check('… sharp again a moment after it stops', pr == 2, pr)
+    cv = pg.evaluate("() => { const c = " + V3 + ".renderer.domElement; return [c.width, c.clientWidth]; }")
+    check('… the canvas back at full size (2 pixels per screen pixel)', cv[0] == cv[1] * 2, cv)
+    # phone: search and help
+    pg.tap('#btn-search'); pg.wait_for_timeout(700)
+    pg.fill('#search-q', 'woon'); pg.wait_for_timeout(300)
+    hs = pg.evaluate("() => [...document.querySelectorAll('#search-list .search-row')].map(r => r.getBoundingClientRect().height)")
+    check('phone: the magnifier opens the search; results big enough to tap', hs and min(hs) >= 44, hs)
+    pg.tap('#search-list .search-row'); pg.wait_for_timeout(1500)
+    check('… tap: the room (Woonkamer) selected', pg.evaluate("() => { const a = window.__hp.app; const r = a.selection && a.shownVersion().plan.rooms.find(r => r.id === a.selection.id); return r && r.name; }") == 'Woonkamer')
+    pg.evaluate("() => { window.__hp.app.select(null); window.__hp.app.toggleInspector(false); }"); pg.wait_for_timeout(600)
+    pg.evaluate("() => { window.__hp.app.helpOverlay(); }"); pg.wait_for_timeout(800)
+    hp = pg.evaluate("() => { const p = document.querySelector('.help-panel').getBoundingClientRect(); return [p.left >= 0, p.right <= innerWidth + 1, p.bottom <= innerHeight + 1, document.querySelectorAll('.help-badge').length]; }")
+    check('phone: the help fits the screen (the list at the bottom), badges on the buttons', hp[0] and hp[1] and hp[2] and hp[3] >= 8, hp)
+    pg.screenshot(path=SHOTS + 'r15-phone-help.png')
+    pg.touchscreen.tap(195, 120); pg.wait_for_timeout(400)
+    check('… a tap outside the list closes it', pg.locator('.help-ov').count() == 0)
+    check('phone: no page errors', not pg.errors, pg.errors[:3])
+    b.close()
+sys.exit(summary())

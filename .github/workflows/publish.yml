@@ -1,0 +1,109 @@
+name: Publish web version
+
+# Puts the web version on https://smholte.github.io/house-planner/ (task 0008). Only by hand, when the owner says so:
+#   Actions → "Publish web version" → Run workflow → (version: main, or a commit) → Run workflow
+# It builds the web version of that commit (the public app with the made-up example house), checks that it holds no
+# word of the owner's house (the secret HOUSE_WORDS – it refuses to publish without it) and that the commit's Tests
+# run was green, then publishes it. Needs once: Settings → Pages → Source: GitHub Actions.
+# The address and the file names stay the same, so an installed copy on a phone keeps working and updates itself.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "What to publish: main, or a commit of this repository"
+        default: main
+        required: true
+      skip_tests_check:
+        description: "Publish even when that commit has no green Tests run (only when the owner asks)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build, check and publish the web version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.version }}
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: tools/requirements-dev.txt
+
+      - name: The commit's Tests run was green
+        if: ${{ !inputs.skip_tests_check }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha=$(git rev-parse HEAD)
+          ok=$(gh api "repos/${{ github.repository }}/actions/workflows/tests.yml/runs?head_sha=$sha&status=success&per_page=5" --jq '.total_count')
+          echo "commit $sha: $ok green Tests run(s)"
+          if [ "$ok" = "0" ]; then
+            echo "::error title=Not tested::Commit $sha has no green Tests run. Wait for it, or run this again with the tick 'Publish even when …' (only when the owner asks)."
+            exit 1
+          fi
+
+      - name: Build the web version
+        env:
+          HP_SECRET_WORDS: ${{ secrets.HOUSE_WORDS }}
+        run: |
+          if [ -z "$HP_SECRET_WORDS" ]; then
+            echo "::error title=House words missing::The secret HOUSE_WORDS is not set (Settings → Secrets and variables → Actions). Without it the web version cannot be checked for the house's words, so it is not published."
+            exit 1
+          fi
+          python -m pip install -q -r tools/requirements-dev.txt
+          python build.py --no-house | tee build.txt
+          grep -q "house words: [0-9]* checked" build.txt
+          python - <<'PY'
+          # the web version again, file by file: no word of the house, the made-up example only
+          import os, re, sys, json, gzip, base64
+          words = [w.strip() for w in os.environ['HP_SECRET_WORDS'].splitlines() if w.strip()]
+          bad = []
+          for name in sorted(os.listdir('dist/web')):
+              data = open(os.path.join('dist/web', name), 'rb').read().decode('utf-8', 'replace')
+              bad += [f'{name}: a word of the house (number {i + 1} of the list)' for i, w in enumerate(words) if w in data]
+          html = open('dist/web/index.html', encoding='utf-8').read()
+          m = re.search(r"EXAMPLE_HOUSE = \{ projectGz: '([^']+)'", html)
+          ex = json.loads(gzip.decompress(base64.b64decode(m.group(1)))) if m else {}
+          if html.count('EXAMPLE_HOUSE = {') != 1 or ex.get('id') != 'p_example_testhouse':
+              bad.append('the example is not the made-up house')
+          if re.search(r'Object\.assign\(HOUSE\b', html):
+              bad.append('a house is built in')
+          for b in bad:
+              print('::error title=Not published::' + b)
+          print(f'web version checked: {len(os.listdir("dist/web"))} files, {len(words)} words, example {ex.get("name")}')
+          sys.exit(1 if bad else 0)
+          PY
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/web
+
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Address
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          echo "### Web version published – $PAGE_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "From commit $(git rev-parse --short HEAD) ($(grep -o 'APP_VERSION = { n: [0-9]*' src/util.js))" >> "$GITHUB_STEP_SUMMARY"

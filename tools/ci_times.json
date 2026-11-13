@@ -1,0 +1,728 @@
+{
+ "total_seconds": 8351.0,
+ "files": {
+  "test_backup.py": {
+   "seconds": 67.0,
+   "ok": true,
+   "checks": 22,
+   "made_up": {
+    "seconds": 63.0,
+    "ok": true,
+    "checks": 22
+   },
+   "set": "public"
+  },
+  "test_budget.py": {
+   "seconds": 55.0,
+   "ok": true,
+   "checks": 21,
+   "made_up": {
+    "seconds": 40.0,
+    "ok": true,
+    "checks": 21
+   },
+   "set": "public"
+  },
+  "test_doors.py": {
+   "seconds": 202.0,
+   "ok": true,
+   "checks": 16,
+   "made_up": {
+    "seconds": 124.0,
+    "ok": true,
+    "checks": 16
+   },
+   "set": "public"
+  },
+  "test_doors_fill.py": {
+   "seconds": 67.0,
+   "ok": true,
+   "checks": 27,
+   "made_up": {
+    "seconds": 61.0,
+    "ok": true,
+    "checks": 27
+   },
+   "set": "public"
+  },
+  "test_drawings.py": {
+   "seconds": 213.0,
+   "ok": true,
+   "checks": 25,
+   "made_up": {
+    "seconds": 133.0,
+    "ok": true,
+    "checks": 25
+   },
+   "set": "public"
+  },
+  "test_editing.py": {
+   "seconds": 128.0,
+   "ok": true,
+   "checks": 40,
+   "made_up": {
+    "seconds": 103.0,
+    "ok": true,
+    "checks": 40
+   },
+   "set": "public"
+  },
+  "test_facade.py": {
+   "seconds": 175.0,
+   "ok": true,
+   "checks": 37,
+   "made_up": {
+    "seconds": 118.0,
+    "ok": true,
+    "checks": 37
+   },
+   "set": "public"
+  },
+  "test_finish.py": {
+   "seconds": 98.0,
+   "ok": true,
+   "checks": 40,
+   "made_up": {
+    "seconds": 84.0,
+    "ok": true,
+    "checks": 40
+   },
+   "set": "public"
+  },
+  "test_furniture.py": {
+   "seconds": 132.0,
+   "ok": true,
+   "checks": 19,
+   "made_up": {
+    "seconds": 104.0,
+    "ok": true,
+    "checks": 19
+   },
+   "set": "public"
+  },
+  "test_garden.py": {
+   "seconds": 100.0,
+   "ok": true,
+   "set": "public",
+   "checks": 28,
+   "made_up": {
+    "seconds": 79.0,
+    "ok": true,
+    "checks": 28
+   }
+  },
+  "test_garden_wall.py": {
+   "seconds": 46.0,
+   "ok": true,
+   "set": "public",
+   "checks": 16,
+   "made_up": {
+    "seconds": 28.0,
+    "ok": true,
+    "checks": 16
+   }
+  },
+  "test_handover.py": {
+   "seconds": 27.0,
+   "ok": true,
+   "checks": 11,
+   "made_up": {
+    "seconds": 20.0,
+    "ok": true,
+    "checks": 11
+   },
+   "set": "public"
+  },
+  "test_i18n.py": {
+   "seconds": 53.0,
+   "ok": true,
+   "checks": 21,
+   "made_up": {
+    "seconds": 43.0,
+    "ok": true,
+    "checks": 21
+   },
+   "set": "public"
+  },
+  "test_install.py": {
+   "seconds": 139.0,
+   "ok": true,
+   "checks": 28,
+   "made_up": {
+    "seconds": 91.0,
+    "ok": true,
+    "checks": 28
+   },
+   "set": "public"
+  },
+  "test_kitchen.py": {
+   "seconds": 64.0,
+   "ok": true,
+   "checks": 14,
+   "made_up": {
+    "seconds": 51.0,
+    "ok": true,
+    "checks": 14
+   },
+   "set": "public"
+  },
+  "test_materials.py": {
+   "seconds": 61.0,
+   "ok": true,
+   "checks": 20,
+   "made_up": {
+    "seconds": 51.0,
+    "ok": true,
+    "checks": 20
+   },
+   "set": "public"
+  },
+  "test_merge.py": {
+   "seconds": 44.0,
+   "ok": true,
+   "checks": 21,
+   "made_up": {
+    "seconds": 33.0,
+    "ok": true,
+    "checks": 21
+   },
+   "set": "public"
+  },
+  "test_models.py": {
+   "seconds": 144.0,
+   "ok": true,
+   "checks": 21,
+   "made_up": {
+    "seconds": 105.0,
+    "ok": true,
+    "checks": 21
+   },
+   "set": "public"
+  },
+  "test_notes.py": {
+   "seconds": 42.0,
+   "ok": true,
+   "checks": 12,
+   "made_up": {
+    "seconds": 32.0,
+    "ok": true,
+    "checks": 12
+   },
+   "set": "public"
+  },
+  "test_oldfile.py": {
+   "seconds": 77.0,
+   "ok": true,
+   "checks": 7,
+   "made_up": {
+    "seconds": 55.0,
+    "ok": true,
+    "checks": 7
+   },
+   "set": "public"
+  },
+  "test_openings.py": {
+   "seconds": 39.0,
+   "ok": true,
+   "checks": 13,
+   "made_up": {
+    "seconds": 36.0,
+    "ok": true,
+    "checks": 13
+   },
+   "set": "public"
+  },
+  "test_pdf.py": {
+   "seconds": 41.0,
+   "ok": true,
+   "checks": 12,
+   "made_up": {
+    "seconds": 31.0,
+    "ok": true,
+    "checks": 12
+   },
+   "set": "public"
+  },
+  "test_phone.py": {
+   "seconds": 136.0,
+   "ok": true,
+   "checks": 23,
+   "made_up": {
+    "seconds": 103.0,
+    "ok": true,
+    "checks": 23
+   },
+   "set": "public"
+  },
+  "test_quantities.py": {
+   "seconds": 36.0,
+   "ok": true,
+   "checks": 19,
+   "made_up": {
+    "seconds": 32.0,
+    "ok": true,
+    "checks": 19
+   },
+   "set": "public"
+  },
+  "test_regress.py": {
+   "seconds": 596.0,
+   "ok": true,
+   "checks": 18,
+   "made_up": {
+    "seconds": 214.0,
+    "ok": true,
+    "checks": 18
+   },
+   "set": "public"
+  },
+  "test_round10.py": {
+   "seconds": 143.0,
+   "ok": true,
+   "set": "public",
+   "checks": 16,
+   "made_up": {
+    "seconds": 97.0,
+    "ok": true,
+    "checks": 16
+   }
+  },
+  "test_round11.py": {
+   "seconds": 165.0,
+   "ok": true,
+   "set": "public",
+   "checks": 47,
+   "made_up": {
+    "seconds": 133.0,
+    "ok": true,
+    "checks": 47
+   }
+  },
+  "test_round12.py": {
+   "seconds": 66.0,
+   "ok": true,
+   "checks": 44,
+   "made_up": {
+    "seconds": 55.0,
+    "ok": true,
+    "checks": 44
+   },
+   "set": "public"
+  },
+  "test_round13.py": {
+   "seconds": 261.0,
+   "ok": true,
+   "checks": 29,
+   "made_up": {
+    "seconds": 167.0,
+    "ok": true,
+    "checks": 29
+   },
+   "set": "public"
+  },
+  "test_round14.py": {
+   "seconds": 66.0,
+   "ok": true,
+   "checks": 40,
+   "made_up": {
+    "seconds": 192.0,
+    "ok": true,
+    "checks": 40
+   },
+   "set": "public"
+  },
+  "test_round15.py": {
+   "seconds": 241.0,
+   "ok": true,
+   "checks": 49,
+   "made_up": {
+    "seconds": 221.0,
+    "ok": true,
+    "checks": 49
+   },
+   "set": "public"
+  },
+  "test_round16.py": {
+   "seconds": 81.0,
+   "ok": true,
+   "checks": 40,
+   "made_up": {
+    "seconds": 65.0,
+    "ok": true,
+    "checks": 40
+   },
+   "set": "public"
+  },
+  "test_round17.py": {
+   "seconds": 41.0,
+   "ok": true,
+   "checks": 28,
+   "made_up": {
+    "seconds": 37.0,
+    "ok": true,
+    "checks": 28
+   },
+   "set": "public"
+  },
+  "test_round18.py": {
+   "seconds": 223.0,
+   "ok": true,
+   "set": "public",
+   "checks": 26,
+   "made_up": {
+    "seconds": 180.0,
+    "ok": true,
+    "checks": 26
+   }
+  },
+  "test_round19.py": {
+   "seconds": 85.0,
+   "ok": true,
+   "set": "public",
+   "checks": 20,
+   "made_up": {
+    "seconds": 73.0,
+    "ok": true,
+    "checks": 20
+   }
+  },
+  "test_round20.py": {
+   "seconds": 258.0,
+   "ok": true,
+   "checks": 22,
+   "made_up": {
+    "seconds": 216.0,
+    "ok": true,
+    "checks": 22
+   },
+   "set": "public"
+  },
+  "test_round21.py": {
+   "seconds": 34.0,
+   "ok": true,
+   "checks": 20,
+   "made_up": {
+    "seconds": 31.0,
+    "ok": true,
+    "checks": 20
+   },
+   "set": "public"
+  },
+  "test_round22.py": {
+   "seconds": 140.0,
+   "ok": true,
+   "checks": 27,
+   "made_up": {
+    "seconds": 74.0,
+    "ok": true,
+    "checks": 27
+   },
+   "set": "public"
+  },
+  "test_round23.py": {
+   "seconds": 132.0,
+   "ok": true,
+   "checks": 15,
+   "made_up": {
+    "seconds": 106.0,
+    "ok": true,
+    "checks": 15
+   },
+   "set": "public"
+  },
+  "test_round24.py": {
+   "seconds": 239.0,
+   "ok": true,
+   "checks": 18,
+   "made_up": {
+    "seconds": 158.0,
+    "ok": true,
+    "checks": 18
+   },
+   "set": "public"
+  },
+  "test_round25.py": {
+   "seconds": 274.0,
+   "ok": true,
+   "checks": 31,
+   "made_up": {
+    "seconds": 185.0,
+    "ok": true,
+    "checks": 31
+   },
+   "set": "public"
+  },
+  "test_round26.py": {
+   "seconds": 166.0,
+   "ok": true,
+   "checks": 15,
+   "made_up": {
+    "seconds": 135.0,
+    "ok": true,
+    "checks": 15
+   },
+   "set": "public"
+  },
+  "test_round27.py": {
+   "seconds": 483.0,
+   "ok": true,
+   "checks": 11,
+   "made_up": {
+    "seconds": 258.0,
+    "ok": true,
+    "checks": 11
+   },
+   "set": "public"
+  },
+  "test_round28.py": {
+   "seconds": 73.0,
+   "ok": true,
+   "checks": 15,
+   "made_up": {
+    "seconds": 53.0,
+    "ok": true,
+    "checks": 15
+   },
+   "set": "public"
+  },
+  "test_round29.py": {
+   "seconds": 293.0,
+   "ok": true,
+   "checks": 24,
+   "made_up": {
+    "seconds": 179.0,
+    "ok": true,
+    "checks": 24
+   },
+   "set": "public"
+  },
+  "test_round3.py": {
+   "seconds": 369.0,
+   "ok": true,
+   "set": "public",
+   "checks": 28,
+   "made_up": {
+    "seconds": 233.0,
+    "ok": true,
+    "checks": 28
+   }
+  },
+  "test_round30.py": {
+   "seconds": 38.0,
+   "ok": true,
+   "set": "public",
+   "checks": 6,
+   "made_up": {
+    "seconds": 30.0,
+    "ok": true,
+    "checks": 6
+   }
+  },
+  "test_round31.py": {
+   "seconds": 15.0,
+   "ok": true,
+   "checks": 10,
+   "made_up": {
+    "seconds": 12.0,
+    "ok": true,
+    "checks": 10
+   },
+   "set": "public"
+  },
+  "test_round32.py": {
+   "seconds": 136.0,
+   "ok": true,
+   "checks": 17,
+   "made_up": {
+    "seconds": 122.0,
+    "ok": true,
+    "checks": 17
+   },
+   "set": "public"
+  },
+  "test_round37.py": {
+   "seconds": 29.0,
+   "ok": true,
+   "set": "public",
+   "checks": 16,
+   "made_up": {
+    "seconds": 26.0,
+    "ok": true,
+    "checks": 16
+   }
+  },
+  "test_round38.py": {
+   "seconds": 60.0,
+   "ok": true,
+   "set": "public",
+   "checks": 13,
+   "made_up": {
+    "seconds": 51.0,
+    "ok": true,
+    "checks": 13
+   }
+  },
+  "test_round4.py": {
+   "seconds": 41.0,
+   "ok": true,
+   "set": "public",
+   "checks": 10,
+   "made_up": {
+    "seconds": 29.0,
+    "ok": true,
+    "checks": 10
+   }
+  },
+  "test_round5.py": {
+   "seconds": 88.0,
+   "ok": true,
+   "set": "public",
+   "checks": 11,
+   "made_up": {
+    "seconds": 71.0,
+    "ok": true,
+    "checks": 11
+   }
+  },
+  "test_round6.py": {
+   "seconds": 317.0,
+   "ok": true,
+   "set": "public",
+   "checks": 22,
+   "made_up": {
+    "seconds": 199.0,
+    "ok": true,
+    "checks": 22
+   }
+  },
+  "test_round7.py": {
+   "seconds": 63.0,
+   "ok": true,
+   "checks": 19,
+   "made_up": {
+    "seconds": 48.0,
+    "ok": true,
+    "checks": 19
+   },
+   "set": "public"
+  },
+  "test_round8.py": {
+   "seconds": 253.0,
+   "ok": true,
+   "checks": 13,
+   "made_up": {
+    "seconds": 164.0,
+    "ok": true,
+    "checks": 13
+   },
+   "set": "public"
+  },
+  "test_round9.py": {
+   "seconds": 62.0,
+   "ok": true,
+   "set": "public",
+   "checks": 23,
+   "made_up": {
+    "seconds": 50.0,
+    "ok": true,
+    "checks": 23
+   }
+  },
+  "test_sun.py": {
+   "seconds": 167.0,
+   "ok": true,
+   "checks": 18,
+   "made_up": {
+    "seconds": 87.0,
+    "ok": true,
+    "checks": 18
+   },
+   "set": "public"
+  },
+  "test_tasks.py": {
+   "seconds": 43.0,
+   "ok": true,
+   "checks": 18,
+   "made_up": {
+    "seconds": 32.0,
+    "ok": true,
+    "checks": 18
+   },
+   "set": "public"
+  },
+  "test_tour.py": {
+   "seconds": 55.0,
+   "ok": true,
+   "checks": 12,
+   "made_up": {
+    "seconds": 40.0,
+    "ok": true,
+    "checks": 12
+   },
+   "set": "public"
+  },
+  "test_view3d.py": {
+   "seconds": 125.0,
+   "ok": true,
+   "checks": 15,
+   "made_up": {
+    "seconds": 91.0,
+    "ok": true,
+    "checks": 15
+   },
+   "set": "public"
+  },
+  "test_viewer.py": {
+   "seconds": 46.0,
+   "ok": true,
+   "checks": 17,
+   "made_up": {
+    "seconds": 38.0,
+    "ok": true,
+    "checks": 17
+   },
+   "set": "public"
+  },
+  "test_voids.py": {
+   "seconds": 62.0,
+   "ok": true,
+   "checks": 36,
+   "made_up": {
+    "seconds": 50.0,
+    "ok": true,
+    "checks": 36
+   },
+   "set": "public"
+  },
+  "test_walk.py": {
+   "seconds": 114.0,
+   "ok": true,
+   "checks": 13,
+   "made_up": {
+    "seconds": 47.0,
+    "ok": true,
+    "checks": 13
+   },
+   "set": "public"
+  },
+  "test_web.py": {
+   "seconds": 22.0,
+   "ok": true,
+   "checks": 10,
+   "made_up": {
+    "seconds": 15.0,
+    "ok": true,
+    "checks": 10
+   },
+   "set": "public"
+  }
+ },
+ "note": "seconds: on the owner's house (measured 12 Nov 2026, tasks 0007a / 0007b, two or three test files at a time); made_up: the same file on the made-up house (public app). ci: what GitHub's runs measured (python3 tools/ci_status.py --record), which tools/ci_groups.py balances by first. checks: the number of checks.",
+ "sets": {
+  "public": {
+   "files": 65,
+   "seconds": 8351.0,
+   "made_up_seconds": 5884.0
+  }
+ }
+}

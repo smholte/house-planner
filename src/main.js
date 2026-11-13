@@ -1,0 +1,13 @@
+/* ───────────── main.js — start ───────────── */
+window.addEventListener('error', e => console.error('[house-planner]', e.error || e.message));
+window.addEventListener('unhandledrejection', e => console.error('[house-planner] unhandled', e.reason));
+// the material pictures: decoded in the background; the 3D views are built again with them when they are ready
+window.__hp_texlib = texlibInit();
+window.__hp = { app, DB, TEXLIB, TEX, libSet, libMaterial, libBrickFor, libBrick, libBrickCanvas, libBrickShared, libDetailTex, libTintCanvas, softPatch, brickPalette, BRICK_PAL, Saver, Snapshots, Trash, Assets, diffPlans, buildExampleProject, stairLine, snapFurniture, THREE, labelPoint, houseQuantities, budgetFor, parseMoney, boardProgress, roomProgress, tasksOf, stairGeom, roomHoles, furnCorners, wallFaces, roomFaces, roomFinishStats, faceFinish, tileCount, FURN_TYPES, RAL, Settings, MODELS, MLIB, modelInfo, addon, loadModelLib, makeDrawing: (it, o) => app.makeDrawing(it, o), SLICE, sliceFromJSON, sunPosition, sunMoment, sunTimes, facadeDiff, facadeShellParts, assemblyOpenings, fxCluster, fxBox, fxCutPart, fxLayerLook, mergeChanges, readHouseFile, t, trText, setLang, I18N, fmtDate, floorSpec, floorLayout, roomHoles, gLinePath, gPlotOutline, outwardBoxes, wallEnds, canHighQuality, quality3d, vegSpecies, vegGrow, hqMaterial, migrateSite, hoodApply, hoodKerbs, modelWindowInfo, facadeUpstands, gateLayout, migrateProject, sortedStoreys, docsOfStorey, docMeta, viewerPage, renatoParts, renatoMesh, renatoShopSet, safeTex: () => SAFE_TEX, gpuInfo: () => GPU_INFO, needSafeTex, furnSymbol, FURN, floorProductKey, budgetOf, unitFaces, runLayout, runCtx, floorShapes, floorHeatR, shortStoreyName, frameStats, speedAdvice, floorSpec, floorMaterial, tileMat, kTopMat, tileFall, faceFrame, wallViewData, diaryInit, noteDay, isoDay, DIARY_TYPES, renderView3d, renderPathTraced, makeDenoiser, canvasBlank, libSkyNoSun, renderLight, renderSize, renderDims, renderRatio, renderResList, fmtDur, RENDER_RES, halton, skyDir, arFit, arPlace, arCorners, arSupport , HOUSE, ownId: id => !!(HOUSE.ownId && HOUSE.ownId(String(id))), ...HOUSE.exports };
+app.boot().catch(err => {
+  console.error(err);
+  const box = document.createElement('div');
+  box.style.cssText = 'position:fixed;inset:auto 16px 16px;padding:12px 14px;border-radius:8px;background:#C0352A;color:#fff;font:14px system-ui;z-index:99';
+  box.textContent = 'The app could not start: ' + (err && err.message ? err.message : err) + '. Try reloading. Your saved houses are not affected.';
+  document.body.appendChild(box);
+});

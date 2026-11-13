@@ -1,0 +1,20 @@
+{
+ "storeyNames": ["Begane grond", "1e verdieping", "Zolder"],
+ "storageName": "Opslag achter knieschot",
+ "rooms": [
+  {"storey": "Begane grond", "at": [3.0, 0.6], "name": "Hal"},
+  {"storey": "Begane grond", "at": [1.0, 0.7], "name": "Toilet"},
+  {"storey": "Begane grond", "at": [1.0, 1.95], "name": "Meterkast"},
+  {"storey": "Begane grond", "at": [1.0, 3.5], "name": "Bijkeuken"},
+  {"storey": "Begane grond", "at": [6.0, 2.2], "name": "Keuken"},
+  {"storey": "Begane grond", "at": [4.0, 7.0], "name": "Woonkamer"},
+  {"storey": "1e verdieping", "at": [2.5, 0.6], "name": "Overloop"},
+  {"storey": "1e verdieping", "at": [1.0, 1.7], "name": "Badkamer"},
+  {"storey": "1e verdieping", "at": [1.0, 4.5], "name": "Toilet boven"},
+  {"storey": "1e verdieping", "at": [6.0, 2.7], "name": "Slaapkamer 1"},
+  {"storey": "1e verdieping", "at": [1.5, 7.5], "name": "Slaapkamer 2"},
+  {"storey": "1e verdieping", "at": [5.5, 7.5], "name": "Slaapkamer 3"},
+  {"storey": "Zolder", "at": [4.0, 0.6], "name": "Zolder"},
+  {"storey": "Zolder", "at": [4.0, 7.5], "name": "Zolderkamer"}
+ ]
+}

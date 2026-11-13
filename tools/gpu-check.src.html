@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D Check</title>
+<style>
+:root {
+  --bg: #F6F5F2; --card: #FFFFFF; --ink: #1D2321; --muted: #5E6763; --line: #DEDBD4; --accent: #0E6B66; --accent-ink: #FFFFFF;
+  --ok: #1F7A3E; --ok-bg: #E4F2E8; --bad: #B3261E; --bad-bg: #FBE7E5; --warn: #8A5A00; --warn-bg: #FBF0D9; --code: #EFEDE8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141A19; --card: #1C2422; --ink: #E7ECEA; --muted: #9AA6A2; --line: #2E3936; --accent: #4CC2B9; --accent-ink: #0B1413;
+    --ok: #7FD69A; --ok-bg: #1B3325; --bad: #FF8A80; --bad-bg: #3A1D1B; --warn: #F2C46B; --warn-bg: #3A2F17; --code: #222C2A;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141A19; --card: #1C2422; --ink: #E7ECEA; --muted: #9AA6A2; --line: #2E3936; --accent: #4CC2B9; --accent-ink: #0B1413;
+  --ok: #7FD69A; --ok-bg: #1B3325; --bad: #FF8A80; --bad-bg: #3A1D1B; --warn: #F2C46B; --warn-bg: #3A2F17; --code: #222C2A;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 760px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 26px; line-height: 1.2; margin: 8px 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 18px; margin: 0 0 10px; }
+p { margin: 0 0 10px; }
+.lead { color: var(--muted); margin-bottom: 18px; }
+section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 0 0 14px; }
+.row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 1px solid var(--line); }
+.row:first-of-type { border-top: 0; }
+.badge { flex: none; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-top: 2px; min-width: 52px; text-align: center; }
+.b-ok { background: var(--ok-bg); color: var(--ok); }
+.b-bad { background: var(--bad-bg); color: var(--bad); }
+.b-warn { background: var(--warn-bg); color: var(--warn); }
+.b-wait { background: var(--code); color: var(--muted); }
+.row .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.row .s { color: var(--muted); font-size: 14px; }
+dl { display: grid; grid-template-columns: minmax(110px, 38%) 1fr; gap: 6px 12px; margin: 0; }
+dt { color: var(--muted); font-size: 14px; }
+dd { margin: 0; overflow-wrap: anywhere; font-size: 14px; }
+#stage { position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 60vh; background: #0D1211; border-radius: 10px; overflow: hidden; margin: 6px 0 10px; }
+#stage canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; }
+#stage .msg { position: absolute; inset: 0; display: grid; place-items: center; color: #9AA6A2; font-size: 14px; padding: 16px; text-align: center; }
+button { font: inherit; font-weight: 600; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 10px 16px; min-height: 44px; cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button:disabled { opacity: 0.5; cursor: default; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.verdict { border-radius: 10px; padding: 12px 14px; margin: 0 0 10px; }
+.verdict.ok { background: var(--ok-bg); }
+.verdict.bad { background: var(--bad-bg); }
+.verdict.warn { background: var(--warn-bg); }
+.verdict strong { display: block; margin-bottom: 4px; }
+ol, ul { margin: 6px 0 10px; padding-left: 22px; }
+li { margin: 3px 0; }
+code, pre { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 13px; }
+code { background: var(--code); padding: 1px 5px; border-radius: 5px; }
+pre { background: var(--code); padding: 12px; border-radius: 10px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; margin: 0; }
+.small { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>3D check</h1>
+  <p class="lead">Finds out why the house planner's 3D does or doesn't start on this phone or computer. Open this file the same way and in the same browser as the house planner. Nothing leaves your device.</p>
+
+  <section id="s-verdict" aria-live="polite">
+    <h2>Result</h2>
+    <div id="verdict"><div class="verdict warn"><strong>Checking…</strong>One moment.</div></div>
+  </section>
+
+  <section>
+    <h2>1 · Can this browser start 3D?</h2>
+    <div id="start"></div>
+  </section>
+
+  <section>
+    <h2>2 · The graphics chip</h2>
+    <dl id="gpu"><dt>…</dt><dd></dd></dl>
+  </section>
+
+  <section>
+    <h2>3 · 3D test, step by step</h2>
+    <p class="small">Short steps, from simple shapes to what the house planner does; the material pictures in small steps to find what brings the graphics driver down. If it crashes (black screen, “3D lost”, or the page reloads): close the browser completely, open this file again and tap <b>Continue</b> – it goes on after the step that crashed and keeps the results. Repeat until every step has a result, then copy the report.</p>
+    <div id="stage"><div class="msg" id="stage-msg">The test runs here.</div></div>
+    <div id="steps"></div>
+    <div class="actions"><button class="primary" id="cont" disabled>Continue</button><button id="run" disabled>Run the 3D test from the start</button></div>
+    <p class="small" id="nokeep" hidden>This browser doesn't keep the results between runs for a file opened this way. After a crash: copy the report, close the browser, open this file again, pick the next step below and tap <b>Run from this step</b>.</p>
+    <div class="actions"><select id="from" aria-label="Start at step" style="flex:1;min-width:0;font:inherit;font-size:14px;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)"></select><button id="from-run" disabled>Run from this step</button></div>
+  </section>
+
+  <section>
+    <h2>Report</h2>
+    <p class="small">Copy it and paste it in the chat (or save it and attach the file).</p>
+    <pre id="report">…</pre>
+    <div class="actions"><button id="copy">Copy report</button><button id="save">Save report</button></div>
+  </section>
+
+  <p class="small">House planner · 3D check · three.js r__THREE_REV__ (MIT licence)</p>
+</main>
+
+<script>
+/* three.js r__THREE_REV__ (MIT), as a plain script (works where a page may not load modules) */
+__THREE_SRC__
+</script>
+<script>
+(function () {
+  'use strict';
+  var KEY = 'hp-3dcheck';
+  var webview = /; wv\)/.test(navigator.userAgent) || /^(about|blob|data):$/.test(location.protocol);
+  var R = { when: new Date().toISOString(), page: location.protocol + (webview ? ' (inside an app\'s viewer, not a browser)' : ''), ua: navigator.userAgent, tries: [], gpu: {}, steps: [], errors: [], earlier: null };
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var store = {
+    get: function () { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } },
+    set: function (v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* no storage here */ } },
+  };
+  // errors the 3D library or the browser writes (a shader the driver can't compile, …)
+  var oldErr = console.error;
+  console.error = function () { try { R.errors.push([].slice.call(arguments).map(String).join(' ').slice(0, 400)); } catch (e) { /* */ } return oldErr.apply(console, arguments); };
+  window.addEventListener('error', function (e) { R.errors.push('page error: ' + (e.message || e)); report(); });
+
+  // a run that stopped half-way last time (the page crashed or reloaded)
+  var prev = store.get() || {};
+  if (prev.running) R.earlier = prev;
+
+  function row(el, kind, title, sub) {
+    var lab = { ok: 'OK', bad: 'No', warn: 'Note', wait: '…' }[kind];
+    var d = document.createElement('div'); d.className = 'row';
+    d.innerHTML = '<span class="badge b-' + kind + '">' + lab + '</span><div class="t">' + esc(title) + (sub ? '<div class="s">' + esc(sub) + '</div>' : '') + '</div>';
+    el.appendChild(d); return d;
+  }
+
+  /* ───────── 1 · start 3D, the way the app asks first ───────── */
+  var TRIES = [
+    { name: 'WebGL 2 as the house planner asks (smooth edges, fast graphics)', type: 'webgl2', attrs: { antialias: true, powerPreference: 'high-performance' } },
+    { name: 'WebGL 2 without smooth edges', type: 'webgl2', attrs: { antialias: false } },
+    { name: 'WebGL 2, plain', type: 'webgl2', attrs: {} },
+    { name: 'WebGL 1 (the older kind; the house planner needs WebGL 2)', type: 'webgl', attrs: {} },
+  ];
+  var ctx = null;
+  for (var i = 0; i < TRIES.length && !ctx; i++) {
+    var T = TRIES[i], cv = document.createElement('canvas'), msg = '';
+    cv.width = 640; cv.height = 480;
+    cv.addEventListener('webglcontextcreationerror', function (e) { msg = e.statusMessage || msg; }, false);
+    var gl = null;
+    try { gl = cv.getContext(T.type, T.attrs); } catch (e) { msg = msg || String(e && e.message || e); }
+    R.tries.push({ name: T.name, ok: !!gl, why: msg || (gl ? '' : 'the browser gave no reason') });
+    row($('start'), gl ? 'ok' : 'bad', T.name, gl ? 'Started.' : 'Refused: ' + (msg || 'the browser gave no reason.'));
+    if (gl) ctx = { gl: gl, cv: cv, T: T };
+  }
+
+  /* ───────── 2 · what the chip and the browser say ───────── */
+  if (ctx) {
+    var g = ctx.gl, dbg = g.getExtension('WEBGL_debug_renderer_info');
+    var P = function (k) { try { return g.getParameter(k); } catch (e) { return '?'; } };
+    var ext = g.getSupportedExtensions() || [];
+    R.gpu = {
+      webgl: ctx.T.type === 'webgl2' ? 'WebGL 2' : 'WebGL 1',
+      renderer: dbg ? P(dbg.UNMASKED_RENDERER_WEBGL) : P(g.RENDERER),
+      vendor: dbg ? P(dbg.UNMASKED_VENDOR_WEBGL) : P(g.VENDOR),
+      version: P(g.VERSION),
+      glsl: P(g.SHADING_LANGUAGE_VERSION),
+      maxTexture: P(g.MAX_TEXTURE_SIZE),
+      maxSamples: ctx.T.type === 'webgl2' ? P(g.MAX_SAMPLES) : 'n/a',
+      antialias: !!(g.getContextAttributes() || {}).antialias,
+      floatBuffers: ext.indexOf('EXT_color_buffer_float') >= 0,
+      anisotropy: ext.indexOf('EXT_texture_filter_anisotropic') >= 0,
+      extensions: ext.length,
+    };
+  }
+  R.device = {
+    screen: screen.width + ' × ' + screen.height + ' @' + (window.devicePixelRatio || 1),
+    memory: navigator.deviceMemory ? navigator.deviceMemory + ' GB (rounded by the browser)' : '?',
+    cores: navigator.hardwareConcurrency || '?',
+  };
+  var G = R.gpu, gpuRows = [['3D', G.webgl || 'not available'], ['Graphics chip', G.renderer || '—'], ['Maker', G.vendor || '—'], ['Version', G.version || '—'], ['Biggest picture', G.maxTexture ? G.maxTexture + ' px' : '—'], ['Smooth edges', G.webgl ? (G.antialias ? 'yes (up to ' + G.maxSamples + '×)' : 'no') : '—'], ['Screen', R.device.screen], ['Memory', R.device.memory], ['Opened as', location.protocol.replace(':', '') + (location.protocol === 'content:' ? ' (from Files / Drive)' : '')]];
+  $('gpu').innerHTML = gpuRows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('');
+  var powervr = /powervr|imagination|img-tec|\bimg\b|dxt-/i.test((G.renderer || '') + ' ' + (G.vendor || ''));
+  var software = /swiftshader|llvmpipe|software|basic render/i.test(G.renderer || '');
+
+  /* ───────── 3 · the test ───────── */
+  // the material pictures in small steps, safest first, to find what brings the driver down (a crash needs the
+  // browser restarted; the results so far are kept, Continue goes on after the step that crashed)
+  var STEPS = [
+    { id: 'simple', name: 'Simple shapes', sub: '200 blocks, two lights' },
+    { id: 'shadows', name: 'Shadows and tone, as the app', sub: 'sun shadows (2048 px map, soft edges), smooth edges, sharp screen' },
+    { id: 'tex-plain', name: 'Pictures, no smaller copies', sub: '36 pictures of 1024 px without mipmaps (the smaller copies for far away)' },
+    { id: 'tex-cpu', name: 'Pictures, smaller copies made beforehand', sub: 'the same 36 with mipmaps made by the page, not by the graphics chip' },
+    { id: 'tex-cpu-aniso', name: '… and sharp at an angle', sub: 'the same, with anisotropic filtering 8× (floors seen at an angle)' },
+    { id: 'tex-gpu-linear', name: 'Relief pictures, smaller copies made by the chip', sub: '12 relief / roughness pictures, mipmaps made by the graphics chip' },
+    { id: 'tex-gpu-srgb', name: 'Colour pictures, smaller copies made by the chip', sub: '12 colour (sRGB) pictures, mipmaps made by the graphics chip' },
+    { id: 'tex-gpu-all', name: 'All pictures as the app does now', sub: '36 pictures, mipmaps by the chip, anisotropic 8×' },
+    { id: 'rebuild', name: 'Rebuilding while you edit', sub: 'parts and materials thrown away and made new, 3× a second' },
+    { id: 'big', name: 'A big scene', sub: '20,000 blocks, like the house with the street' },
+  ];
+  var NAME = {}; STEPS.forEach(function (s) { NAME[s.id] = s.name; });
+  var stepRows = {};
+  STEPS.forEach(function (s) { stepRows[s.id] = row($('steps'), 'wait', s.name, s.sub); });
+  var lost = false;
+  // results kept between runs (a crash may need the browser restarted)
+  var saved = (prev && prev.results) || {};
+  if (prev && prev.running && !saved[prev.running]) saved[prev.running] = { step: prev.running, lost: true, page: true };
+  if (prev && prev.lostAt && !saved[prev.lostAt]) saved[prev.lostAt] = { step: prev.lostAt, lost: true };
+  store.set({ running: null, results: saved });
+  R.steps = STEPS.map(function (s) { return saved[s.id]; }).filter(Boolean);
+
+  function setStep(id, kind, extra) {
+    var s = STEPS.filter(function (x) { return x.id === id; })[0], d = stepRows[id];
+    var lab = { ok: 'OK', bad: 'No', warn: 'Note', wait: '…' }[kind];
+    d.innerHTML = '<span class="badge b-' + kind + '">' + lab + '</span><div class="t">' + esc(s.name) + '<div class="s">' + esc(s.sub + (extra ? ' — ' + extra : '')) + '</div></div>';
+  }
+  function showResult(st) {
+    if (st.skipped) setStep(st.step, 'wait', 'skipped');
+    else if (st.lost) setStep(st.step, 'bad', 'the graphics driver crashed here (3D lost)');
+    else if (st.failed) setStep(st.step, 'bad', 'could not draw');
+    else setStep(st.step, st.fps < 15 ? 'warn' : 'ok', st.fps + ' frames a second' + (st.fps < 15 ? ' (slow)' : '') + (st.rebuilds ? ', ' + st.rebuilds + ' rebuilds' : ''));
+  }
+  R.steps.forEach(showResult);
+  $('from').innerHTML = STEPS.map(function (x, i) { return '<option value="' + x.id + '">' + (i + 1) + ' · ' + esc(x.name) + '</option>'; }).join('');
+  var firstLeft = STEPS.filter(function (x) { return !saved[x.id]; })[0]; if (firstLeft) $('from').value = firstLeft.id;
+  var keeps = (function () { try { localStorage.setItem(KEY + '-t', '1'); var ok = localStorage.getItem(KEY + '-t') === '1'; localStorage.removeItem(KEY + '-t'); return ok; } catch (e) { return false; } })();
+  if (!keeps) $('nokeep').hidden = false;
+
+  async function runTest(cont, fromId) {
+    $('run').disabled = true; $('cont').disabled = true; $('from-run').disabled = true;
+    if (!cont) { saved = {}; R.steps = []; STEPS.forEach(function (s) { setStep(s.id, 'wait'); }); store.set({ running: null, results: saved }); }
+    if (fromId) { var before = true; STEPS.forEach(function (s) { if (s.id === fromId) before = false; if (!before) { delete saved[s.id]; setStep(s.id, 'wait'); } else if (!saved[s.id]) { saved[s.id] = { step: s.id, skipped: true }; setStep(s.id, 'wait', 'skipped'); } }); }
+    var THREE = window.__THREE;
+    if (!THREE || !THREE.WebGLRenderer) { R.errors.push('3D library: not loaded'); finish(); return; }
+    var cv = ctx.cv;
+    $('stage').innerHTML = ''; $('stage').appendChild(cv);
+    cv.addEventListener('webglcontextlost', function (e) {
+      e.preventDefault(); lost = true; R.lostAt = R.current || '?';
+      saved[R.lostAt] = { step: R.lostAt, lost: true }; store.set({ running: null, results: saved });
+      if (stepRows[R.lostAt]) showResult(saved[R.lostAt]);
+      R.steps = STEPS.map(function (x) { return saved[x.id]; }).filter(Boolean);
+      var m = document.createElement('div'); m.className = 'msg'; m.textContent = 'The graphics driver crashed: 3D is gone for this page.'; $('stage').appendChild(m); cv.style.visibility = 'hidden';
+    }, false);
+    var renderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas: cv, context: ctx.gl, antialias: ctx.T.attrs.antialias }); }
+    catch (e) { R.errors.push('renderer: ' + (e && e.message || e)); finish(); return; }
+    var W = function () { var r = $('stage').getBoundingClientRect(); return [Math.max(64, r.width), Math.max(48, r.height)]; };
+    var scene = new THREE.Scene(); scene.background = new THREE.Color(0x0D1211);
+    var cam = new THREE.PerspectiveCamera(45, 4 / 3, 0.1, 400); cam.position.set(14, 11, 16); cam.lookAt(0, 0, 0);
+    var hemi = new THREE.HemisphereLight(0xffffff, 0x8a8478, 1.2); scene.add(hemi);
+    var sun = new THREE.DirectionalLight(0xfff6ea, 1.6); sun.position.set(12, 20, 8); scene.add(sun, sun.target);
+    var ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshStandardMaterial({ color: 0x6f7d5a, roughness: 0.95 }));
+    ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+    var group = new THREE.Group(); scene.add(group);
+    var clearGroup = function () { group.traverse(function (o) { if (o.geometry) o.geometry.dispose(); if (o.material) [].concat(o.material).forEach(function (m) { for (var k in m) if (m[k] && m[k].isTexture) m[k].dispose(); m.dispose(); }); }); group.clear(); };
+    var size = function (pr) { var s = W(); renderer.setPixelRatio(pr); renderer.setSize(s[0], s[1], false); cam.aspect = s[0] / s[1]; cam.updateProjectionMatrix(); };
+    var blocks = function (n, mats, spread) {
+      var geo = new THREE.BoxGeometry(1, 1, 1);
+      for (var k = 0; k < n; k++) { var m = new THREE.Mesh(geo, mats[k % mats.length]); m.position.set((Math.random() - 0.5) * spread, 0.5 + Math.random() * 3, (Math.random() - 0.5) * spread); m.rotation.y = Math.random() * 3; m.castShadow = m.receiveShadow = true; group.add(m); }
+    };
+    var maxAniso = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1;
+    // a 1024 px picture; mips: 'none' | 'cpu' (made here) | 'gpu' (generateMipmap, as the app does now)
+    var picture = function (k, kind, mips, aniso) {
+      var c = document.createElement('canvas'); c.width = c.height = 1024; var x = c.getContext('2d');
+      x.fillStyle = 'hsl(' + (k * 37 % 360) + ',35%,' + (kind === 'n' ? 50 : 55) + '%)'; x.fillRect(0, 0, 1024, 1024);
+      for (var j = 0; j < 400; j++) { x.fillStyle = 'rgba(' + (kind === 'n' ? '128,128,255' : '0,0,0') + ',' + (Math.random() * 0.3) + ')'; x.fillRect(Math.random() * 1024, Math.random() * 1024, 8 + Math.random() * 90, 4 + Math.random() * 30); }
+      var t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.anisotropy = aniso ? Math.min(8, maxAniso) : 1;
+      if (kind === 'c') t.colorSpace = THREE.SRGBColorSpace;
+      if (mips === 'none') { t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; }
+      else if (mips === 'cpu') {
+        var lv = [c], w = 1024;
+        while (w > 1) { w = w / 2; var d = document.createElement('canvas'); d.width = d.height = w; var dx = d.getContext('2d'); dx.imageSmoothingQuality = 'high'; dx.drawImage(lv[lv.length - 1], 0, 0, w, w); lv.push(d); }
+        t.mipmaps = lv; t.generateMipmaps = false; t.minFilter = THREE.LinearMipmapLinearFilter;
+      }
+      return t;
+    };
+    var materials = function (n, mips, aniso, maps) {
+      var mats = [];
+      for (var k = 0; k < n; k++) {
+        var o = {};
+        if (maps.indexOf('c') >= 0) o.map = picture(k, 'c', mips, aniso);
+        if (maps.indexOf('n') >= 0) o.normalMap = picture(k, 'n', mips, aniso);
+        if (maps.indexOf('r') >= 0) o.roughnessMap = picture(k + 5, 'r', mips, aniso);
+        if (!o.map) o.color = new THREE.Color().setHSL(k / n, 0.3, 0.6);
+        mats.push(new THREE.MeshStandardMaterial(o));
+      }
+      return mats;
+    };
+    var frames = function (ms) {
+      return new Promise(function (res) {
+        var n = 0, t0 = performance.now();
+        var tick = function () {
+          if (lost) { res({ fps: 0, n: n }); return; }
+          var t = performance.now() - t0;
+          group.rotation.y = t / 4000;
+          try { renderer.render(scene, cam); } catch (e) { R.errors.push('draw: ' + (e && e.message || e)); res({ fps: -1, n: n }); return; }
+          n++;
+          if (t < ms) requestAnimationFrame(tick); else { var f = n * 1000 / t; res({ fps: f < 10 ? Math.round(f * 10) / 10 : Math.round(f), n: n }); }
+        };
+        requestAnimationFrame(tick);
+      });
+    };
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // every step starts from the same scene: the app's look (shadows, tone) once 'shadows' has passed
+    var look = function () {
+      size(dpr); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap; renderer.toneMapping = THREE.NeutralToneMapping;
+      sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 2; sun.shadow.camera.left = sun.shadow.camera.bottom = -20; sun.shadow.camera.right = sun.shadow.camera.top = 20;
+      renderer.localClippingEnabled = true;
+    };
+    var texStep = function (n, mips, aniso, maps) { return async function () { clearGroup(); look(); blocks(360, materials(n, mips, aniso, maps), 22); return frames(4000); }; };
+    var plan = {
+      simple: async function () { clearGroup(); size(1); renderer.shadowMap.enabled = false; blocks(200, [new THREE.MeshStandardMaterial({ color: 0xc9a27a }), new THREE.MeshStandardMaterial({ color: 0x8e9196, roughness: 0.4, metalness: 0.5 })], 18); return frames(3000); },
+      shadows: async function () {
+        clearGroup(); look();
+        blocks(600, [new THREE.MeshStandardMaterial({ color: 0xa9794f }), new THREE.MeshPhysicalMaterial({ color: 0xcfe0dc, roughness: 0.05, transmission: 0.0, clearcoat: 0.6 }), new THREE.MeshLambertMaterial({ color: 0x5e8b4d })], 22);
+        return frames(4000);
+      },
+      'tex-plain': texStep(12, 'none', false, 'cnr'),
+      'tex-cpu': texStep(12, 'cpu', false, 'cnr'),
+      'tex-cpu-aniso': texStep(12, 'cpu', true, 'cnr'),
+      'tex-gpu-linear': texStep(12, 'gpu', false, 'nr'),
+      'tex-gpu-srgb': texStep(12, 'gpu', false, 'c'),
+      'tex-gpu-all': texStep(12, 'gpu', true, 'cnr'),
+      rebuild: async function () {
+        clearGroup(); look();
+        var stop = false, n = 0;
+        var iv = setInterval(function () {
+          if (stop || lost) return;
+          clearGroup();
+          var mats = [new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff, vertexColors: n % 2 === 1 }), new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff, map: picture(n, 'c', 'cpu', false), fog: n % 3 === 0 })];
+          blocks(150, mats, 20); n++;
+        }, 330);
+        var r = await frames(5000); stop = true; clearInterval(iv); r.rebuilds = n; return r;
+      },
+      big: async function () {
+        clearGroup(); look();
+        var inst = new THREE.InstancedMesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), new THREE.MeshStandardMaterial({ color: 0xb0583c }), 20000), m4 = new THREE.Matrix4();
+        for (var k = 0; k < 20000; k++) { m4.makeTranslation((Math.random() - 0.5) * 50, Math.random() * 6, (Math.random() - 0.5) * 50); inst.setMatrixAt(k, m4); }
+        inst.castShadow = inst.receiveShadow = true; group.add(inst); cam.position.set(30, 22, 34); cam.lookAt(0, 0, 0);
+        var r = await frames(4000); cam.position.set(14, 11, 16); cam.lookAt(0, 0, 0); return r;
+      },
+    };
+    for (var s = 0; s < STEPS.length; s++) {
+      var id = STEPS[s].id;
+      if (saved[id]) continue;                         // done in an earlier run (or crashed there)
+      if (lost) { setStep(id, 'wait', 'not run yet'); continue; }
+      R.current = id; store.set({ running: id, results: saved });
+      setStep(id, 'wait', 'running…');
+      var res;
+      try { res = await plan[id](); } catch (e) { R.errors.push(id + ': ' + (e && e.message || e)); res = { fps: -1, n: 0 }; }
+      if (lost) break;
+      var st = { step: id, fps: res.fps, frames: res.n, rebuilds: res.rebuilds, failed: res.fps < 0 || !res.n };
+      try { var inf = renderer.info; st.programs = inf.programs ? inf.programs.length : '?'; st.textures = inf.memory.textures; } catch (e) { /* */ }
+      saved[id] = st; store.set({ running: null, results: saved });
+      showResult(st);
+      R.steps = STEPS.map(function (x) { return saved[x.id]; }).filter(Boolean);
+      report();
+    }
+    R.steps = STEPS.map(function (x) { return saved[x.id]; }).filter(Boolean);
+    if (lost) STEPS.forEach(function (x) { if (!saved[x.id]) setStep(x.id, 'wait', 'not run yet – close the browser, open this file again, tap Continue'); });
+    R.current = null; store.set({ running: null, results: saved });
+    try { if (!lost) clearGroup(); } catch (e) { /* */ }
+    finish();
+  }
+
+  /* ───────── what it means ───────── */
+  function finish() {
+    var can = !!ctx && ctx.T.type === 'webgl2' && !lost;
+    var left = STEPS.filter(function (s) { return !saved[s.id]; }).length;
+    $('run').disabled = !can; $('cont').disabled = !can || !left; $('from-run').disabled = !can;
+    $('cont').textContent = left === STEPS.length ? 'Run the 3D test' : left ? 'Continue (' + left + ' steps left)' : 'All steps done';
+    $('run').hidden = left === STEPS.length;
+    verdict(); report();
+  }
+  function verdict() {
+    var v = $('verdict'), html = '';
+    var restart = 'Close the browser completely (recent apps: swipe it away), open this file again from Files and tap <b>Continue</b>.';
+    var close = '<ol><li>Close the browser completely: open the recent apps (swipe up and hold), swipe the browser away. Then open this file (or the house planner) again.</li><li>Still no 3D? Type <code>brave://gpu</code> (Brave) or <code>chrome://gpu</code> (Chrome) in the address bar and take a screenshot of the top part (Graphics Feature Status) and of “Problems detected”.</li><li>Update the phone: Settings → System → Software updates (Google ships graphics-driver fixes for the Pixel 10 with them).</li></ol>';
+    var res = function (id) { return saved[id]; }, crashed = function (id) { return !!(saved[id] && saved[id].lost); }, fine = function (id) { return !!(saved[id] && !saved[id].lost && !saved[id].failed); };
+    var left = STEPS.filter(function (s) { return !saved[s.id]; }).length;
+    // what the picture steps say so far
+    var cause = null;
+    if (crashed('tex-plain')) cause = 'Even pictures without smaller copies bring the driver down: the amount of picture memory, or uploading pictures. In the planner: fewer and smaller pictures on this phone.';
+    else if (fine('tex-plain') && crashed('tex-cpu')) cause = 'Pictures with smaller copies crash even when the copies are made beforehand: the extra memory. In the planner: smaller pictures (and fewer copies) on this phone.';
+    else if (fine('tex-cpu') && crashed('tex-cpu-aniso')) cause = 'Anisotropic filtering (sharp floors at an angle) brings the driver down. In the planner: anisotropic filtering off on this phone.';
+    else if (fine('tex-cpu-aniso') && crashed('tex-gpu-linear')) cause = 'The graphics chip making the smaller copies itself (generateMipmap) brings the driver down. In the planner: the copies made beforehand on this phone (they draw fine).';
+    else if (fine('tex-gpu-linear') && crashed('tex-gpu-srgb')) cause = 'The chip making smaller copies of colour (sRGB) pictures brings the driver down. In the planner: those copies made beforehand on this phone.';
+    else if (fine('tex-gpu-srgb') && crashed('tex-gpu-all')) cause = 'Each part alone is fine, all pictures together with the chip\'s copies and anisotropic filtering are not. In the planner: copies made beforehand and less filtering on this phone.';
+    if (R.earlier && R.earlier.running && !lost) html += '<div class="verdict bad"><strong>Last time the page died during “' + esc(NAME[R.earlier.running] || R.earlier.running) + '”.</strong>Counted as a crash at that step.</div>';
+    if (!ctx) {
+      var why = R.tries.map(function (t) { return t.why; }).filter(Boolean)[0] || '';
+      html += '<div class="verdict bad"><strong>The browser refuses to start 3D for this page.</strong>' + (why ? 'Its reason: “' + esc(why) + '”. ' : '') +
+        'Usually this means the graphics driver crashed earlier on a page opened the same way (this test or the house planner), and the browser now blocks 3D for such pages until the browser is restarted.</div>' + close;
+    } else if (ctx.T.type !== 'webgl2') {
+      html += '<div class="verdict bad"><strong>Only the older WebGL 1 starts here; the house planner needs WebGL 2.</strong>The browser has switched WebGL 2 off for this chip or this page.</div>' + close;
+    } else if (lost) {
+      html += '<div class="verdict bad"><strong>The graphics driver crashed during “' + esc(NAME[R.lostAt] || R.lostAt) + '”.</strong>' + (cause ? cause + ' ' : '') + (left ? restart + ' (' + left + ' steps left)' : 'All steps have a result now: copy the report.') + '</div>';
+    } else if (!R.steps.length) {
+      html += '<div class="verdict ok"><strong>3D starts in this browser' + (ctx.T !== TRIES[0] ? ' (not in the way the app asks first: ' + esc(ctx.T.name) + ')' : '') + '.</strong>Now run the 3D test below.' + (software ? ' Note: it runs on the processor, not on the graphics chip (slow).' : '') + '</div>';
+    } else if (left) {
+      html += '<div class="verdict warn"><strong>' + (STEPS.length - left) + ' of ' + STEPS.length + ' steps have a result.</strong>' + (cause ? cause + ' ' : '') + 'Tap <b>Continue</b> for the rest.</div>';
+    } else {
+      var crashes = R.steps.filter(function (s) { return s.lost; }).map(function (s) { return NAME[s.step]; });
+      var failed = R.steps.filter(function (s) { return s.failed; }).map(function (s) { return NAME[s.step]; });
+      var slow = R.steps.filter(function (s) { return !s.skipped && !s.lost && !s.failed && s.fps < 15; }).length;
+      if (crashes.length || failed.length) html += '<div class="verdict ' + (crashes.length ? 'bad' : 'warn') + '"><strong>All steps done. ' + (crashes.length ? 'The driver crashed at: ' + esc(crashes.join(', ')) + '.' : '') + (failed.length ? ' Could not draw: ' + esc(failed.join(', ')) + '.' : '') + '</strong>' + (cause || '') + ' Copy the report and send it: I make the house planner avoid this on this phone.</div>';
+      else html += '<div class="verdict ok"><strong>3D works in this browser: every step drew without trouble.</strong>If the house planner still says “3D is not available”, the browser had blocked 3D after an earlier crash: close the browser completely and open the planner again.' + (slow ? ' Some steps were slow (under 15 frames a second).' : '') + '</div>';
+    }
+    if (webview) html += '<div class="verdict warn"><strong>This ran inside an app\'s file viewer, not in your browser.</strong>That is fine for the test of the chip. For the house planner itself, also open this file from the Files app in the same browser as the planner and run it there.</div>';
+    if (powervr) html += '<p class="small">This chip is the Imagination PowerVR GPU of the Pixel 10 (Tensor G5). Its graphics driver is new and has known WebGL problems in Chrome-based browsers.</p>';
+    v.innerHTML = html;
+  }
+  function report() {
+    var L = [];
+    L.push('3D check · ' + R.when);
+    L.push('Browser: ' + R.ua);
+    L.push('Opened as: ' + R.page + ' · screen ' + R.device.screen + ' · memory ' + R.device.memory + ' · cores ' + R.device.cores);
+    L.push('');
+    R.tries.forEach(function (t) { L.push((t.ok ? 'OK  ' : 'NO  ') + t.name + (t.ok ? '' : ' — ' + t.why)); });
+    if (R.gpu.renderer) { L.push(''); L.push('GPU: ' + R.gpu.renderer + ' · ' + R.gpu.vendor); L.push('Version: ' + R.gpu.version + ' · ' + R.gpu.glsl); L.push('Max texture ' + R.gpu.maxTexture + ' · samples ' + R.gpu.maxSamples + ' · antialias ' + R.gpu.antialias + ' · float buffers ' + R.gpu.floatBuffers + ' · anisotropy ' + R.gpu.anisotropy + ' · ' + R.gpu.extensions + ' extensions'); }
+    if (R.steps.length) { L.push(''); R.steps.forEach(function (s) { L.push('Step ' + s.step + ': ' + (s.skipped ? 'skipped' : s.lost ? 'CRASH (context lost' + (s.page ? ', page died' : '') + ')' : s.failed ? 'could not draw' : s.fps + ' fps (' + s.frames + ' frames)') + (s.rebuilds ? ', ' + s.rebuilds + ' rebuilds' : '') + (s.programs != null ? ', ' + s.programs + ' programs, ' + s.textures + ' textures' : '')); }); }
+    var left = STEPS.filter(function (s) { return !saved[s.id]; }).map(function (s) { return s.id; });
+    if (left.length && left.length < STEPS.length) L.push('Not run yet: ' + left.join(', '));
+    if (R.errors.length) { L.push(''); L.push('Messages:'); R.errors.slice(0, 12).forEach(function (e) { L.push('  ' + e); }); }
+    $('report').textContent = L.join('\n');
+  }
+  $('run').addEventListener('click', function () { runTest(false); });
+  $('from-run').addEventListener('click', function () { runTest(true, $('from').value); });
+  $('cont').addEventListener('click', function () { runTest(true); });
+  $('copy').addEventListener('click', function () {
+    var t = $('report').textContent, b = $('copy');
+    var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy report'; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, function () { fallbackCopy(t); done(); });
+    else { fallbackCopy(t); done(); }
+  });
+  function fallbackCopy(t) { var a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); } catch (e) { /* */ } a.remove(); }
+  $('save').addEventListener('click', function () {
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([$('report').textContent], { type: 'text/plain' })); a.download = '3d-check-report.txt'; document.body.appendChild(a); a.click(); a.remove();
+  });
+  if (!ctx) $('stage-msg').textContent = 'No 3D in this browser right now (see 1).';
+  finish();
+})();
+</script>
+</body>
+</html>
