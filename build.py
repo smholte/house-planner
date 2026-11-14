@@ -258,12 +258,15 @@ def house_models():
         d = json.load(open(out + '.json')) if packed else {}
         slug = os.path.splitext(os.path.basename(r['file']))[0]
         size = [round(float(r[k]) / 100, 4) for k in ('width cm', 'depth cm', 'height cm')]
+        # its picture for Add furniture (task 0028): made once by tools/model-thumbs.py into house/models/thumbs/
+        thumb = os.path.join(mdir, 'thumbs', slug + '.webp')
         items.append({'id': 'l:' + slug, 'kind': 'model', 'private': True, 'licence': r.get('licence', ''), 'source': r.get('source', ''),
                       'name': r['name'], 'cat': r.get('room', ''), 'size': size, 'o': d.get('o', []), 'u': d.get('u', []),
-                      '_src': out if packed else src, '_name': f'models/{slug}'})
+                      '_src': out if packed else src, '_name': f'models/{slug}', '_thumb': thumb if os.path.exists(thumb) else None})
         raw += os.path.getsize(src)
     if items:
-        print(f"house models: {len(items)} ({raw / 1e6:.1f} MB as they are; " + ('packed' if all(os.path.exists(info[r['file']][1] + '.json') for r in rows) else 'NOT packed: npm ci --prefix tools') + ')')
+        print(f"house models: {len(items)} ({raw / 1e6:.1f} MB as they are; " + ('packed' if all(os.path.exists(info[r['file']][1] + '.json') for r in rows) else 'NOT packed: npm ci --prefix tools') + '; '
+              + (f"{sum(1 for i in items if i['_thumb'])} pictures" if all(i['_thumb'] for i in items) else f"{sum(1 for i in items if not i['_thumb'])} without a picture: python3 tools/model-thumbs.py") + ')')
     return items
 
 def make_lib(dst, extra=()):
@@ -286,22 +289,28 @@ def make_lib(dst, extra=()):
                          'files': [dict(name=n, **put('code/' + n.split('.')[0], n.split('.', 1)[1], open(os.path.join(basis, n), 'rb').read())) for n in ('basis_transcoder.js', 'basis_transcoder.wasm')]})
     for it in extra:
         it = dict(it)
-        src, stem = it.pop('_src'), it.pop('_name')
+        src, stem, thumb = it.pop('_src'), it.pop('_name'), it.pop('_thumb', None)
         it['files'] = [put(stem, 'glb', open(src, 'rb').read())]
+        if thumb:
+            it['files'].append(dict(put(stem, 'webp', open(thumb, 'rb').read()), thumb=True))
         man['items'].append(it)
     man['name'] = 'house' if any(it.get('private') for it in man['items']) else 'public'
     man['build'] = ver
     BL.save(man, dst)
     return man
 
-def wrap(body, inline_tex):
+HOUSE_MODELS = house_models()
+
+def wrap(body, inline_tex, house_models=0):
     pre = ('const TEXLIB_DATA = ' + tex_json + ';\n') if (inline_tex and tex_json) else 'const TEXLIB_DATA = null;\n'
+    # (the owner's app knows how many models its library brings, so Add furniture can say where to get it; task 0028)
+    pre += f'const LIB_HOUSE_MODELS = {int(house_models)};\n'
     pre += ("const MODEL_LIB_BLOB = '" + MODEL_SRC['blob'] + "';\n") if (inline_tex and MODEL_SRC) else 'const MODEL_LIB_BLOB = null;\n'
     # (the KTX2 transcoder is taken from the library only when it is exactly this app's copy)
     pre += 'const LIB_CODE_SHA = ' + json.dumps({n: hashlib.sha256(open(os.path.join(THREE_DIR, 'examples', 'jsm', 'libs', 'basis', n), 'rb').read()).hexdigest() for n in ('basis_transcoder.js', 'basis_transcoder.wasm')}) + ';\n'
     return ("(function(){\n'use strict';\n" + pre + three_js + orbit_js + body + '\n})();\n').replace('</script', '<\\/script')
-js = wrap(app_js, True)
-js_hosted = wrap(app_js, False)
+js = wrap(app_js, True, len(HOUSE_MODELS))
+js_hosted = wrap(app_js, False, len(HOUSE_MODELS))
 
 css = read(os.path.join(SRC, 'styles.css'))
 for w in ('Medium', 'SemiBold'):
@@ -337,7 +346,6 @@ shutil.rmtree(app_dir, ignore_errors=True)
 os.makedirs(app_dir)
 with open(os.path.join(app_dir, 'index.html'), 'w', encoding='utf-8') as f:
     f.write(html_hosted)
-HOUSE_MODELS = house_models()
 app_lib = make_lib(os.path.join(app_dir, 'lib'), HOUSE_MODELS)
 
 def draw_icon(size, maskable=False):
@@ -412,7 +420,9 @@ with zipfile.ZipFile(zpath, 'w', zipfile.ZIP_DEFLATED) as z:
             continue
         for dirpath, _, files in os.walk(base):
             for name in sorted(files):
-                if (name.endswith('.png') and sub != 'tools') or '__pycache__' in dirpath or os.sep + 'shots' in dirpath or 'node_modules' in dirpath:
+                # (the house's furniture models stay out: makers' licences, and they are in the library already – 0005)
+                if (name.endswith('.png') and sub != 'tools') or '__pycache__' in dirpath or os.sep + 'shots' in dirpath or 'node_modules' in dirpath \
+                        or (sub not in ('vendor', 'tests', 'i18n', 'tools') and os.path.relpath(dirpath, base).split(os.sep)[0] == 'models'):
                     continue
                 full = os.path.join(dirpath, name)
                 z.write(full, arcname='house-planner-source/' + os.path.relpath(full, ROOT))
