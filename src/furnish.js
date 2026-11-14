@@ -110,7 +110,9 @@ Object.assign(app, {
     else if (pane && pane.kind === '3d' && pane.view.ok) { const tg = pane.view.controls.target; pt = [tg.x, tg.z]; }
     // the middle of the room you look at (or the biggest room), so a new piece is never half in a wall
     const rooms = plan.rooms.filter(r => r.storey === st.id);
-    const here = pt && rooms.filter(r => pointInPolygon(pt, r.poly)).sort((a, b) => roomArea(a) - roomArea(b))[0];
+    // a picked room wins: the owner chose it
+    const sel = this.selection, picked = sel && sel.type === 'room' && rooms.find(r => r.id === sel.id);
+    const here = picked || pt && rooms.filter(r => pointInPolygon(pt, r.poly)).sort((a, b) => roomArea(a) - roomArea(b))[0];
     const room = here || rooms.sort((a, b) => roomArea(b) - roomArea(a))[0];
     if (room) pt = labelPoint(room.poly, roomHoles(plan, room));
     return { storey: st.id, p: pt || [0, 0] };
@@ -125,6 +127,10 @@ Object.assign(app, {
     if (spot) { it.x = spot[0]; it.y = spot[1]; }
     this.furnMutate(l => { l.items.push(it); });
     this.select({ type: 'furn', ids: [it.id] });
+    // bring it into view, big enough to grab (on the phone the details sheet covers the lower part)
+    const main = this.panes.find(x => x.role === 'main');
+    // (after the sheet has settled: its sliding in would cancel the glide)
+    if (main && main.kind === '2d' && main.view.showPoint) setTimeout(() => { if (main.view.showPoint && main.view.spec) main.view.showPoint([it.x, it.y], 1.6); }, 350);
     this.toast(t('{n} added. Drag it into place; the round handle turns it.', { n: furnName(it) }));
     return it;
   },

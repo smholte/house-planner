@@ -47,6 +47,7 @@ documents …) are in the private tests (`house/tests/`, task 0007b), which run 
 | test_walk.py | free walk, walls and closed doors stop you, stairs, paths made from the plan, path walk, evening light |
 | test_view3d.py | evening, Fast / Beautiful, soft shadows in corners, slices and view settings kept with the house, 3D measure, pictures, colour library, PDF reader offline |
 | test_phone.py | phone in light and dark: top bar, furnish by touch, note by tap, joysticks |
+| test_phone_taps.py | one touch tap = one pick (a tapped wall stays picked), new furniture in the picked room on free floor, in view |
 | test_oldfile.py | a house file from before these features still opens, in every mode; old tiles text becomes tiles; quantities, budget and task board work on it |
 | test_regress.py | home view gestures, room taps, slices, side by side / compare, ViewCube home view, IFC import (the builder's files in `HP_IFC_DIR`, else the made-up house's `tools/testhouse/testhouse.ifc`) |
 | test_garden.py | the plot (around the house, or the example's), north, levels and water; garden areas (lawn, tiles with sizes and a count), lines (low wall, hedge), plants; dragging; 2D and 3D; Changes; kept in the house file; phone dark |
