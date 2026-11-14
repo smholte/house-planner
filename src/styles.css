@@ -693,6 +693,9 @@ body[data-mode="furnish"] .plan-svg { cursor: default; }
 .cc-size { font-size: 11.5px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
 .cat-sub { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 6px 2px 0; font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
 .cat-sub .note-muted { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.lib-rooms, .lib-hint { grid-column: 1 / -1; }
+.lib-rooms { display: flex; flex-wrap: wrap; gap: 6px; }
+.lib-hint p { margin: 4px 2px 8px; }
 .cc-pic { display: grid; place-items: center; min-height: 0; overflow: hidden; }
 .cc-pic .furn-prev { height: 84px; }
 .cc-img { width: 100%; height: 84px; object-fit: contain; display: block; }
