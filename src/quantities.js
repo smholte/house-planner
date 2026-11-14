@@ -27,6 +27,29 @@ const floorProduct = fl => (fl && fl.product && (fl.product.name || '').trim() &
 function floorProductKey(fl) { return 'floor|' + (fl.material || 'screed') + '|p:' + fl.product.name.trim(); }
 const PAINTED_CEIL = new Set(['paint', 'plaster']);
 
+/** the area of a room's ceiling (task 0024): flat at the ceiling height, but along the roof where the builder's roof
+ *  comes lower (an attic room: the slopes are larger than the floor under them). The roof is the 3D view's height
+ *  field of the inside of the roof (view3d.js, kept per shell and storey); without a shell the ceiling is the floor. */
+function ceilingArea(r, st, floor) {
+  const sh = app.shell;
+  if (!(floor > 0) || !sh || !sh.storeys || !sh.storeys[r.storey] || typeof buildRoofCeiling !== 'function') return floor;
+  let cache = ROOF_CEIL.get(sh);
+  if (!cache) ROOF_CEIL.set(sh, cache = new Map());
+  if (!cache.has(r.storey)) cache.set(r.storey, buildRoofCeiling(sh, r.storey));
+  const F = cache.get(r.storey);
+  if (!F) return floor;
+  const ch = roomCeilH(r, st), c = 0.05, bb = bboxOfPoints(r.poly);
+  const hAt = (x, y) => { const v = F.at(x, y); return v == null ? ch : Math.min(ch, v); };
+  let n = 0, A = 0;
+  for (let x = bb.minX + c / 2; x < bb.maxX; x += c) for (let y = bb.minY + c / 2; y < bb.maxY; y += c) {
+    if (!pointInPolygon([x, y], r.poly)) continue;
+    const gx = (hAt(x + c / 2, y) - hAt(x - c / 2, y)) / c, gy = (hAt(x, y + c / 2) - hAt(x, y - c / 2)) / c;
+    A += Math.sqrt(1 + gx * gx + gy * gy); n++;
+  }
+  // the slope factor on the grid, times the floor's own area (without the holes)
+  return n ? floor * Math.max(1, A / n) : floor;
+}
+
 /** everything for one room */
 function roomQuantities(plan, r, st, S) {
   const stats = roomFinishStats(plan, r, st);
@@ -77,12 +100,13 @@ function roomQuantities(plan, r, st, S) {
     if (!T) skirting += Math.max(0, row.len - doors);
   }
   const ch = r.ceilingFinish || 'paint';
-  const ceilPainted = PAINTED_CEIL.has(ch) ? floor : 0;
+  const ceiling = ceilingArea(r, st, floor);
+  const ceilPainted = PAINTED_CEIL.has(ch) ? ceiling : 0;
   const painted = byBase.paint + byBase.renovlies;
   return {
     room: r, counted: roomCounted(r), stats,
     floor, floorMat: mat, floorColor: r.floor && r.floor.color, floorPat, floorWaste: fw, floorBuy: floor * (1 + fw / 100), floorProd: floorProduct(r.floor), floorKey: floorProduct(r.floor) ? floorProductKey(r.floor) : null,
-    ceiling: floor, ceilFinish: ch, ceilPainted, ceilColor: r.ceilingColor || CEIL_DEFAULT, ceilName: r.ceilingName || '',
+    ceiling, ceilFinish: ch, ceilPainted, ceilColor: r.ceilingColor || CEIL_DEFAULT, ceilName: r.ceilingName || '',
     ceilPaintL: ceilPainted * S.ceilCoats / S.ceilCov,
     walls: stats.wall, tiled: stats.tiled, byBase, painted, colours: [...colours.values()], papers: [...papers.values()],
     paintL: painted * S.wallCoats / S.wallCov, primerL: painted / S.primerCov, preL: (byBase.renovlies + byBase.paper) / S.preCov,

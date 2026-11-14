@@ -60,8 +60,16 @@ const elecColor = plan => (ELEC_COLORS.find(c => c[0] === (plan && plan.elecColo
 
 /** the room a point is in (wall things sit just inside their room) */
 function pointRoom(plan, pt) {
+  // a thing on a wall belongs to the room on its side of that wall, even when the wall was moved after it was placed
+  // (it then sits in the wall or past it – task 0024)
+  let q = [pt.x, pt.y];
+  const w = pt.wall && pt.side ? plan.walls.find(x => x.id === pt.wall) : null;
+  if (w) {
+    const L = wallLen(w);
+    if (L > 0.01) { const d = wallDir(w), u = clamp(V.dot(V.sub(q, w.a), d), 0, L); q = V.add(V.add(w.a, V.mul(d, u)), V.mul(V.perp(d), pt.side * (w.t / 2 + 0.05))); }
+  }
   let best = null;
-  for (const r of plan.rooms) if (r.storey === pt.storey && pointInPolygon([pt.x, pt.y], r.poly) && (!best || roomArea(r) < roomArea(best))) best = r;
+  for (const r of plan.rooms) if (r.storey === pt.storey && pointInPolygon(q, r.poly) && (!best || roomArea(r) < roomArea(best))) best = r;
   return best;
 }
 function pointsOfRoom(plan, r) { return (plan.points || []).filter(pt => pt.storey === r.storey && pointRoom(plan, pt) === r); }
