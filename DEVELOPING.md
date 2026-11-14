@@ -633,7 +633,9 @@ Lengths are metres. Plan x to the right, y towards the back of the house.
                    garden.js (migrateSite: HOUSE.site / gardenDelivered, the site steps 2 … 10 through HOUSE.siteStep;
                    a plot with site.from whose house is not built in is left as it is; the Garden tool's HOUSE.plot
                    button), docs.js (docsEnsureFiles: HOUSE.files + exampleFiles – the example's own document files,
-                   EXAMPLE_HOUSE.files), share.js (viewerScript: the "big files of the house" marks → HOUSE.viewerStub),
+                   EXAMPLE_HOUSE.files – + docsFromLibrary: a document with doc.lib = 'doc:<name>' gets its PDF and
+                   thumb from the library item of that id, under its own asset ids, where they are not on the device;
+                   without the library Documents shows a hint with Load library…; task 0022), share.js (viewerScript: the "big files of the house" marks → HOUSE.viewerStub),
                    hood.js (the mirrored neighbour: HOUSE.mirror), main.js (window.__hp gets HOUSE.exports).
     build.py       --house DIR / --no-house (default: house/ when it is there). The house's modules go just before
                    main.js; its "texts" replace whole quoted texts of the public app (general → the house's own); the web
@@ -673,7 +675,9 @@ Lengths are metres. Plan x to the right, y towards the back of the house.
                      safe pictures – libSafe – cap them at 512 / off), libBlob (device, else fetch lib/<f> and keep),
                      libUrl, libGunzip, libLoadZip (the zip's central directory, file by file with File.slice; stored or
                      deflated; sizes checked against the list before anything is unpacked; a failed or replaced load
-                     is pruned), libRemove, libStatus. libValid: a list (served or from a zip or kept) whose items lack
+                     is pruned), libRemove, libStatus. Item kinds: tex, sky, pack, code, model ('l:…', the owner's
+                     models) and doc ('doc:…', the owner's documents: a PDF and a thumb { thumb, w, h } – build.py
+                     house_docs() from house/docs/docs.json; task 0022). libValid: a list (served or from a zip or kept) whose items lack
                      their files is refused. The list is fetched with a 6 s timeout (then the kept one); files of an
                      old list are pruned only after the new base is kept (texlibInit). The KTX2 transcoder is used only
                      when its SHA-256 equals LIB_CODE_SHA (build.py builds the hashes of vendor/…/basis into the app).

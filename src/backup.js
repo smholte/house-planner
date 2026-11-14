@@ -63,8 +63,13 @@ Object.assign(app, {
       this.toast(t('This file is {s}. Files over {m} are not opened, because the phone or computer could run out of memory and close the app. Your houses are untouched.', { s: fmtBytes(file.size), m: fmtBytes(HOUSE_FILE_MAX) }), { ms: 12000 });
       return null;
     }
-    try { return await readHouseFile(file); }
-    catch (e) { this.toast(t('This file could not be read. Choose a file exported from House Planner.')); return null; }
+    try { return await readHouseFile(file, HOUSE_FILE_MAX); }
+    catch (e) {
+      // (a packed file is checked by what it unpacks to, too)
+      if (e && e.code === 'HP_TOO_BIG') this.toast(t('This file unpacks to more than {m}. Files over {m} are not opened, because the phone or computer could run out of memory and close the app. Your houses are untouched.', { m: fmtBytes(HOUSE_FILE_MAX) }), { ms: 12000 });
+      else this.toast(t('This file could not be read. Choose a file exported from House Planner.'));
+      return null;
+    }
   },
   /** "made with a newer version" – the file (or one of its houses) says it is newer than this app; the number it was made with, or 0 */
   fileNewerVersion(data) {

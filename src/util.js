@@ -3,7 +3,7 @@
 /* the app's own version, shown at the bottom of the projects page (2 Nov): its number goes up by one with each round of
    changes that is delivered (the rounds in the notes), the date of that round, and the build – a code made from the app
    itself by build.py (the same code the offline copy's cache carries; the placeholder stays when run from the source) */
-const APP_VERSION = { n: 47, date: '2026-11-14', build: '__BUILD__' };
+const APP_VERSION = { n: 48, date: '2026-11-14', build: '__BUILD__' };
 
 /* the page as it was loaded, before the app changed anything: "Export for viewing" writes the app again with a
    house inside (share.js). Only the small parts are copied now; the script is read when it is needed. */
@@ -333,12 +333,28 @@ function readFileAs(file, how) {
   });
 }
 /** a house file: plain JSON, or gzip-compressed JSON (.house) */
-async function readHouseFile(file) {
+/** a house file (.house.json, or packed: .house.gz) read; max: a packed file that unpacks to more than this many bytes
+ *  is not read on (an error with code 'HP_TOO_BIG' – a small .gz can unpack to far more than a phone has; task 0022) */
+async function readHouseFile(file, max) {
   const buf = new Uint8Array(await readFileAs(file, 'buffer'));
   if (buf[0] === 0x1f && buf[1] === 0x8b) {
     if (typeof DecompressionStream === 'undefined') throw new Error('This browser can not unpack the file.');
-    const text = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-    return JSON.parse(text);
+    const rd = new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip')).getReader();
+    const parts = [];
+    let n = 0;
+    for (;;) {
+      const { done, value } = await rd.read();
+      if (done) break;
+      n += value.length;
+      if (max && n > max) {
+        try { rd.cancel().catch(() => {}); } catch (e) { /* stopped */ }
+        const e = new Error('The file unpacks to more than ' + max + ' bytes.');
+        e.code = 'HP_TOO_BIG';
+        throw e;
+      }
+      parts.push(value);
+    }
+    return JSON.parse(await new Blob(parts).text());
   }
   return JSON.parse(new TextDecoder().decode(buf));
 }

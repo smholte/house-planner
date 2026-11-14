@@ -269,6 +269,24 @@ def house_models():
               + (f"{sum(1 for i in items if i['_thumb'])} pictures" if all(i['_thumb'] for i in items) else f"{sum(1 for i in items if not i['_thumb'])} without a picture: python3 tools/model-thumbs.py") + ')')
     return items
 
+def house_docs():
+    """the house's documents (house/docs: docs.json + the PDFs and their thumbs, task 0022) as library items 'doc:<key>',
+    never public: the app file no longer carries them – a document of the house names its item (doc.lib) and the app
+    copies its files into the house the first time it opens where the library is"""
+    if not HOUSE_CFG:
+        return []
+    ddir = os.path.join(HOUSE_DIR, 'docs')
+    lst = os.path.join(ddir, 'docs.json')
+    if not os.path.exists(lst):
+        return []
+    items = []
+    for key, d in json.load(open(lst, encoding='utf-8')).items():
+        items.append({'id': 'doc:' + key, 'kind': 'doc', 'private': True, 'licence': 'private (the house\'s own documents)', 'name': key,
+                      '_files': [(f'docs/{key}', 'pdf', os.path.join(ddir, d['pdf']), {}),
+                                 (f'docs/{key}', 'jpg', os.path.join(ddir, d['thumb']), {'thumb': True, 'w': d['tw'], 'h': d['th']})]})
+    print(f"house docs : {len(items)} ({sum(os.path.getsize(f[2]) for i in items for f in i['_files']) / 1e6:.1f} MB) – into the library")
+    return items
+
 def make_lib(dst, extra=()):
     """a whole library folder at dst: build/library + the Kenney pack + the KTX2 reader + extra items; returns its manifest"""
     if not LIB_MAN:
@@ -289,6 +307,10 @@ def make_lib(dst, extra=()):
                          'files': [dict(name=n, **put('code/' + n.split('.')[0], n.split('.', 1)[1], open(os.path.join(basis, n), 'rb').read())) for n in ('basis_transcoder.js', 'basis_transcoder.wasm')]})
     for it in extra:
         it = dict(it)
+        if '_files' in it:
+            it['files'] = [dict(put(stem, ext, open(src, 'rb').read()), **more) for stem, ext, src, more in it.pop('_files')]
+            man['items'].append(it)
+            continue
         src, stem, thumb = it.pop('_src'), it.pop('_name'), it.pop('_thumb', None)
         it['files'] = [put(stem, 'glb', open(src, 'rb').read())]
         if thumb:
@@ -300,6 +322,7 @@ def make_lib(dst, extra=()):
     return man
 
 HOUSE_MODELS = house_models()
+HOUSE_DOCS = house_docs()
 
 def wrap(body, inline_tex, house_models=0):
     pre = ('const TEXLIB_DATA = ' + tex_json + ';\n') if (inline_tex and tex_json) else 'const TEXLIB_DATA = null;\n'
@@ -346,7 +369,7 @@ shutil.rmtree(app_dir, ignore_errors=True)
 os.makedirs(app_dir)
 with open(os.path.join(app_dir, 'index.html'), 'w', encoding='utf-8') as f:
     f.write(html_hosted)
-app_lib = make_lib(os.path.join(app_dir, 'lib'), HOUSE_MODELS)
+app_lib = make_lib(os.path.join(app_dir, 'lib'), HOUSE_MODELS + HOUSE_DOCS)
 
 def draw_icon(size, maskable=False):
     s = size / 48.0
@@ -420,9 +443,10 @@ with zipfile.ZipFile(zpath, 'w', zipfile.ZIP_DEFLATED) as z:
             continue
         for dirpath, _, files in os.walk(base):
             for name in sorted(files):
-                # (the house's furniture models stay out: makers' licences, and they are in the library already – 0005)
+                # (the house's furniture models and documents stay out: makers' licences, and they are in the library
+                #  already – 0005, 0022)
                 if (name.endswith('.png') and sub != 'tools') or '__pycache__' in dirpath or os.sep + 'shots' in dirpath or 'node_modules' in dirpath \
-                        or (sub not in ('vendor', 'tests', 'i18n', 'tools') and os.path.relpath(dirpath, base).split(os.sep)[0] == 'models'):
+                        or (sub not in ('vendor', 'tests', 'i18n', 'tools') and os.path.relpath(dirpath, base).split(os.sep)[0] in ('models', 'docs')):
                     continue
                 full = os.path.join(dirpath, name)
                 z.write(full, arcname='house-planner-source/' + os.path.relpath(full, ROOT))
@@ -482,7 +506,7 @@ shutil.copytree(app_dir, web_dir, ignore=shutil.ignore_patterns('lib'))
 # its list or in any of its files
 web_lib = make_lib(os.path.join(web_dir, 'lib'))
 if web_lib:
-    assert not any(it.get('private') or it['kind'] == 'model' for it in web_lib['items']), 'a private model in the web version\'s library'
+    assert not any(it.get('private') or it['kind'] in ('model', 'doc') for it in web_lib['items']), 'a private model or document in the web version\'s library'
     assert not [p for p in BL.check(os.path.join(web_dir, 'lib'), public=False) if 'licence' not in p], BL.check(os.path.join(web_dir, 'lib'), public=False)
     for it in web_lib['items']:
         assert it['kind'] == 'code' or str(it.get('licence', '')).startswith(BL.PUBLIC_LICENCES), 'the web version\'s library: not CC0 / CC BY: ' + it['id']

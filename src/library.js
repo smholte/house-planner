@@ -1,7 +1,8 @@
 /* ───────────── library.js — the asset library: pictures and models outside the app file (task 0009) ─────────────
    A library is a folder lib/ (or a zip of it): library.json (tools/build-library.py, build.py) and its files, each named
    by its content. Items: picture sets (kind 'tex', texlib.js), skies ('sky'), the Kenney models' geometry ('pack'), the
-   KTX2 reader ('code') and – the owner's library only – models ('model', key 'l:<name>').
+   KTX2 reader ('code') and – the owner's library only – models ('model', key 'l:<name>') and documents ('doc', key
+   'doc:<name>': a PDF and its thumb { thumb: true, w, h }; docs.js copies them into a house whose document names the item).
    Where it comes from:
      - the web version and the app folder: lib/ next to index.html – the list at start, each file the first time it is
        needed;
@@ -102,7 +103,7 @@ function libValid(man) {
   return man.items.every(it => it && typeof it.id === 'string' && (
     it.kind === 'tex' ? it.maps && typeof it.maps === 'object' && it.meta && Object.values(it.maps).every(files) && Object.values(it.gpu || {}).every(files)
       : it.kind === 'sky' ? files(it.files) && it.files.every(v => typeof v.px === 'number')
-        : ['pack', 'code', 'model'].includes(it.kind) ? files(it.files) && (it.kind !== 'model' || (Array.isArray(it.size) && it.size.length === 3))
+        : ['pack', 'code', 'model', 'doc'].includes(it.kind) ? files(it.files) && (it.kind !== 'model' || (Array.isArray(it.size) && it.size.length === 3))
           : true));
 }
 /** every item by its id: the public library first, the house's over it */

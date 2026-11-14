@@ -184,9 +184,12 @@ const Assets = {
         if (t.payload && t.payload.snapshots) for (const sn of t.payload.snapshots) scan(sn.project);
         if (t.payload && t.payload.snapshot) scan(t.payload.snapshot.project);
       }
+      // (a file only Undo / Redo of the open house still uses – a photo deleted a moment ago – stays: task 0022)
+      const steps = typeof app !== 'undefined' && app ? [...(app.undoStack || []), ...(app.redoStack || [])].map(e => e && e.s).filter(x => typeof x === 'string') : [];
       const old = Date.now() - ASSET_GRACE_MS;
       for (const id of await DB.allKeys('assets')) {
         if (used.has(id)) continue;
+        if (steps.some(x => x.includes('"' + id + '"'))) continue;
         const rec = await DB.get('assets', id);
         if (rec && rec.created && rec.created > old) continue;
         await DB.del('assets', id); this.cache.delete(id);

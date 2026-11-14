@@ -3443,6 +3443,10 @@
   "In de vloer",
   "I gulvet"
  ],
+ "In the library – not on this device yet": [
+  "In de bibliotheek – nog niet op dit apparaat",
+  "I biblioteket – ikke på denne enheten ennå"
+ ],
  "In the wall": [
   "In de wand",
   "I veggen"
@@ -8287,6 +8291,10 @@
   "Dit document kon niet worden geopend: {e}",
   "Dette dokumentet kunne ikke åpnes: {e}"
  ],
+ "This document is in the library, which is not on this device yet: Documents → Load library….": [
+  "Dit document zit in de bibliotheek, die nog niet op dit apparaat staat: Documenten → Bibliotheek laden….",
+  "Dette dokumentet ligger i biblioteket, som ikke er på denne enheten ennå: Dokumenter → Last inn bibliotek…."
+ ],
  "This document’s file is not on this device.": [
   "Het bestand van dit document staat niet op dit apparaat.",
   "Filen til dette dokumentet er ikke på denne enheten."
@@ -8306,6 +8314,10 @@
  "This file is {s}. Files over {m} are not opened, because the phone or computer could run out of memory and close the app. Your houses are untouched.": [
   "Dit bestand is {s}. Bestanden boven {m} worden niet geopend, omdat de telefoon of computer geen geheugen meer kan hebben en de app sluit. Je huizen zijn niet aangeraakt.",
   "Denne filen er {s}. Filer over {m} åpnes ikke, fordi telefonen eller datamaskinen kan gå tom for minne og lukke appen. Husene dine er urørt."
+ ],
+ "This file unpacks to more than {m}. Files over {m} are not opened, because the phone or computer could run out of memory and close the app. Your houses are untouched.": [
+  "Dit bestand wordt uitgepakt groter dan {m}. Bestanden boven {m} worden niet geopend, omdat de telefoon of computer dan te weinig geheugen kan hebben en de app sluit. Je huizen zijn niet aangeraakt.",
+  "Denne filen blir større enn {m} når den pakkes ut. Filer over {m} åpnes ikke, fordi telefonen eller datamaskinen kan gå tom for minne og lukke appen. Husene dine er urørt."
  ],
  "This file was made with a newer version of House Planner than this app (version {m}). Update the app first, then import the file again. Nothing was stored.": [
   "Dit bestand is gemaakt met een nieuwere versie van House Planner dan deze app (versie {m}). Werk eerst de app bij en importeer het bestand dan opnieuw. Er is niets opgeslagen.",
@@ -10614,6 +10626,10 @@
  "{n} notes deleted": [
   "{n} notities verwijderd",
   "{n} notater slettet"
+ ],
+ "{n} of these documents are in the library, which is not on this device yet. Get house-planner-library.zip from the release page (next to this app file) and load it here or in Settings → Library.": [
+  "{n} van deze documenten zitten in de bibliotheek, die nog niet op dit apparaat staat. Haal house-planner-library.zip van de releasepagina (naast dit app-bestand) en laad hem hier of in Instellingen → Bibliotheek.",
+  "{n} av disse dokumentene ligger i biblioteket, som ikke er på denne enheten ennå. Hent house-planner-library.zip fra utgivelsessiden (ved siden av denne app-filen) og last den inn her eller i Innstillinger → Bibliotek."
  ],
  "{n} outlets": [
   "{n} contacten",
