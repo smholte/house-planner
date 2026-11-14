@@ -142,16 +142,16 @@ Object.assign(app, {
   levelSettings() {
     const s = this.settings, auto = deviceLevel(), sig = deviceSignals();
     const cur = LEVELS[s.level] ? s.level : 'auto';
-    const why = auto.why.map(w => t(w, { m: fmtDec(sig.mem), n: sig.maxTex, c: sig.cores })).join(', ');
-    const pics = h('div', { class: 'pip-set-row', id: 'set-pics-row' }, h('span', null, t('Pictures')),
-      h('div', { class: 'seg', id: 'set-pics' }, ...[[false, t('Compressed (less memory)')], [true, t('As before')]].map(([v, l]) => h('button', { 'data-k': String(v), 'aria-pressed': String(!!s.texPlain === v), onclick: e => {
+    const why = auto.why.map(w => t(w, { m: sig.mem != null ? fmtDec(String(sig.mem)) : '?', n: sig.maxTex, c: sig.cores })).join(', ');
+    const pics = h('div', { class: 'pip-set-row', id: 'set-pics-row', style: { flexWrap: 'wrap', gap: '6px' } }, h('span', null, t('Pictures')),
+      h('div', { class: 'seg', id: 'set-pics', style: { flexWrap: 'wrap', maxWidth: '100%' } }, ...[[false, t('Compressed (less memory)')], [true, t('As before')]].map(([v, l]) => h('button', { 'data-k': String(v), 'aria-pressed': String(!!s.texPlain === v), onclick: e => {
         for (const b of e.currentTarget.parentNode.children) b.setAttribute('aria-pressed', String(b === e.currentTarget));
         this.setPicturesPlain(v);
       } }, l))));
     const picsBox = h('div', { id: 'set-pics-box', style: { display: 'grid', gap: '6px' } }, pics,
       h('p', { class: 'note-muted', id: 'set-pics-note' }, t('If surfaces look black or wrong in 3D, choose “As before” (also in the ⋯ menu).')));
     const showPics = () => { picsBox.style.display = levelKnobs(this.settings).ktx2 ? '' : 'none'; };
-    const seg = h('div', { class: 'seg', id: 'set-level' }, ...[['auto', t('Auto ({l})', { l: t(LEVEL_NAMES[auto.level]) })], ['phone', t('Phone')], ['normal', t('Normal')], ['pc', t('PC high')]].map(([v, l]) => h('button', { 'data-k': v, 'aria-pressed': String(cur === v), onclick: e => {
+    const seg = h('div', { class: 'seg', id: 'set-level', style: { flexWrap: 'wrap', maxWidth: '100%' } }, ...[['auto', t('Auto ({l})', { l: t(LEVEL_NAMES[auto.level]) })], ['phone', t('Phone')], ['normal', t('Normal')], ['pc', t('PC high')]].map(([v, l]) => h('button', { 'data-k': v, 'aria-pressed': String(cur === v), onclick: e => {
       for (const b of e.currentTarget.parentNode.children) b.setAttribute('aria-pressed', String(b === e.currentTarget));
       this.setLevel(v);
       showPics();
