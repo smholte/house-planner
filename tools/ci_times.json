@@ -266,6 +266,12 @@
    },
    "set": "public"
   },
+  "test_phone_taps.py": {
+   "seconds": 60.0,
+   "ok": true,
+   "checks": 14,
+   "set": "public"
+  },
   "test_quantities.py": {
    "seconds": 36.0,
    "ok": true,

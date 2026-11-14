@@ -129,6 +129,29 @@ class PlanView extends Emitter {
     requestAnimationFrame(stepFn);
   }
 
+  /** pan (and zoom in if needed) so a plan point (of the edited storey) sits in the open part of the view with about
+   *  `span` metres around it – a new piece of furniture you can grab */
+  showPoint(lp, span = 1.6) {
+    const en = this.spec.entries.find(x => x.edit) || this.spec.entries.find(x => !x.wallsOnly);
+    if (!en || !this.W) return;
+    const wp = [lp[0] + en.offset[0], lp[1] + en.offset[1]];
+    const ins = this.insets || { top: 0, bottom: 0 };
+    const openH = Math.max(80, this.H - ins.top - ins.bottom - 60);
+    const need = Math.min(this.W - 40, Math.min(openH, 300)) / (span * 2);   // ≈ 90 px per metre on a phone
+    const s = Math.max(this.cam.s, clamp(need, 4, 1200));
+    const id = ++this._animId;
+    const to = { s, tx: this.W / 2 - wp[0] * s, ty: ins.top + (this.H - ins.top - ins.bottom) / 2 - wp[1] * s };
+    const from = { ...this.cam }, t0 = performance.now(), dur = 260;
+    const step = now => {
+      if (id !== this._animId) return;
+      const k0 = Math.min(1, (now - t0) / dur), k = 1 - Math.pow(1 - k0, 3);
+      Object.assign(this.cam, k0 >= 1 ? to : { s: from.s + (to.s - from.s) * k, tx: from.tx + (to.tx - from.tx) * k, ty: from.ty + (to.ty - from.ty) * k });
+      this.applyCam();
+      if (k0 < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
   /** back to the whole drawing, gliding there */
   home() { this.fit(36, true); }
 
@@ -818,6 +841,9 @@ class PlanView extends Emitter {
           const sel = this.spec.selection;
           const already = sel && sel.type === hit.type && sel.id === hit.id;
           if (!already) this.app.select(hit);
+          // remembered for the tap that follows (touch taps run 300 ms late, after the details panel has resized the
+          // view): one tap = one pick, a wall never falls through to the room under it
+          if (hit.type !== 'room') this.gesture.downHit = hit;
           if (hit.type !== 'room') this.prepareBodyDrag(hit, en, p);
           return;
         }
@@ -919,10 +945,10 @@ class PlanView extends Emitter {
     this.drag = null;
     if (!g.moved && g.dim) { this.editDim(g.dim, sp); return; }
     if (!g.moved && g.multiTap !== undefined) { if (g.multiTap && g.multiTap.solo) this.app.select(g.multiTap.solo); else if (g.multiTap) this.app.multiToggle(g.multiTap); return; }
-    if (!g.moved) this.onTap(wp, sp, e);
+    if (!g.moved) { this._tapDownHit = g.downHit || null; this.onTap(wp, sp, e); this._tapDownHit = null; }
   }
 
-  onTap(wp, sp, e, deferred = false) {
+  onTap(wp, sp, e, deferred = false, downHit = this._tapDownHit) {
     const en = this.editEntry;
     const tool = this.app.tool;
     // double tap (touch / pen) while not drawing: back to the whole drawing. A single tap waits a moment,
@@ -933,7 +959,7 @@ class PlanView extends Emitter {
       if (prev) { clearTimeout(prev.timer); this._pendingTap = null; }
       if (prev && now - prev.t < 320 && V.dist(prev.sp, sp) < 40) { this.home(); return; }
       if (prev) prev.run();
-      const run = () => { if (this.spec) this.onTap(wp, sp, e, true); };
+      const run = () => { if (this.spec) this.onTap(wp, sp, e, true, downHit); };
       this._pendingTap = { t: now, sp, run, timer: setTimeout(() => { this._pendingTap = null; run(); }, 300) };
       return;
     }
@@ -963,8 +989,8 @@ class PlanView extends Emitter {
       if (pin) { this.app.selectNote(pin.pin.id); return; }
       const pt = this.pointAt(sp, en);
       if (pt) { this.app.select({ type: 'point', id: pt.id }); return; }
-      const hit = this.hit(p, en) || (en.site ? this.gardenHit(p, en, true) : null);
-      this.app.select(hit);
+      const hit = downHit || this.hit(p, en) || (en.site ? this.gardenHit(p, en, true) : null);
+      if (!(downHit && this.app.selection && this.app.selection.type === downHit.type && this.app.selection.id === downHit.id)) this.app.select(hit);
       // a door: a small pop-up to open or close it
       if (hit && hit.type === 'opening') this.app.doorTapped(hit.id, e, '2d');
       return;
