@@ -35,15 +35,17 @@ const roomCeilH = (r, st) => (r && r.ceilingH > 0 ? r.ceilingH : (st ? st.wallHe
 /** where the rooms of a storey run along the sides of its walls → [{ wall, room, side, u0, u1, edge }]
  *  side +1 = the wall's left side (V.perp of its direction); u0..u1 in metres from the wall's start.
  *  A room edge counts when it runs parallel to a wall, on the wall's face (or its centre line). */
-function wallFaces(plan, sid, onlyRooms) {
+function wallFaces(plan, sid, onlyRooms, corners) {
   const rooms = (onlyRooms || plan.rooms).filter(r => r.storey === sid && r.poly && r.poly.length >= 3);
   const out = [];
   if (!rooms.length) return out;
   const geo = rooms.map(r => ({ r, sgn: Math.sign(polygonArea(r.poly)) || 1, bb: bboxOfPoints(r.poly) }));
+  const ext = corners ? wallCornerExt(plan, sid) : null;
   for (const w of plan.walls) {
     if (w.storey !== sid || w.kind === 'insulation' || w.leaf === 'outer') continue;
     const L = wallLen(w);
     if (L < 0.05) continue;
+    const [e0, e1] = ext ? ext.get(w.id) || [0, 0] : [0, 0];
     const d = wallDir(w), n = V.perp(d), reach = w.t / 2 + 0.06;
     const wx0 = Math.min(w.a[0], w.b[0]) - reach, wx1 = Math.max(w.a[0], w.b[0]) + reach, wy0 = Math.min(w.a[1], w.b[1]) - reach, wy1 = Math.max(w.a[1], w.b[1]) + reach;
     for (const { r, sgn, bb } of geo) {
@@ -60,7 +62,7 @@ function wallFaces(plan, sid, onlyRooms) {
         if (off * side < -w.t / 4) continue;
         let a = V.dot(V.sub(p, w.a), d), b = V.dot(V.sub(q, w.a), d);
         if (a > b) [a, b] = [b, a];
-        a = Math.max(a, 0); b = Math.min(b, L);
+        a = Math.max(a, -e0); b = Math.min(b, L + e1);
         if (b - a > 0.05) segs.push({ u0: a, u1: b, side, edge: i });
       }
       segs.sort((x, y) => x.side - y.side || x.u0 - y.u0);
@@ -75,9 +77,30 @@ function wallFaces(plan, sid, onlyRooms) {
   }
   return out;
 }
-/** the walls of one room, in order around the room, lettered A, B, C … */
-function roomFaces(plan, r) {
-  const list = wallFaces(plan, r.storey, [r]);
+/** how far the faces of each wall reach past its end points round an outside corner (task 0024): a wall that ends
+ *  on another wall (an L or the end of a T) is covered there by the other wall, so its face on the outside of the
+ *  corner goes on for half the other wall's thickness → Map(wall id → [past a, past b]). The 3D view and the wall
+ *  views keep the centre-line ends; the quantities count the whole face. */
+function wallCornerExt(plan, sid) {
+  const ws = plan.walls.filter(w => w.storey === sid && w.kind !== 'insulation' && w.leaf !== 'outer' && wallLen(w) >= 0.05);
+  const out = new Map();
+  for (const w of ws) {
+    const d = wallDir(w), res = [0, 0];
+    [w.a, w.b].forEach((P, k) => {
+      for (const o of ws) {
+        if (o === w || Math.abs(V.cross(d, wallDir(o))) < 0.3) continue;
+        const od = wallDir(o), L = wallLen(o), u = clamp(V.dot(V.sub(P, o.a), od), 0, L);
+        if (V.len(V.sub(P, V.add(o.a, V.mul(od, u)))) <= 0.02) res[k] = Math.max(res[k], o.t / 2);
+      }
+    });
+    if (res[0] || res[1]) out.set(w.id, res);
+  }
+  return out;
+}
+/** the walls of one room, in order around the room, lettered A, B, C … (corners: the faces reach round outside
+ *  corners, for the quantities) */
+function roomFaces(plan, r, corners) {
+  const list = wallFaces(plan, r.storey, [r], corners);
   // order around the room: by the edge, then along the edge's direction
   list.sort((a, b) => a.edge - b.edge || edgeAlong(r, a) - edgeAlong(r, b));
   list.forEach((f, i) => { f.letter = i < 26 ? FACE_LETTERS[i] : 'Z' + (i - 25); });
@@ -135,7 +158,7 @@ function finishSummary(fin) {
 
 /** per room: its walls with their finishes and areas, and the tiles per kind of tile */
 function roomFinishStats(plan, r, st) {
-  const faces = roomFaces(plan, r);
+  const faces = roomFaces(plan, r, true);
   const tiles = new Map();
   let wall = 0, tiled = 0;
   const rows = faces.map(f => {
