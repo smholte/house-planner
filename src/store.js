@@ -12,7 +12,10 @@ const DB_VER = 1;
 const AUTO_EVERY_MS = 2 * 60 * 1000;   // rolling autosave interval
 const AUTO_KEEP = 10;                  // rolling autosaves kept per project
 const BACKUP_KEEP = 10;                // automatic safety backups kept per project
-const EMERGENCY_KEY = 'house-planner.emergency';
+const EMERGENCY_KEY = 'house-planner.emergency';   // + '.' + house id: one emergency copy per house (task 0027)
+const ASSET_GRACE_MS = 24 * 3600 * 1000;   // the clean-up leaves files younger than this alone (another copy may use them)
+const SAVE_RETRY_MS = 30 * 1000;           // a save that failed is tried again this often
+const WRITER_LOCK = 'house-planner.writer.';  // + house id: the Web Lock of the one copy that writes it
 
 const DB = {
   db: null,
@@ -64,8 +67,10 @@ const DB = {
     if (this.memory) return Promise.resolve(clone(this.mem[store].get(key)));
     return this._req(store, 'readonly', st => st.get(key));
   },
-  put(store, value) {
-    if (this.memory) { this.mem[store].set(value.id ?? value.key, clone(value)); return Promise.resolve(); }
+  async put(store, value) {
+    if (this.memory) { this.mem[store].set(value.id ?? value.key, clone(value)); return; }
+    // a house another copy of the app writes is not written from here (a merge, a rename in the list – task 0027)
+    if (store === 'projects' && value && value.id && await writerElsewhere(value.id)) throw elsewhereError();
     return this._req(store, 'readwrite', st => st.put(value));
   },
   del(store, key) {
@@ -80,11 +85,44 @@ const DB = {
     if (this.memory) return Promise.resolve([...this.mem.snapshots.values()].filter(s => s.projectId === projectId).map(clone));
     return this._req('snapshots', 'readonly', st => st.index('projectId').getAll(projectId));
   },
+  /** write the open house unless another copy wrote it since `base` (its `updated` when this copy last read or
+      wrote it): false then, and nothing is written. Read and write are one transaction (task 0027). */
+  putProject(value, base) {
+    if (this.memory) { this.mem.projects.set(value.id, clone(value)); return Promise.resolve(true); }
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('projects', 'readwrite');
+      const st = tx.objectStore('projects');
+      let ok = true, err = null;
+      const g = st.get(value.id);
+      g.onsuccess = () => {
+        const cur = g.result;
+        if (cur && base != null && (cur.updated || 0) !== base) { ok = false; return; }
+        try { st.put(value); } catch (e) { err = e; try { tx.abort(); } catch (e2) { /* already over */ } }
+      };
+      tx.oncomplete = () => resolve(ok);
+      tx.onerror = () => reject(err || tx.error);
+      tx.onabort = () => reject(err || tx.error || new Error('Transaction aborted'));
+    });
+  },
   allKeys(store) {
     if (this.memory) return Promise.resolve([...this.mem[store].keys()]);
     return this._req(store, 'readonly', st => st.getAllKeys());
   },
 };
+
+/** another copy of the app (tab, installed app) holds the writer lock of house `id` – not this one */
+async function writerElsewhere(id) {
+  if (Saver._lock && Saver._lock.id === id && Saver._lock.held) return false;
+  try {
+    if (!(navigator.locks && navigator.locks.query)) return false;
+    return ((await navigator.locks.query()).held || []).some(l => l.name === WRITER_LOCK + id);
+  } catch (e) { return false; }
+}
+function elsewhereError() {
+  const e = new Error(t('This house is open in another window – changes here are not saved.'));
+  e.code = 'HP_ELSEWHERE';
+  return e;
+}
 
 /* ───────── assets (imported drawings) — kept in memory as object URLs for drawing ───────── */
 const Assets = {
@@ -129,7 +167,9 @@ const Assets = {
   get(id) { return this.cache.get(id) || null; },
   async getRecord(id) { return DB.get('assets', id); },
   async putRecord(rec) { this.fresh.add(rec.id); await DB.put('assets', rec); this.cache.set(rec.id, rec.kind === 'shell' ? { kind: 'shell', json: rec.json } : { url: rec.dataUrl, w: rec.w, h: rec.h }); },
-  /** delete assets nobody references any more (projects, snapshots, trash) */
+  /** delete assets nobody references any more (projects, snapshots, trash) – only ones older than ASSET_GRACE_MS:
+      another copy of the app (a second tab, the installed app) may have just added a photo its house refers to but
+      has not written yet (task 0027) */
   async collectGarbage() {
     try {
       const used = new Set();
@@ -144,7 +184,13 @@ const Assets = {
         if (t.payload && t.payload.snapshots) for (const sn of t.payload.snapshots) scan(sn.project);
         if (t.payload && t.payload.snapshot) scan(t.payload.snapshot.project);
       }
-      for (const id of await DB.allKeys('assets')) if (!used.has(id)) { await DB.del('assets', id); this.cache.delete(id); }
+      const old = Date.now() - ASSET_GRACE_MS;
+      for (const id of await DB.allKeys('assets')) {
+        if (used.has(id)) continue;
+        const rec = await DB.get('assets', id);
+        if (rec && rec.created && rec.created > old) continue;
+        await DB.del('assets', id); this.cache.delete(id);
+      }
     } catch (e) { console.warn('asset GC failed', e); }
   },
 };
@@ -273,6 +319,11 @@ const Trash = {
    - every change is written ~0.7 s later (and instantly when the app is hidden or closed)
    - a synchronous emergency copy goes to localStorage on hide/close, so even a hard close is recoverable
    - every AUTO_EVERY_MS with changes, a rolling autosave snapshot is stored (only the last AUTO_KEEP kept)
+   - one writer (task 0027): the copy of the app that opened a house first holds a Web Lock on it; another copy (a
+     second tab, the installed app beside a browser tab) shows it but saves nothing ('elsewhere') until it takes
+     over. Each write also checks that nobody wrote the house since this copy read it (no Web Locks, a frozen tab).
+   - a failed write ('error') is tried again every SAVE_RETRY_MS; 'failed' tells the app (message, Export now)
+   states: idle | saving | saved | memory | error | elsewhere
 */
 const Saver = new (class extends Emitter {
   constructor() {
@@ -283,6 +334,15 @@ const Saver = new (class extends Emitter {
     this.lastAuto = 0;
     this.changedSinceAuto = false;
     this.pending = false;
+    this.readonly = false;      // another copy writes this house (task 0027)
+    this.why = null;            // 'open' (it holds the lock) | 'changed' (it wrote in between)
+    this.base = null;           // the stored house's `updated` as this copy last read or wrote it
+    this.failures = 0;          // writes failed in a row
+    this.lastError = null;
+    this.retryMs = SAVE_RETRY_MS;
+    this._lock = null;
+    this._inflight = null;
+    this._retry = null;
     this._write = debounce(() => this.flush(), 700);
     this._timer = setInterval(() => this.tick(), 15000);
     const hide = () => { this.emergencyWrite(); this.flush(); };
@@ -290,43 +350,146 @@ const Saver = new (class extends Emitter {
     window.addEventListener('pagehide', hide);
     window.addEventListener('beforeunload', () => this.emergencyWrite());
   }
-  attach(project) {
+  /** become the one copy that writes house `id` (steal: take it from the copy that has it). true = this copy writes. */
+  async claim(id, steal) {
+    this.release();
+    if (DB.memory || !(navigator.locks && navigator.locks.request)) return true;
+    const token = { id };
+    this._lock = token;
+    const held = new Promise(r => { token.release = r; });
+    const keep = lock => { token.held = true; return held; };
+    // wait for the other copy to let go (it closes the house or its window): then this copy writes (app: 'free')
+    const waitFree = () => {
+      if (this._lock !== token || token.wait) return;
+      token.wait = new AbortController();
+      navigator.locks.request(WRITER_LOCK + id, { signal: token.wait.signal }, lock => {
+        token.wait = null;
+        if (this._lock !== token) return undefined;
+        const r = keep(lock);
+        this.emit('free', id);
+        return r;
+      }).catch(ended);
+    };
+    const ended = e => {
+      // another copy took the house over (steal): this one stops writing it, and waits for it to come free
+      if (this._lock === token && token.held) { token.held = false; this.lost('open'); waitFree(); }
+    };
+    try {
+      const got = await new Promise(resolve => {
+        navigator.locks.request(WRITER_LOCK + id, steal ? { steal: true } : { ifAvailable: true }, lock => {
+          if (!lock) { resolve(false); return undefined; }
+          resolve(true);
+          return keep(lock);
+        }).catch(e => {
+          // a lock that was never given (a browser that refuses locks here): write anyway, the check in putProject stays
+          if (!token.held) { console.warn('writer lock', e); resolve(true); token.nolock = true; return; }
+          ended(e);
+        });
+      });
+      if (!got) waitFree();
+      return got;
+    } catch (e) { console.warn('writer lock', e); return true; }
+  }
+  release() {
+    const tk = this._lock;
+    this._lock = null;
+    if (!tk) return;
+    if (tk.wait) { try { tk.wait.abort(); } catch (e) { /* given already */ } }
+    if (tk.release) { tk.held = false; tk.release(); }
+  }
+  /** this copy may not write the open house any more: another copy has it ('open') or wrote it ('changed').
+      What it had not written yet is kept as a backup of the house (Save points → Automatic backups). */
+  lost(why) {
+    if (!this.project) return;
+    this._write.cancel();
+    clearTimeout(this._retry);
+    this.keepUnsaved();
+    this.readonly = true;
+    this.why = why;
+    this.setState('elsewhere');
+  }
+  /** the open house as this copy has it, when it holds changes not written: a backup snapshot (task 0027 review) */
+  async keepUnsaved() {
+    const p = this.project;
+    if (!p || !this.pending || this._kept === p.updated) return false;
+    this._kept = p.updated;
+    try { await Snapshots.create(p, 'backup', 'Unsaved changes from another window'); this.emit('kept'); return true; }
+    catch (e) { console.warn('keep unsaved', e); return false; }
+  }
+  attach(project, opts = {}) {
     if (this.project && this.project !== project) { this.flushNow(); }
     this.project = project;
     this.lastAuto = Date.now();
     this.changedSinceAuto = false;
     this.pending = false;
-    this.setState(project ? 'saved' : 'idle');
+    this.failures = 0; this.lastError = null; clearTimeout(this._retry);
+    this.base = project ? (project.updated || 0) : null;
+    this.readonly = !!(project && opts.readonly);
+    this.why = this.readonly ? 'open' : null;
+    this.setState(!project ? 'idle' : this.readonly ? 'elsewhere' : DB.memory ? 'memory' : 'saved');
   }
-  detach() { this.flushNow(); this.project = null; this.setState('idle'); }
+  detach() { this.flushNow(); this.release(); this.project = null; this.readonly = false; this.why = null; clearTimeout(this._retry); this.setState('idle'); }
   markDirty() {
     if (!this.project) return;
     this.project.updated = Date.now();
     this.pending = true;
     this.changedSinceAuto = true;
-    this.setState('saving');
+    if (this.readonly) { this.setState('elsewhere'); return; }
+    this.setState(this.state === 'error' ? 'error' : 'saving');
     this._write();
   }
   setState(st) { this.state = st; this.emit('state', st); }
-  flushNow() { this._write.cancel(); return this.flush(); }
-  async flush() {
-    if (!this.project || !this.pending) return;
+  /** write what is waiting now; resolves when nothing of it is still being written (Restart waits for this) */
+  async flushNow() {
+    this._write.cancel();
+    if (this._inflight) { try { await this._inflight; } catch (e) { /* reported by flush */ } }
+    return this.flush();
+  }
+  flush() {
+    // one write at a time: a change made while one is written goes in the next one
+    if (this._inflight) return this._inflight.then(() => this.flush());
+    if (!this.project || !this.pending || this.readonly) return Promise.resolve();
+    const run = this._flush();
+    this._inflight = run;
+    return run.finally(() => { if (this._inflight === run) this._inflight = null; });
+  }
+  async _flush() {
     const p = this.project;
     this.pending = false;
+    clearTimeout(this._retry);
+    const copy = clone(p);
     try {
-      await DB.put('projects', clone(p));
+      const ok = await DB.putProject(copy, this.base);
+      if (this.project !== p) return;
+      if (!ok) {
+        // another copy wrote this house since this one read it: nothing written, this copy stops saving it
+        this.pending = true;
+        this.lost('changed');
+        return;
+      }
+      this.base = copy.updated || 0;
       this.lastSaved = Date.now();
       this.clearEmergency(p.id);
+      const was = this.failures;
+      this.failures = 0; this.lastError = null;
       if (!this.pending) this.setState(DB.memory ? 'memory' : 'saved');
+      if (was) this.emit('recovered');
     } catch (e) {
       console.error('save failed', e);
+      // the browser closed the database (another version of the app opened it): open it again for the next try
+      if (e && e.name === 'InvalidStateError') { try { await DB.open(); } catch (e2) { /* next try */ } }
+      if (this.project !== p) return;
       this.pending = true;
+      this.failures++;
+      this.lastError = e;
       this.setState('error');
       this.emergencyWrite();
+      this.emit('failed', { count: this.failures, error: e });
+      this._retry = setTimeout(() => { if (this.project === p && this.pending) this.flush(); }, this.retryMs);
     }
   }
   async tick() {
-    if (!this.project) return;
+    if (!this.project || this.readonly) return;
     if (this.changedSinceAuto && Date.now() - this.lastAuto >= AUTO_EVERY_MS) {
       await this.autosaveNow();
     }
@@ -339,37 +502,48 @@ const Saver = new (class extends Emitter {
     catch (e) { console.warn('autosave failed', e); }
   }
   emergencyWrite() {
-    if (!this.project) return;
-    try { localStorage.setItem(EMERGENCY_KEY, JSON.stringify({ id: this.project.id, updated: this.project.updated, project: this.project })); }
+    // a copy that does not write this house leaves the emergency copy alone (it would bring back its older house)
+    if (!this.project || this.readonly) return;
+    if (!this.pending && !this._inflight && this.state !== 'error') return;   // nothing unsaved
+    try { localStorage.setItem(EMERGENCY_KEY + '.' + this.project.id, JSON.stringify({ id: this.project.id, updated: this.project.updated, project: this.project })); }
     catch (e) { /* quota or blocked — IndexedDB copy still exists */ }
   }
   clearEmergency(id) {
     try {
+      localStorage.removeItem(EMERGENCY_KEY + '.' + id);
+      // the one shared slot of versions before 0027
       const raw = localStorage.getItem(EMERGENCY_KEY);
-      if (!raw) return;
-      const em = JSON.parse(raw);
-      if (em.id === id) localStorage.removeItem(EMERGENCY_KEY);
+      if (raw && JSON.parse(raw).id === id) localStorage.removeItem(EMERGENCY_KEY);
     } catch (e) { /* ignore */ }
   }
 })();
 
-/** On start: if the emergency copy is newer than what is in IndexedDB (app was killed mid-save), put it back. */
+/** On start: if an emergency copy is newer than what is in IndexedDB (app was killed mid-save), put it back.
+    One copy per house (task 0027; the single slot of older versions too). A house another copy of the app has open
+    is left alone – that copy is alive and writes it itself. Returns the last house brought back, or null. */
 async function recoverEmergency() {
+  let back = null;
   try {
-    const raw = localStorage.getItem(EMERGENCY_KEY);
-    if (!raw) return null;
-    const em = JSON.parse(raw);
-    if (!em || !em.project || !em.id) return null;
-    const stored = await DB.get('projects', em.id);
-    if (!stored || (em.updated || 0) > (stored.updated || 0)) {
-      if (stored) await Snapshots.create(stored, 'backup', 'Before recovering unsaved changes');
-      await DB.put('projects', em.project);
-      localStorage.removeItem(EMERGENCY_KEY);
-      return em.project;
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k === EMERGENCY_KEY || (k && k.startsWith(EMERGENCY_KEY + '.'))) keys.push(k); }
+    let busy = new Set();
+    try { if (navigator.locks && navigator.locks.query) busy = new Set(((await navigator.locks.query()).held || []).map(l => l.name)); } catch (e) { /* no locks */ }
+    for (const key of keys) {
+      try {
+        const em = JSON.parse(localStorage.getItem(key) || 'null');
+        if (!em || !em.project || !em.id) { localStorage.removeItem(key); continue; }
+        if (busy.has(WRITER_LOCK + em.id)) continue;
+        const stored = await DB.get('projects', em.id);
+        if (!stored || (em.updated || 0) > (stored.updated || 0)) {
+          if (stored) await Snapshots.create(stored, 'backup', 'Before recovering unsaved changes');
+          await DB.put('projects', em.project);
+          if (!back || (em.updated || 0) > (back.updated || 0)) back = em.project;
+        }
+        localStorage.removeItem(key);
+      } catch (e) { console.warn('recovery of', key, e); }
     }
-    localStorage.removeItem(EMERGENCY_KEY);
   } catch (e) { console.warn('recovery check failed', e); }
-  return null;
+  return back;
 }
 
 const Settings = {

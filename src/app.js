@@ -48,8 +48,15 @@ const app = new (class App extends Emitter {
     this.applyTheme();
     const recovered = await recoverEmergency();
     this.wireStatic();
-    Saver.on('state', () => this.renderSaveStatus());
+    Saver.on('state', () => { this.renderSaveStatus(); this.renderSaveBar(); });
     Saver.on('autosaved', () => this.renderSaveStatus());
+    Saver.on('failed', () => this.renderSaveBar());
+    Saver.on('recovered', () => this.toast(t('Saved again.')));
+    // the other copy let go of the open house: this one reads it again and writes it from now on
+    Saver.on('free', id => { if (this.project && this.project.id === id && Saver.readonly) this.writerFree(id); });
+    Saver.on('kept', () => this.toast(t('What this window had not saved is kept under Save points → Automatic backups.'), { ms: 7000 }));
+    // a write refused because another copy has the house (a merge or rename here): said, not an error
+    window.addEventListener('unhandledrejection', e => { if (e.reason && e.reason.code === 'HP_ELSEWHERE') { e.preventDefault(); this.toast(e.reason.message, { ms: 6000 }); } });
     setInterval(() => this.renderSaveStatus(), 20000);
     let last = null;
     try { last = localStorage.getItem('house-planner.last'); } catch (e) { /* ignore */ }
@@ -102,7 +109,10 @@ const app = new (class App extends Emitter {
   async restartForUpdate(worker, bar) {
     const btn = bar && bar.querySelector('button.primary');
     if (btn) btn.disabled = true;
-    try { await Saver.flushNow(); await Settings.flushNow(); } catch (e) { console.warn('save before update', e); }
+    // a save that is being written is waited for (task 0027); what could not be written goes into the emergency copy
+    const wait = (async () => { try { await Saver.flushNow(); await Settings.flushNow(); } catch (e) { console.warn('save before update', e); } })();
+    await Promise.race([wait, new Promise(r => setTimeout(r, 8000))]);   // a write that never ends: the emergency copy
+    Saver.emergencyWrite();
     let reloaded = false;
     const reload = () => { if (reloaded) return; reloaded = true; location.reload(); };
     navigator.serviceWorker.addEventListener('controllerchange', reload);
@@ -333,8 +343,10 @@ const app = new (class App extends Emitter {
       this.mutate((proj) => { proj.name = v.trim(); }, { project: true });
       this.renderEditorChrome();
     } else {
-      p.name = v.trim(); p.updated = Date.now();
-      await DB.put('projects', p);
+      // the house as stored now (another window may have changed it since this list was drawn): only its name changes
+      const cur = await DB.get('projects', p.id) || p;
+      cur.name = v.trim(); cur.updated = Date.now();
+      try { await DB.put('projects', cur); } catch (e) { this.toast(e.message || String(e), { ms: 6000 }); }
       this.renderProjectList();
     }
   }
@@ -361,13 +373,21 @@ const app = new (class App extends Emitter {
     this.toast('Moved to trash.');
   }
 
-  async openProject(id) {
-    const p = await DB.get('projects', id);
+  /** opts.takeOver: another copy of the app has this house open – this copy takes it over (task 0027) */
+  async openProject(id, opts = {}) {
+    let p = await DB.get('projects', id);
     if (!p) { this.toast('That project is no longer on this device.'); return this.showHome(); }
     if (this.project) await this.closeProject(true);
+    // one copy of the app writes a house at a time; the other shows it and saves nothing until it takes over
+    const writes = await Saver.claim(id, !!opts.takeOver);
+    if (opts.takeOver) {
+      // what the other copy wrote last (a write it had started may still land: a moment's wait)
+      await new Promise(r => setTimeout(r, 300));
+      p = await DB.get('projects', id) || p;
+    }
     migrateProject(p);
     this.project = p;
-    Saver.attach(p);
+    Saver.attach(p, { readonly: !writes });
     this.loadProjectView(p);
     this.undoStack = []; this.redoStack = [];
     // files a house's own data brings along (documents) onto this device, then everything it uses into memory
@@ -739,13 +759,64 @@ const app = new (class App extends Emitter {
     }
   }
 
+  /** take the open house over from the other copy of the app that has it: read again from storage, then write it here */
+  async takeOver() {
+    const p = this.project;
+    if (!p) return;
+    await Saver.keepUnsaved();
+    await this.openProject(p.id, { takeOver: true });
+    if (Saver.readonly) this.toast(t('The other window still has this house. Close it there, then try again.'), { ms: 6000 });
+    else this.toast(t('This window saves the house now.'));
+  }
+
+  async writerFree(id) {
+    await Saver.keepUnsaved();
+    await this.openProject(id);
+    if (!Saver.readonly) this.toast(t('This window saves the house now.'));
+  }
+
+  /** the bar over the view when the open house is not being saved (task 0027): another copy writes it, or a save failed */
+  renderSaveBar() {
+    const old = document.getElementById('save-bar');
+    const st = Saver.project ? Saver.state : 'idle';
+    if (st !== 'elsewhere' && st !== 'error') { if (old) old.remove(); this._saveBarKey = null; this._savePrep = null; return; }
+    if (old && this._savePrep) this._savePrep();
+    const quota = Saver.lastError && /quota/i.test(Saver.lastError.name + ' ' + Saver.lastError.message);
+    const longFail = st === 'error' && Saver.failures >= 3;
+    const key = st + '|' + Saver.why + '|' + quota + '|' + longFail + '|' + (Saver.project && Saver.project.id);
+    if (old && this._saveBarKey === key) return;
+    if (old) old.remove();
+    this._saveBarKey = key;
+    let msg, btn;
+    if (st === 'elsewhere') {
+      msg = Saver.why === 'changed' ? t('This house was changed in another window – changes here are not saved.') : t('This house is open in another window – changes here are not saved.');
+      btn = h('button', { class: 'btn sm primary', id: 'save-takeover', onclick: () => this.takeOver() }, t('Take over'));
+    } else if (!longFail) {
+      msg = (quota ? t('Not saved – this device is full.') : t('Not saved – the browser did not store the change.')) + ' ' + t('Trying again every 30 seconds.');
+    } else {
+      msg = t('Still not saved. Export a copy now so nothing is lost.');
+      const p = Saver.project;
+      // the file is made now: a phone's share sheet needs the tap itself (as the backup reminder)
+      // (made again when the house changed since – the copy has everything up to the tap)
+      let prep = null, at = 0;
+      const make = () => { at = p.updated; try { prep = this.quickBackupPrep(p); prep.catch(() => {}); } catch (e) { prep = null; } };
+      make();
+      this._savePrep = debounce(() => { if (p.updated !== at && document.getElementById('save-export')) make(); }, 1500);
+      btn = h('button', { class: 'btn sm primary', id: 'save-export', onclick: () => { if (p.updated !== at) make(); this.quickBackup(p, prep); } }, t('Export now'));
+    }
+    const bar = h('div', { class: 'update-bar save-bar', id: 'save-bar', role: 'alert', 'data-state': st }, h('span', null, msg), btn || null);
+    document.getElementById('app').appendChild(bar);
+  }
+
   renderSaveStatus() {
     const el = $('#save-status');
     if (!el) return;
     const st = Saver.state;
     el.dataset.state = st;
-    el.querySelector('.txt').textContent = st === 'saving' ? 'Saving…' : st === 'error' ? 'Not saved' : st === 'memory' ? 'Not stored' : 'Saved';
-    el.title = st === 'memory' ? t('This browser blocks storage. Export to keep your work.') + ' ' + t('Tap for save points.')
+    el.querySelector('.txt').textContent = st === 'saving' ? 'Saving…' : st === 'error' || st === 'elsewhere' ? 'Not saved' : st === 'memory' ? 'Not stored' : 'Saved';
+    el.title = st === 'elsewhere' ? t('This house is open in another window – changes here are not saved.')
+      : st === 'error' ? t('Not saved – the browser did not store the change.') + ' ' + t('Trying again every 30 seconds.')
+      : st === 'memory' ? t('This browser blocks storage. Export to keep your work.') + ' ' + t('Tap for save points.')
       : (Saver.lastSaved ? t('Saved on this device at {t}.', { t: fmtTime(Saver.lastSaved) }) : t('Saved on this device.')) + ' ' + t('Autosave every 2 minutes; the last 10 are kept.') + ' ' + t('Tap for save points.');
   }
 
@@ -1209,13 +1280,29 @@ const app = new (class App extends Emitter {
 
   pushUndo() {
     // (each step: the house as it was before, and when the change was made – history.js names it)
-    this.undoStack.push({ s: JSON.stringify(this.project), t: Date.now() });
+    const s = JSON.stringify(this.project);
+    this.undoStack.push({ s, t: Date.now(), b: undoBytes(s) });
     if (this.undoStack.length > 80) this.undoStack.shift();
     this.redoStack.length = 0;
+    this.trimUndo();
   }
-  restoreState(json) {
+  /** the history is kept under a size (task 0027): oldest steps go first, the newest one always stays */
+  trimUndo() {
+    const cap = undoCap();
+    const size = e => e.b || (e.b = undoBytes(e.s));
+    let total = 0;
+    for (const e of this.undoStack) total += size(e);
+    for (const e of this.redoStack) total += size(e);
+    while (total > cap && this.undoStack.length > 1) total -= size(this.undoStack.shift());
+    return total;
+  }
+  undoSize() { let n = 0; for (const e of this.undoStack) n += e.b || (e.b = undoBytes(e.s)); for (const e of this.redoStack) n += e.b || (e.b = undoBytes(e.s)); return n; }
+  restoreState(json, keepView) {
     const data = JSON.parse(json);
     const p = this.project;
+    // undo / redo leave what is saved without an undo step alone: the shown version and layout, doors open or
+    // closed, slices, view settings, a document page turned, a drawing's opacity (task 0027, audit finding 7)
+    if (keepView) keepViewState(p, data);
     for (const k of Object.keys(p)) delete p[k];
     Object.assign(p, data);
     p.updated = Date.now();
@@ -1237,7 +1324,7 @@ const app = new (class App extends Emitter {
     for (; n > 0 && this.undoStack.length; n--, moved++) { const e = this.undoStack.pop(); this.redoStack.push({ s: cur, t: e.t }); cur = e.s; }
     for (; n < 0 && this.redoStack.length; n++, moved++) { const e = this.redoStack.pop(); this.undoStack.push({ s: cur, t: e.t }); cur = e.s; }
     if (!moved) return;
-    this.restoreState(cur);
+    this.restoreState(cur, true);
     this._co = null;
   }
 
@@ -1409,3 +1496,28 @@ const app = new (class App extends Emitter {
 })();
 
 app.on('chain', () => app.renderStageOverlays());
+
+/* ───────── undo history size (task 0027, audit finding 7) ─────────
+   A step is the whole house as a JSON string: one byte a character in V8 while every character is Latin-1, two
+   otherwise. Phones (touch, or 4 GB or less) keep 15 MB – his house is ~0.36 MB a step, so ~40 steps; the Pixel
+   drops a tab in the background long before its 16 GB are used. Computers keep 60 MB. Never more than 80 steps. */
+function undoBytes(s) { return s.length * (/[^\u0000-\u00ff]/.test(s) ? 2 : 1); }
+function undoCap() {
+  if (window.__hpUndoCap) return window.__hpUndoCap;    // tests
+  const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  const small = navigator.deviceMemory && navigator.deviceMemory <= 4;
+  return (coarse || small ? 15 : 60) * 1024 * 1024;
+}
+/** copy what is saved without an undo step from the house as it is (cur) into the house undo brings back (data) */
+function keepViewState(cur, data) {
+  if (cur.activeVersionId && (data.versions || []).some(v => v.id === cur.activeVersionId)) data.activeVersionId = cur.activeVersionId;
+  if (cur.furniture && data.furniture && (data.furniture.layouts || []).some(l => l.id === cur.furniture.activeLayoutId)) data.furniture.activeLayoutId = cur.furniture.activeLayoutId;
+  for (const k of ['doorState', 'slices', 'viewSettings']) { if (cur[k] === undefined) delete data[k]; else data[k] = clone(cur[k]); }
+  const docs = new Map((cur.docs || []).map(d => [d.id, d]));
+  for (const d of data.docs || []) { const c = docs.get(d.id); if (!c) continue; if (c.rot === undefined) delete d.rot; else d.rot = c.rot; if (c.thumb !== undefined) d.thumb = c.thumb; }
+  for (const [k, u] of Object.entries(data.underlays || {})) {
+    const c = cur.underlays && cur.underlays[k];
+    if (!u || !c) continue;
+    for (const f of ['opacity', 'visible']) { if (c[f] === undefined) delete u[f]; else u[f] = c[f]; }
+  }
+}
