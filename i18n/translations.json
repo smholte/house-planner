@@ -2187,6 +2187,10 @@
   "Tekening klaar. Trek hem over met het Muur-gereedschap en voeg dan deuren, ramen en kamers toe.",
   "Tegningen er klar. Tegn over den med Vegg-verktøyet, og legg så til dører, vinduer og rom."
  ],
+ "Drawing under {s}": [
+  "Tekening onder {s}",
+  "Tegning under {s}"
+ ],
  "Drawing underneath": [
   "Tekening eronder",
   "Bakgrunnstegning"
@@ -2194,6 +2198,10 @@
  "Drawings need 3D, which this device does not have.": [
   "Tekeningen hebben 3D nodig en dat heeft dit apparaat niet.",
   "Tegninger krever 3D, og det har ikke denne enheten."
+ ],
+ "Drawings under the plans": [
+  "Tekeningen onder de plattegronden",
+  "Tegninger under planene"
  ],
  "Drawings: façades and sections": [
   "Tekeningen: gevels en doorsneden",
@@ -3575,6 +3583,10 @@
   "Beide houden",
   "Behold begge"
  ],
+ "Keep my copy": [
+  "Mijn kopie houden",
+  "Behold min kopi"
+ ],
  "Keep proportions": [
   "Verhoudingen behouden",
   "Behold proporsjonene"
@@ -4755,6 +4767,18 @@
   "Er is niets opgenomen.",
   "Ingenting ble tatt opp."
  ],
+ "Nothing was stored.": [
+  "Er is niets opgeslagen.",
+  "Ingenting ble lagret."
+ ],
+ "Nothing was written: there is no house to copy yet. The example house is copied once you change it.": [
+  "Er is niets weggeschreven: er is nog geen huis om te kopiëren. Het voorbeeldhuis wordt gekopieerd zodra je het verandert.",
+  "Ingenting ble skrevet: det finnes ikke noe hus å kopiere ennå. Eksempelhuset kopieres så snart du endrer det."
+ ],
+ "Nothing written yet.": [
+  "Nog niets weggeschreven.",
+  "Ingenting skrevet ennå."
+ ],
  "Nov": [
   "nov",
   "nov"
@@ -5414,6 +5438,10 @@
  "Perilex (cooker)": [
   "Perilex (kookplaat)",
   "Perilex (komfyr)"
+ ],
+ "Person": [
+  "Persoon",
+  "Person"
  ],
  "Person 1": [
   "Persoon 1",
@@ -6227,9 +6255,17 @@
   "Vervangen",
   "Erstatt"
  ],
+ "Replace it": [
+  "Vervangen",
+  "Erstatt"
+ ],
  "Replace my copy": [
   "Mijn kopie vervangen",
   "Erstatt min kopi"
+ ],
+ "Replace your newer copy?": [
+  "Je nieuwere kopie vervangen?",
+  "Erstatte den nyere kopien din?"
  ],
  "Reported": [
   "Gemeld",
@@ -6630,6 +6666,14 @@
  "Section B–B": [
   "Doorsnede B–B",
   "Snitt B–B"
+ ],
+ "Section cuts": [
+  "Doorsneden",
+  "Snitt"
+ ],
+ "Section cuts: {k}": [
+  "Doorsneden: {k}",
+  "Snitt: {k}"
  ],
  "Section drawing": [
   "Doorsnedetekening",
@@ -7791,6 +7835,10 @@
   "De kopie kon niet worden gemaakt: {e}",
   "Kopien kunne ikke lages: {e}"
  ],
+ "The copy into the folder did not work. Try again, or choose the folder again in Settings.": [
+  "De kopie naar de map is niet gelukt. Probeer het opnieuw of kies de map opnieuw bij Instellingen.",
+  "Kopieringen til mappen virket ikke. Prøv igjen, eller velg mappen på nytt i Innstillinger."
+ ],
  "The day in the sun bar ({d})": [
   "De dag in de zonnebalk ({d})",
   "Dagen i solfeltet ({d})"
@@ -7926,6 +7974,10 @@
  "The original is locked. Make a planned version, or unlock it from the versions list.": [
   "Het origineel is vergrendeld. Maak een geplande versie, of ontgrendel het via de lijst met versies.",
   "Originalen er låst. Lag en planlagt versjon, eller lås den opp fra versjonslisten."
+ ],
+ "The other houses are imported.": [
+  "De andere huizen zijn geïmporteerd.",
+  "De andre husene er importert."
  ],
  "The page belongs to no storey now.": [
   "De pagina hoort nu bij geen verdieping.",
@@ -8179,6 +8231,10 @@
   "Deze computer is snel genoeg voor de 3D-kwaliteit Hoog.",
   "Denne datamaskinen er rask nok for 3D-kvaliteten Høy."
  ],
+ "This copy of the house could not be used: it is damaged. Nothing was changed.": [
+  "Deze kopie van het huis kon niet worden gebruikt: hij is beschadigd. Er is niets veranderd.",
+  "Denne kopien av huset kunne ikke brukes: den er skadet. Ingenting ble endret."
+ ],
  "This copy only has the original.": [
   "Deze kopie bevat alleen het origineel.",
   "Denne kopien har bare originalen."
@@ -8202,6 +8258,18 @@
  "This file is not a copy of this house. Use “Import a house file” instead.": [
   "Dit bestand is geen kopie van dit huis. Gebruik in plaats daarvan “Een huisbestand importeren”.",
   "Denne filen er ikke en kopi av dette huset. Bruk “Importer en husfil” i stedet."
+ ],
+ "This file is {s}. Files over {m} are not opened, because the phone or computer could run out of memory and close the app. Your houses are untouched.": [
+  "Dit bestand is {s}. Bestanden boven {m} worden niet geopend, omdat de telefoon of computer geen geheugen meer kan hebben en de app sluit. Je huizen zijn niet aangeraakt.",
+  "Denne filen er {s}. Filer over {m} åpnes ikke, fordi telefonen eller datamaskinen kan gå tom for minne og lukke appen. Husene dine er urørt."
+ ],
+ "This file was made with a newer version of House Planner than this app (version {m}). Update the app first, then import the file again. Nothing was stored.": [
+  "Dit bestand is gemaakt met een nieuwere versie van House Planner dan deze app (versie {m}). Werk eerst de app bij en importeer het bestand dan opnieuw. Er is niets opgeslagen.",
+  "Denne filen ble laget med en nyere versjon av House Planner enn denne appen (versjon {m}). Oppdater appen først, og importer filen på nytt. Ingenting ble lagret."
+ ],
+ "This file was made with version {n} of House Planner; this app is version {m}. Update the app first, then import the file again. Nothing was stored.": [
+  "Dit bestand is gemaakt met versie {n} van House Planner; deze app is versie {m}. Werk eerst de app bij en importeer het bestand dan opnieuw. Er is niets opgeslagen.",
+  "Denne filen ble laget med versjon {n} av House Planner; denne appen er versjon {m}. Oppdater appen først, og importer filen på nytt. Ingenting ble lagret."
  ],
  "This floor is too large to detect rooms automatically. Draw the corners instead.": [
   "Deze verdieping is te groot om kamers automatisch te herkennen. Teken in plaats daarvan de hoeken.",
@@ -9359,6 +9427,10 @@
   "Wat ging er mis, of wat zou je willen?",
   "Hva gikk galt, eller hva ønsker du?"
  ],
+ "What you changed since then is lost from the house, but a copy of yours is kept in Save points for 30 days.": [
+  "Wat je sindsdien hebt veranderd verdwijnt uit het huis, maar een kopie van het jouwe blijft 30 dagen bewaard bij Herstelpunten.",
+  "Det du har endret siden da forsvinner fra huset, men en kopi av din versjon ligger i Lagringspunkter i 30 dager."
+ ],
  "What your plan changes: new walls red, removed walls dashed; the list in the details.": [
   "Wat je plan verandert: nieuwe wanden rood, verwijderde wanden gestippeld; de lijst in de details.",
   "Hva planen din endrer: nye vegger røde, fjernede vegger stiplet; listen i detaljene."
@@ -9614,6 +9686,10 @@
  "Your copy is newer than the file.": [
   "Jouw kopie is nieuwer dan het bestand.",
   "Din kopi er nyere enn filen."
+ ],
+ "Your copy: {a} – the file: {b}": [
+  "Jouw kopie: {a} – het bestand: {b}",
+  "Din kopi: {a} – filen: {b}"
  ],
  "Your feedback": [
   "Je feedback",
@@ -10095,6 +10171,10 @@
   "tegels tot {h} mm",
   "fliser til {h} mm"
  ],
+ "today": [
+  "vandaag",
+  "i dag"
+ ],
  "top": [
   "boven",
   "topp"
@@ -10379,6 +10459,10 @@
   "{n} barkrukken geplaatst.",
   "{n} barkrakker plassert."
  ],
+ "{n} could not be used and was skipped: {names}.": [
+  "{n} kon niet worden gebruikt en is overgeslagen: {names}.",
+  "{n} kunne ikke brukes og ble hoppet over: {names}."
+ ],
  "{n} days ago": [
   "{n} dagen geleden",
   "{n} dager siden"
@@ -10402,6 +10486,10 @@
  "{n} houses copied into the folder.": [
   "{n} huizen naar de map gekopieerd.",
   "{n} hus kopiert til mappen."
+ ],
+ "{n} houses written.": [
+  "{n} huizen weggeschreven.",
+  "{n} hus skrevet."
  ],
  "{n} items ({s} picture sets, {m} models)": [
   "{n} onderdelen ({s} sets afbeeldingen, {m} modellen)",

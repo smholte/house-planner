@@ -148,6 +148,8 @@ Object.assign(app, {
   async openViewerData(data) {
     const entry = data && data.projects && data.projects[0];
     if (!entry || !data.viewer) return false;
+    if (this.fileNewerToast(data)) return false;
+    if (this.houseProblem(entry)) { this.toast(t('This copy of the house could not be used: it is damaged. Nothing was changed.')); return false; }
     const incoming = migrateProject(entry.project);
     const vid = 'v_' + data.viewer.sourceId;
     incoming.id = vid;

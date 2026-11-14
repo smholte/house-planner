@@ -1083,7 +1083,7 @@ Object.assign(app, {
 
   /* ───────── export / import ───────── */
   async buildExport(projects, includeSaves) {
-    const out = { format: 'house-planner', formatVersion: 1, exported: Date.now(), projects: [], assets: {} };
+    const out = { format: 'house-planner', formatVersion: 1, appVersion: APP_VERSION.n, exported: Date.now(), projects: [], assets: {} };
     for (const p of projects) {
       const saves = includeSaves ? (await Snapshots.list(p.id)).filter(sn => sn.kind === 'manual') : [];
       out.projects.push({ project: p, savePoints: saves });
@@ -1217,15 +1217,18 @@ Object.assign(app, {
     const ifcs = files.filter(f => /\.ifc$/i.test(f.name));
     if (ifcs.length) return this.importIfc(ifcs);
     const file = files[0];
-    let data;
-    try { data = await readHouseFile(file); }
-    catch (e) { this.toast('This file could not be read. Choose a file exported from House Planner.'); return; }
+    const data = await this.readHouseFileChecked(file);
+    if (!data) return;
     if (data && data.format === 'house-planner-notes') return this.importNotesFile(data);
-    if (!data || data.format !== 'house-planner' || !Array.isArray(data.projects)) { this.toast('This is not a House Planner file.'); return; }
+    if (!data || data.format !== 'house-planner' || !Array.isArray(data.projects)) { this.toast(t('This is not a House Planner file.')); return; }
+    if (this.fileNewerToast(data)) return;
     // a copy someone made for you to look at
     if (data.viewer) return this.openViewerData(data);
     let lastId = null, count = 0;
+    const broken = [];
     for (const entry of data.projects) {
+      // every house is checked before anything of it is stored: a broken one is named and skipped, the others come in
+      if (this.houseProblem(entry)) { broken.push((entry && entry.project && entry.project.name) || '?'); continue; }
       const incoming = migrateProject(entry.project);
       const existing = await DB.get('projects', incoming.id);
       let mode = 'new';
@@ -1238,6 +1241,15 @@ Object.assign(app, {
           h('p', null, t('Merge shows each difference, so you take their changes and keep yours. Replace keeps an automatic backup of your copy, so you can go back from Save points.')));
         mode = await UI.dialog({ title: `“${incoming.name}”`, body, actions: [{ label: 'Skip', value: 'skip' }, { label: 'Keep both', value: 'both' }, { label: 'Replace my copy', value: 'replace' }, { label: t('Merge…'), value: 'merge', kind: 'primary' }], dismissValue: 'skip' });
         if (!mode || mode === 'skip') continue;
+        // my copy is newer than the file: one more question, with both dates in words
+        if (mode === 'replace' && newer) {
+          const sure = await UI.dialog({ title: t('Replace your newer copy?'), dismissValue: 'no',
+            body: h('div', { style: { display: 'grid', gap: '10px' } },
+              h('p', { class: 'replace-dates' }, t('Your copy: {a} – the file: {b}', { a: fmtWhenWords(existing.updated), b: fmtWhenWords(incoming.updated) })),
+              h('p', null, t('What you changed since then is lost from the house, but a copy of yours is kept in Save points for 30 days.'))),
+            actions: [{ label: t('Keep my copy'), value: 'no', kind: 'primary' }, { label: t('Replace it'), value: 'yes' }] });
+          if (sure !== 'yes') continue;
+        }
       }
       if (mode === 'merge') {
         for (const [id, a] of Object.entries(data.assets || {})) if (!(await DB.get('assets', id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
@@ -1250,7 +1262,7 @@ Object.assign(app, {
       if (mode === 'replace') {
         let mine = existing;
         if (this.project && this.project.id === existing.id) { await this.closeProject(); mine = await DB.get('projects', existing.id) || existing; }
-        await Snapshots.create(mine, 'backup', 'Before importing a file (' + fmtDate(Date.now()) + ')');
+        await Snapshots.create(mine, 'backup', 'Before importing a file (' + fmtDate(Date.now()) + ')', 30);
       }
       if (mode === 'both') { incoming.id = uid('p_'); incoming.name = incoming.name + ' (imported)'; }
       await DB.put('projects', incoming);
@@ -1263,10 +1275,11 @@ Object.assign(app, {
       this.backupStamp([incoming.id], false);
       lastId = incoming.id; count++;
     }
+    if (broken.length) this.toast(t('{n} could not be used and was skipped: {names}.', { n: broken.length, names: broken.map(x => '“' + x + '”').join(', ') }) + (count ? ' ' + t('The other houses are imported.') : ''), { ms: 15000 });
     if (!count) return;
     if (this._merged && count === 1) { this._merged = false; this.requestPersistence(); await this.openProject(lastId); this.toast(t('Merged: {a} of {b} changes taken. Your copy before the merge is in Save points.', { a: this._lastMerge.taken, b: this._lastMerge.total }), { ms: 7000 }); return; }
     this._merged = false;
-    this.toast(count === 1 ? 'House imported.' : `${count} houses imported.`);
+    if (!broken.length) this.toast(count === 1 ? 'House imported.' : `${count} houses imported.`);
     this.requestPersistence();
     if (count === 1) await this.openProject(lastId);
     else if (this.project) await this.openProject(this.project.id); else await this.showHome();

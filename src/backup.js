@@ -38,9 +38,59 @@ async function writeDirFile(dir, name, blob) {
   await w.write(blob);
   await w.close();
 }
+/** the example house as it came, never changed: nothing of his own in it, so no reminder and no copy in the folder.
+    A changed example (his own house starts as one) is a house like any other. The first seconds after opening are
+    not a change (the app saves what it upgraded on opening). */
+const EXAMPLE_UNTOUCHED_MS = 30000;
+const exampleUntouched = p => !!(p && p.example && (p.updated || 0) - (p.created || 0) < EXAMPLE_UNTOUCHED_MS);
+/** a size limit for house files: reading one needs about three times its size in memory (a phone has little) */
+const FILE_FORMAT_VERSION = 1;   // raise it, and SCHEMA, whenever saved data changes its meaning (CLAUDE.md section 5)
+const HOUSE_FILE_MAX = 150 * 1024 * 1024;
+/** "today 10:12" / "yesterday 18:30" / "3 days ago" – for telling two copies apart */
+function fmtWhenWords(ts) {
+  const d = new Date(ts), now = new Date(), time = d.toLocaleTimeString(i18nLocale(), { hour: '2-digit', minute: '2-digit' });
+  if (d.toDateString() === now.toDateString()) return t('today') + ' ' + time;
+  if (d.toDateString() === new Date(now.getTime() - 864e5).toDateString()) return t('yesterday') + ' ' + time;
+  return fmtAgoDays(ts) + ' (' + time + ')';
+}
 const HOUSE_ACCEPT = '.json,.house,.gz,.txt,application/json,application/gzip,application/x-gzip,text/plain';
 
 Object.assign(app, {
+  /* ───────── files coming in: checked before anything is stored ───────── */
+  /** read a house file for an import or a merge; null (with a message) when it is too big or can not be read */
+  async readHouseFileChecked(file) {
+    if (file.size > HOUSE_FILE_MAX) {
+      this.toast(t('This file is {s}. Files over {m} are not opened, because the phone or computer could run out of memory and close the app. Your houses are untouched.', { s: fmtBytes(file.size), m: fmtBytes(HOUSE_FILE_MAX) }), { ms: 12000 });
+      return null;
+    }
+    try { return await readHouseFile(file); }
+    catch (e) { this.toast(t('This file could not be read. Choose a file exported from House Planner.')); return null; }
+  },
+  /** "made with a newer version" – the file (or one of its houses) says it is newer than this app; the number it was made with, or 0 */
+  fileNewerVersion(data) {
+    const newer = (data.formatVersion || 1) > FILE_FORMAT_VERSION || (data.projects || []).some(x => x && x.project && (x.project.schema || 1) > SCHEMA);
+    return newer ? (data.appVersion || -1) : 0;
+  },
+  fileNewerToast(data) {
+    const n = this.fileNewerVersion(data);
+    if (!n) return false;
+    this.toast(n > 0 ? t('This file was made with version {n} of House Planner; this app is version {m}. Update the app first, then import the file again. Nothing was stored.', { n, m: APP_VERSION.n })
+      : t('This file was made with a newer version of House Planner than this app (version {m}). Update the app first, then import the file again. Nothing was stored.', { m: APP_VERSION.n }), { ms: 15000 });
+    return true;
+  },
+  /** one house of a file: what is wrong with it (null = fine). Run before anything is stored; migrateProject runs on a copy */
+  houseProblem(entry) {
+    const p = entry && entry.project;
+    if (!p || typeof p !== 'object') return 'no house';
+    if (typeof p.id !== 'string' || !p.id) return 'no id';
+    if (!Array.isArray(p.versions) || !p.versions.length) return 'no versions';
+    if (!Array.isArray(p.storeys) || !p.storeys.length) return 'no storeys';
+    for (const v of p.versions) if (!v || typeof v !== 'object' || (v.plan != null && typeof v.plan !== 'object')) return 'a broken version';
+    try { const c = migrateProject(clone(p)); if (!c.versions.length || !c.versions.every(v => Array.isArray(v.plan.walls) && Array.isArray(v.plan.rooms))) return 'a broken plan'; }
+    catch (e) { return String((e && e.message) || e); }
+    return null;
+  },
+
   /* ───────── reminders ───────── */
   /** a copy of the house left the device (or came in: exported = false). The time of the last export is kept with the
       app's settings – the projects list's own data, never in the house, so an exported file does not change because of it */
@@ -61,7 +111,7 @@ Object.assign(app, {
   /** the house changed since its last backup, and that backup is older than the reminder period */
   backupDue(p, now = Date.now()) {
     const days = this.settings.backupRemind ?? 7;
-    if (!days || !p || p.example || p.viewer) return false;
+    if (!days || !p || exampleUntouched(p) || p.viewer) return false;
     if (this._folder && this._folder.ok) return false;
     const last = this.lastBackupOf(p);
     if (last && (p.updated || 0) <= last) return false;
@@ -127,7 +177,7 @@ Object.assign(app, {
     if (!rec || !rec.handle) { lsSet(FOLDER_FLAG, null); return; }
     let saved = {};
     try { saved = JSON.parse(info) || {}; } catch (e) { /* old */ }
-    this._folder = { handle: rec.handle, ok: false, last: saved.last || 0, done: saved.done || {} };
+    this._folder = { handle: rec.handle, ok: false, last: saved.last || 0, count: saved.count || 0, done: saved.done || {} };
     let perm = 'denied';
     try { perm = await rec.handle.queryPermission({ mode: 'readwrite' }); } catch (e) { /* gone */ }
     if (perm === 'granted') { this._folder.ok = true; this.folderSoon(2000); }
@@ -177,13 +227,14 @@ Object.assign(app, {
   /** write a copy of every house that changed (all of them with force) */
   async folderBackupNow(force) {
     const F = this._folder;
-    if (!F || !F.ok) return 0;
-    if (this._folderBusy) { this.folderSoon(3000); return 0; }
+    this._folderWhy = 'none';
+    if (!F || !F.ok) { this._folderWhy = 'error'; return 0; }
+    if (this._folderBusy) { this._folderWhy = 'error'; this.folderSoon(3000); return 0; }
     this._folderBusy = true;
     let n = 0;
     try {
       if (this.project) await Saver.flushNow();
-      const projects = (await DB.all('projects')).filter(p => !p.example && !p.viewer);
+      const projects = (await DB.all('projects')).filter(p => !exampleUntouched(p) && !p.viewer);
       const older = await F.handle.getDirectoryHandle('older', { create: true });
       const day = todayStamp();
       const written = [];
@@ -202,24 +253,30 @@ Object.assign(app, {
         written.push(p.id);
         n++;
       }
-      F.last = Date.now();
-      if (written.length) this.backupStamp(written, false);   // a copy in a folder on this device is not "Exported"
-      lsSet(FOLDER_FLAG, JSON.stringify({ last: F.last, done: F.done }));
+      // the time shown is the time something was written: a round that wrote nothing keeps the earlier time
+      if (written.length) { F.last = Date.now(); F.count = written.length; F.total = projects.length; this.backupStamp(written, false); }   // a copy in a folder on this device is not "Exported"
+      lsSet(FOLDER_FLAG, JSON.stringify({ last: F.last, done: F.done, count: F.count || 0 }));
       const st = document.getElementById('bk-folder-status');
       if (st) st.textContent = this.folderStatusText();
       this.renderFolderStatus();
     } catch (e) {
       console.warn('folder backup failed', e);
+      this._folderWhy = 'error';
       if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) this.folderPaused();
       else if (e && e.name === 'NotFoundError') { this.toast(t('The backup folder is gone. Choose a folder again in Settings.'), { ms: 8000 }); await this.stopFolderBackup(); }
     } finally { this._folderBusy = false; }
     return n;
   },
+  /** what "Back up now" says: how many houses were written – and when none was, why */
+  folderDoneToast(n) {
+    if (!n && this._folderWhy === 'error') { this.toast(t('The copy into the folder did not work. Try again, or choose the folder again in Settings.'), { ms: 8000 }); return; }
+    this.toast(n ? t('{n} houses copied into the folder.', { n }) : t('Nothing was written: there is no house to copy yet. The example house is copied once you change it.'), { ms: n ? 4000 : 8000 });
+  },
   folderStatusText() {
     const F = this._folder;
     if (!F) return '';
     if (!F.ok) return t('Into “{n}”: paused.', { n: F.handle.name });
-    return t('Into “{n}”.', { n: F.handle.name }) + ' ' + (F.last ? t('Last copy: {d}.', { d: fmtDate(F.last) }) : '');
+    return t('Into “{n}”.', { n: F.handle.name }) + ' ' + (F.last ? t('Last copy: {d}.', { d: fmtDate(F.last) }) + (F.count ? ' ' + t('{n} houses written.', { n: F.count }) : '') : t('Nothing written yet.'));
   },
 
   /** the chip in the top bar (computers with a backup folder): the time of the last copy, or Paused */
@@ -242,7 +299,7 @@ Object.assign(app, {
     if (!F.ok) { this.folderResume(); return; }
     UI.menu(anchor, [
       { node: h('div', { class: 'show-head fs-head' }, this.folderStatusText()) },
-      { label: t('Back up now'), icon: 'download', fn: async () => { const n = await this.folderBackupNow(true); this.toast(t('{n} houses copied into the folder.', { n })); } },
+      { label: t('Back up now'), icon: 'download', fn: async () => { this.folderDoneToast(await this.folderBackupNow(true)); } },
       { label: t('Automatic backup into a folder…'), icon: 'folder', fn: () => this.folderDialog() },
     ]);
   },
@@ -263,7 +320,7 @@ Object.assign(app, {
       }
       folderPart.appendChild(h('p', { id: 'bk-folder-status', class: 'bk-status' }, this.folderStatusText()));
       folderPart.appendChild(h('div', { class: 'actions' },
-        this._folder.ok ? h('button', { class: 'btn sm', id: 'bk-now', onclick: async () => { const n = await this.folderBackupNow(true); this.toast(t('{n} houses copied into the folder.', { n })); paintFolder(); } }, icon('download'), t('Back up now'))
+        this._folder.ok ? h('button', { class: 'btn sm', id: 'bk-now', onclick: async () => { this.folderDoneToast(await this.folderBackupNow(true)); paintFolder(); } }, icon('download'), t('Back up now'))
           : h('button', { class: 'btn sm primary', id: 'bk-resume', onclick: async () => { await this.folderResume(); paintFolder(); } }, t('Continue backup')),
         h('button', { class: 'btn sm', id: 'bk-change', onclick: async () => { if (await this.chooseBackupFolder()) paintFolder(); } }, t('Other folder…')),
         h('button', { class: 'btn sm ghost', id: 'bk-stop', onclick: async () => { await this.stopFolderBackup(); paintFolder(); } }, t('Stop'))));
