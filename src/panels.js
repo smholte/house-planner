@@ -267,7 +267,7 @@ Object.assign(app, {
     el.appendChild(h('div', { class: 'insp-sec vcard' },
       h('div', { class: 'eyebrow' }, shown.kind === 'original' ? 'Original' : 'Version', h('button', { class: 'btn ghost sm', onclick: () => this.versionsSheet() }, 'All versions')),
       h('div', { style: { fontWeight: 650 } }, shown.name, shown.locked ? h('span', { class: 'badge locked', style: { marginLeft: '8px' } }, 'Locked') : null),
-      h('div', { class: 'note-muted' }, 'Changed ' + fmtAgo(shown.updated || p.updated)),
+      h('div', { class: 'note-muted' }, t('Changed {when}', { when: fmtAgo(shown.updated || p.updated) })),
       note));
     // drawing (underlay)
     if (scopeStorey && st && this.view.dim === '2d') this.drawingSection(el, st);
@@ -508,31 +508,36 @@ Object.assign(app, {
       return;
     }
     UI.menu(anchor, [
+      { heading: t('This version') },
       { label: 'Versions…', icon: 'layers', fn: () => this.versionsSheet() },
       { label: 'New version from this one', icon: 'copy', fn: () => this.newVersionDialog(shown.id) },
-      '-',
       { label: 'Make a save point', icon: 'save', fn: () => this.savePointDialog() },
       { label: 'Save points and autosaves…', icon: 'history', fn: () => this.savePointsSheet() },
-      { label: 'Export / share this house…', icon: 'share', fn: () => this.exportDialog() },
+      { heading: t('Save and share') },
+      { label: t('Export this house…'), icon: 'share', id: 'mi-export', fn: () => this.exportDialog() },
       { label: t('Export for viewing (family, suppliers)…'), icon: 'eye', fn: () => this.viewerExportDialog() },
       this.folderSupported() ? { label: t('Automatic backup into a folder…'), icon: 'folder', id: 'mi-folder', fn: () => this.folderDialog() } : null,
       { label: t('Save a picture of this view'), icon: 'camera', fn: () => this.savePicture() },
-      { label: t('Colour library…'), icon: 'eye', fn: () => this.colourPicker() },
-      { label: t('Drawings: façades and sections…'), icon: 'ruler', fn: () => this.drawingsSheet() },
-      { label: t('Plans as PDF, to scale…'), icon: 'print', fn: () => this.plansPdfSheet() },
+      { label: t('Photo render…'), icon: 'camera', id: 'mi-render-more', fn: () => this.renderSheet() },
+      { label: 'Import a house file…', icon: 'upload', fn: () => this.importFlow() },
+      { label: t('Merge a copy of this house…'), icon: 'split', fn: () => this.mergeFileFlow() },
+      { heading: t('Lists') },
       { label: t('Quantities and materials…'), icon: 'table', fn: () => this.quantitiesSheet() },
       { label: t('Budget…'), icon: 'euro', fn: () => this.budgetSheet() },
       { label: t('Task board…'), icon: 'board', fn: () => this.tasksSheet() },
       { label: t('Documents (PDFs and pictures)…'), icon: 'doc', id: 'mi-docs', fn: () => this.documentsSheet() },
-      { label: 'Import a house file…', icon: 'upload', fn: () => this.importFlow() },
-      { label: t('Merge a copy of this house…'), icon: 'split', fn: () => this.mergeFileFlow() },
-      '-',
+      { label: t('Drawings: façades and sections…'), icon: 'ruler', fn: () => this.drawingsSheet() },
+      { label: t('Plans as PDF, to scale…'), icon: 'print', fn: () => this.plansPdfSheet() },
+      { label: t('Colour library…'), icon: 'eye', fn: () => this.colourPicker() },
+      { heading: t('House') },
       { label: 'Storeys…', icon: 'layers', fn: () => this.storeysSheet() },
       { label: 'Rename project', icon: 'edit', fn: () => this.renameProject() },
       { label: t('Undo history'), icon: 'history', fn: () => this.historySheet() },
+      { heading: t('App') },
       { label: t('Search…'), icon: 'search', fn: () => this.searchOpen() },
       this.fullscreenMenuItem(),
       { label: t('Help: what each button does'), icon: 'question', fn: () => this.helpOverlay() },
+      { label: t('Send feedback…'), icon: 'edit', id: 'mi-feedback', fn: () => this.feedbackDialog() },
       { label: 'Settings', icon: 'settings', fn: () => this.settingsSheet() },
       { label: 'All projects', icon: 'home', fn: () => this.showHome() },
     ]);
@@ -674,7 +679,7 @@ Object.assign(app, {
               v.locked ? h('span', { class: 'badge locked' }, 'Locked') : null,
               v.status === 'disabled' ? h('span', { class: 'badge' }, 'Disabled') : null,
               isShown ? h('span', { class: 'badge accent' }, 'Open') : null),
-            h('div', { class: 'lr-sub' }, (v.note ? v.note + ' · ' : '') + 'Changed ' + fmtAgo(v.updated || p.updated))),
+            h('div', { class: 'lr-sub' }, (v.note ? v.note + ' · ' : '') + t('Changed {when}', { when: fmtAgo(v.updated || p.updated) }))),
           actions));
       }
       body.appendChild(list);
@@ -941,10 +946,15 @@ Object.assign(app, {
       this.qualitySettings ? this.qualitySettings() : null,
       this.walkSettings(),
       h('div', { class: 'field', id: 'set-library' }, h('span', { class: 'flabel' }, t('Library')), this.librarySettings()),
-      h('div', { class: 'field' }, h('span', { class: 'flabel' }, 'Storage'),
-        h('p', null, DB.memory ? 'This browser does not allow the app to store data here. Use Export to keep your work.' :
-          (persisted ? 'Your houses are stored on this device and protected from automatic clean-up.' : 'Your houses are stored on this device. The browser may clear site data when the device runs out of space, so export a copy now and then.') + (est && est.usage != null ? ` Using ${fmtBytes(est.usage)}.` : '')),
-        persisted ? null : h('div', { class: 'actions' }, h('button', { class: 'btn sm', onclick: async () => { await this.requestPersistence(); this.toast((await navigator.storage.persisted().catch(() => false)) ? 'Storage is now protected.' : 'The browser did not allow it. Installing the app usually helps.'); } }, 'Ask to protect storage'))),
+      h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Start')),
+        h('label', { class: 'row-inline', style: { gap: '8px' } },
+          (() => { const c = h('input', { type: 'checkbox', id: 'set-openlast' }); c.checked = s.openLast !== false; c.onchange = () => Settings.set('openLast', c.checked); return c; })(),
+          h('span', null, t('Open the last house when the app starts'))),
+        h('p', { class: 'note-muted' }, t('The list of houses is one tap away: Back, top left.'))),
+      h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Storage')),
+        h('p', { id: 'set-storage-text' }, DB.memory ? t('This browser does not allow the app to store data here. Use Export to keep your work.') :
+          (persisted ? t('Protected on this device: your houses are kept when the device runs low on space.') : t('Not protected: the browser may clear site data when the device runs out of space, so export a copy now and then.')) + (est && est.usage != null ? ' ' + t('Using {s}.', { s: fmtBytes(est.usage) }) : '')),
+        persisted ? null : h('div', { class: 'actions' }, h('button', { class: 'btn sm', onclick: async () => { await this.requestPersistence(); this.toast((await navigator.storage.persisted().catch(() => false)) ? t('Storage is now protected.') : t('The browser did not allow it. Installing the app usually helps.')); } }, t('Ask to protect storage')))),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Backup')), this.backupSettings()),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, 'About'),
         h('p', null, 'House Planner works offline. Nothing is uploaded: your data only leaves this device when you export a file.'),
@@ -1112,7 +1122,7 @@ Object.assign(app, {
         h('button', { class: 'btn sm', id: 'btn-export-folder', onclick: () => { const d = body.closest('.dialog'); if (d && d.closeWith) d.closeWith(null); this.folderDialog(); } }, icon('folder'), this._folder ? t('Folder…') : t('Choose folder…'))) : null);
     await prep();
     const canShareFiles = !!(navigator.canShare && window.File);
-    const choice = await UI.dialog({ title: 'Export “' + p.name + '”', body, actions: [
+    const choice = await UI.dialog({ title: t('Export “{n}”', { n: p.name }), body, actions: [
       { label: 'Cancel', value: null },
       { label: 'Save file', value: 'save', icon: 'download' },
       canShareFiles ? { label: 'Share…', value: 'share', kind: 'primary', icon: 'share' } : null,
@@ -1250,7 +1260,7 @@ Object.assign(app, {
         if (mode === 'replace') { const mine = await Snapshots.list(incoming.id); if (mine.some(m => m.kind === 'manual' && m.created === sn.created && m.name === sn.name)) continue; }
         await DB.put('snapshots', copy);
       }
-      this.backupStamp([incoming.id]);
+      this.backupStamp([incoming.id], false);
       lastId = incoming.id; count++;
     }
     if (!count) return;

@@ -53,6 +53,8 @@ const app = new (class App extends Emitter {
     setInterval(() => this.renderSaveStatus(), 20000);
     let last = null;
     try { last = localStorage.getItem('house-planner.last'); } catch (e) { /* ignore */ }
+    // Settings → "Open the last house at start" (on): also after Back to the projects page; off: the projects page every time
+    if (this.settings.openLast !== false && !last) last = this.settings.lastProject || null;
     if (recovered) last = recovered.id;
     const exists = last && await DB.get('projects', last);
     // a viewer page (Export for viewing) opens the house it carries
@@ -67,9 +69,46 @@ const app = new (class App extends Emitter {
     this.registerServiceWorker();
   }
 
+  /** hosted copies: the service worker keeps the app offline; a new version waits and the update bar offers it (0019, I6) */
   registerServiceWorker() {
     if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      this._swReg = reg;
+      const offer = w => { if (w && navigator.serviceWorker.controller) this.updateBar(w); };
+      offer(reg.waiting);
+      reg.addEventListener('updatefound', () => {
+        const w = reg.installing;
+        if (w) w.addEventListener('statechange', () => { if (w.state === 'installed') offer(w); });
+      });
+      // look for a new version now, and whenever the app comes back to the front
+      let lastCheck = 0;
+      const check = () => { if (Date.now() - lastCheck < 6e5) return; lastCheck = Date.now(); try { reg.update().catch(() => {}); } catch (e) { /* offline */ } };
+      check();
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+      window.addEventListener('focus', check);
+    }).catch(() => {});
+  }
+
+  updateBar(worker) {
+    if (document.getElementById('update-bar')) return;
+    const bar = h('div', { class: 'update-bar', id: 'update-bar', role: 'status' },
+      h('span', null, t('A new version is ready.')),
+      h('button', { class: 'btn sm primary', id: 'update-restart', onclick: () => this.restartForUpdate(worker, bar) }, t('Restart')),
+      h('button', { class: 'btn sm ghost', 'aria-label': t('Later'), title: t('Later'), onclick: () => bar.remove() }, icon('close')));
+    document.getElementById('app').appendChild(bar);
+  }
+
+  /** Restart: what is open is saved first, then the waiting version takes over and the page loads once */
+  async restartForUpdate(worker, bar) {
+    const btn = bar && bar.querySelector('button.primary');
+    if (btn) btn.disabled = true;
+    try { await Saver.flushNow(); await Settings.flushNow(); } catch (e) { console.warn('save before update', e); }
+    let reloaded = false;
+    const reload = () => { if (reloaded) return; reloaded = true; location.reload(); };
+    navigator.serviceWorker.addEventListener('controllerchange', reload);
+    try { ((this._swReg && this._swReg.waiting) || worker).postMessage('skip-waiting'); } catch (e) { reload(); }
+    // when no controller change comes (the worker was replaced already), reload anyway
+    setTimeout(reload, 4000);
   }
 
   applyTheme() {
@@ -102,6 +141,7 @@ const app = new (class App extends Emitter {
     $('#btn-version').onclick = () => this.versionsSheet();
     lbl('#btn-savepoint', 'save', 'Save point').onclick = () => this.savePointDialog();
     lbl('#btn-share', 'share', 'Export').onclick = () => this.exportDialog();
+    $('#btn-share').setAttribute('aria-label', t('Export'));
     lbl('#btn-menu', 'more').onclick = e => this.editorMenu(e.currentTarget);
     lbl('#btn-search', 'search').onclick = () => this.searchOpen();
     // the whole screen for the app (fullscreen.js)
@@ -123,6 +163,7 @@ const app = new (class App extends Emitter {
       b.onclick = () => this.setMode(m);
     }
 
+    window.addEventListener('appinstalled', () => { this.requestPersistence().then(() => this.renderStorageNote()); });
     window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); this.installEvent = e; $('#btn-install').hidden = false; });
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
@@ -191,7 +232,7 @@ const app = new (class App extends Emitter {
     more.onclick = () => UI.menu(more, [
       { label: 'Rename', icon: 'edit', fn: () => this.renameProject(p) },
       { label: 'Duplicate', icon: 'copy', fn: () => this.duplicateProject(p) },
-      { label: 'Export / share', icon: 'share', fn: () => this.exportDialog(p) },
+      { label: 'Export', icon: 'share', fn: () => this.exportDialog(p) },
       '-',
       { label: 'Move to trash', icon: 'trash', danger: true, fn: () => this.deleteProject(p) },
     ]);
@@ -203,7 +244,8 @@ const app = new (class App extends Emitter {
           p.viewer && p.viewer.from ? h('span', null, t('from {n}', { n: p.viewer.from })) : null,
           h('span', null, `${p.storeys.length} storeys`),
           h('span', null, plans.length ? (plans.length > 1 ? t('{n} planned versions', { n: plans.length }) : t('1 planned version')) : t('Original only')),
-          h('span', null, 'Changed ' + fmtAgo(p.updated))),
+          h('span', null, t('Changed {when}', { when: fmtAgo(p.updated) }))),
+          this.exportedLine(p),
         h('div', { class: 'pcard-actions' },
           h('button', { class: 'btn primary sm', onclick: open }, 'Open'),
           h('button', { class: 'btn sm', onclick: () => this.exportDialog(p) }, icon('share'), 'Export'),
@@ -229,16 +271,31 @@ const app = new (class App extends Emitter {
     return svg;
   }
 
+  /** the projects page's storage line: protected from clean-up or not (task 0019, I4) */
   async renderStorageNote() {
     const el = $('#storage-note');
     let persisted = false, est = null;
     try { persisted = navigator.storage && navigator.storage.persisted ? await navigator.storage.persisted() : false; } catch (e) { /* ignore */ }
     try { est = navigator.storage && navigator.storage.estimate ? await navigator.storage.estimate() : null; } catch (e) { /* ignore */ }
-    el.classList.toggle('warn', !persisted || DB.memory);
-    const used = est && est.usage != null ? ' · ' + fmtBytes(est.usage) + ' used' : '';
-    el.querySelector('.txt').textContent = DB.memory ? 'Storage is blocked in this browser. Export to keep your work.'
-      : persisted ? 'Stored on this device, protected from clean-up' + used
-        : 'Stored on this device' + used + '. Export a copy now and then.';
+    const bad = !persisted || DB.memory;
+    el.classList.toggle('warn', bad);
+    el.dataset.protected = String(!!persisted && !DB.memory);
+    const used = est && est.usage != null ? ' · ' + fmtBytes(est.usage) : '';
+    const txt = el.querySelector('.txt');
+    txt.textContent = DB.memory ? t('Storage is blocked in this browser. Export to keep your work.')
+      : persisted ? t('Protected on this device') + used
+        : t('Not protected – export a copy now and then') + used;
+    let btn = el.querySelector('.sn-export');
+    if (bad && !btn && !DB.memory) {
+      btn = h('button', { class: 'btn ghost sm sn-export', onclick: () => this.exportFromHome() }, t('Export'));
+      el.appendChild(btn);
+    } else if (!bad && btn) btn.remove();
+  }
+
+  /** the storage line's Export button: the one house, or all of them */
+  async exportFromHome() {
+    const list = await DB.all('projects');
+    if (list.length === 1) this.exportDialog(migrateProject(list[0])); else this.exportAll();
   }
 
   /* ───────── projects ───────── */
@@ -318,6 +375,8 @@ const app = new (class App extends Emitter {
     await Assets.ensure(assetIdsOf(p));
     this.shell = p.shell ? Assets.shell(p.shell.assetId) : null;
     try { localStorage.setItem('house-planner.last', id); } catch (e) { /* ignore */ }
+    if (this.settings.lastProject !== id) Settings.set('lastProject', id);
+    if (!this._persistAsked) { this._persistAsked = true; this.requestPersistence(); }
     const ui = this.loadUi(id);
     const storeys = sortedStoreys(p);
     const hasPlans = p.versions.some(v => v.kind !== 'original');
@@ -584,6 +643,8 @@ const app = new (class App extends Emitter {
     const pill = $('#btn-version');
     pill.querySelector('.vp-kind').textContent = shown.kind === 'original' ? 'Original' : 'Version';
     pill.querySelector('.vp-name').textContent = shown.kind === 'original' ? (shown.locked ? 'Locked' : 'Editable') : shown.name;
+    pill.setAttribute('aria-label', t('Versions') + ': ' + (shown.kind === 'original' ? t('Original') : shown.name));
+    pill.title = pill.getAttribute('aria-label');
     for (const b of $$('#display-toggle button')) b.setAttribute('aria-pressed', String(b.dataset.mode === this.display));
     // phones: one button for original / planned / changes (and side by side, compare, home view)
     const dp = $('#btn-display');
@@ -615,6 +676,7 @@ const app = new (class App extends Emitter {
       share.dataset.viewer = String(viewer);
       share.textContent = '';
       share.append(icon('share'), h('span', null, viewer ? t('Send notes back') : 'Export'));
+      share.setAttribute('aria-label', viewer ? t('Send notes back') : t('Export'));
     }
     this.renderToolrail();
     this.renderSaveStatus();

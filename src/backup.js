@@ -42,10 +42,20 @@ const HOUSE_ACCEPT = '.json,.house,.gz,.txt,application/json,application/gzip,ap
 
 Object.assign(app, {
   /* ───────── reminders ───────── */
-  backupStamp(ids) {
-    const b = { ...(this.settings.backups || {}) };
-    for (const id of ids) b[id] = Date.now();
+  /** a copy of the house left the device (or came in: exported = false). The time of the last export is kept with the
+      app's settings – the projects list's own data, never in the house, so an exported file does not change because of it */
+  backupStamp(ids, exported = true) {
+    const b = { ...(this.settings.backups || {}) }, x = { ...(this.settings.exported || {}) };
+    for (const id of ids) { b[id] = Date.now(); if (exported) x[id] = Date.now(); }
     Settings.set('backups', b);
+    if (exported) Settings.set('exported', x);
+    // the projects page is showing: its cards say "Exported …"
+    if (exported && !this.project && !$('#home').hidden) this.renderProjectList();
+  },
+  /** the line on a project card: "Exported 12 days ago" / "Never exported" */
+  exportedLine(p) {
+    const at = (this.settings.exported || {})[p.id] || 0;
+    return h('div', { class: 'pcard-exp note-muted', 'data-exported': at ? String(at) : '' }, at ? t('Exported {when}', { when: fmtAgoDays(at) }) : t('Never exported'));
   },
   lastBackupOf(p) { return (this.settings.backups || {})[p.id] || 0; },
   /** the house changed since its last backup, and that backup is older than the reminder period */
@@ -193,7 +203,7 @@ Object.assign(app, {
         n++;
       }
       F.last = Date.now();
-      if (written.length) this.backupStamp(written);
+      if (written.length) this.backupStamp(written, false);   // a copy in a folder on this device is not "Exported"
       lsSet(FOLDER_FLAG, JSON.stringify({ last: F.last, done: F.done }));
       const st = document.getElementById('bk-folder-status');
       if (st) st.textContent = this.folderStatusText();

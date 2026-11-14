@@ -55,7 +55,8 @@ Object.assign(app, {
     act('Make a save point', 'save', has('savePointDialog') && (() => this.savePointDialog()), 'opslaan save backup');
     act('Save points and autosaves…', 'history', has('savePointsSheet') && (() => this.savePointsSheet()), 'herstellen restore');
     act('Undo history', 'history', has('historySheet') && (() => this.historySheet()), 'ongedaan undo terug geschiedenis');
-    act('Export / share this house…', 'share', has('exportDialog') && (() => this.exportDialog()), 'export delen share bestand file');
+    act('Send feedback…', 'edit', has('feedbackDialog') && (() => this.feedbackDialog()), 'feedback problem idea bug probleem melding tilbakemelding');
+    act('Export this house…', 'share', has('exportDialog') && (() => this.exportDialog()), 'export delen share bestand file');
     act('Automatic backup into a folder…', 'folder', this.folderSupported() && (() => this.folderDialog()), 'backup reservekopie kopie map folder proton onedrive automatisch bestand file');
     act('Save a copy of this house now', 'download', this.project && !this.project.viewer && (() => this.quickBackup(this.project)), 'backup reservekopie kopie copy opslaan save bestand file proton');
     act('Export for viewing (family, suppliers)…', 'eye', has('viewerExportDialog') && (() => this.viewerExportDialog()), 'viewer bekijken familie');

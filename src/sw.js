@@ -2,10 +2,13 @@
    The asset library (lib/, task 0009) is left alone: the app keeps what it fetched from there in its own database
    (house-planner-lib), so a new version of the app does not download the pictures and models again. */
 const CACHE = 'hp-__VERSION__';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const CORE = ['./index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
+  // no skipWaiting here (task 0019): a new version waits until the app says Restart (the update bar), so a house that is
+  // open is never swapped under the person. The very first install has nothing to wait for and takes over by itself.
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)));
 });
+self.addEventListener('message', e => { if (e.data === 'skip-waiting') self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys()
     .then(keys => Promise.all(keys.filter(k => k.startsWith('hp-') && k !== CACHE).map(k => caches.delete(k))))
@@ -22,6 +25,8 @@ self.addEventListener('fetch', e => {
   e.respondWith(caches.open(CACHE).then(async cache => {
     const key = req.mode === 'navigate' ? './index.html' : req;
     const cached = await cache.match(key, { ignoreSearch: same });
+    // the page itself is only refreshed by a new version of this worker (the update bar), never behind its back
+    if (req.mode === 'navigate' && cached) return cached;
     const fresh = fetch(req).then(res => {
       if (res && res.ok) cache.put(key, res.clone());
       return res;
