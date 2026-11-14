@@ -1565,8 +1565,8 @@ button.sun-lab:hover, button.sun-lab:focus-visible { background: var(--surface-2
   .topbar { gap: 4px; padding-inline: 6px; }
   .topbar #btn-back { flex: none; width: 32px; padding: 0; }
   .title-block { flex: 1 1 0; min-width: 0; }
-  .version-pill { flex: 1 1 auto; min-width: 0; max-width: none; height: 40px; padding: 0 6px 0 9px; gap: 4px; }
-  .version-pill .vp-name { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.15; font-size: 13px; text-align: left; overflow-wrap: anywhere; }
+  .version-pill { flex: 1 1 auto; min-width: 0; max-width: none; height: 44px; padding: 0 6px 0 9px; gap: 4px; }
+  .version-pill .vp-name { white-space: normal; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.1; font-size: 12.5px; text-align: left; overflow-wrap: anywhere; }
   .mode-switch { padding: 2px; gap: 0; }
   .mode-switch button { flex-direction: column; justify-content: center; gap: 1px; height: 42px; padding: 0 5px; min-width: 38px; }
   .mode-switch button span { display: block; font-size: 10px; line-height: 1; letter-spacing: -.02em; }

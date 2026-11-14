@@ -141,7 +141,7 @@ def run(phone, theme):
               const hscroll = document.documentElement.scrollWidth > innerWidth + 1;
               return { cut, pillW: R(pill).width, nameW: R(nm).width, nameText: nm.textContent, pillRight: R(pill).right, msLeft: R(ms).left, shareVisible: R(q('#btn-share')).width > 0,
                 modes: [...ms.querySelectorAll('button')].map(b => [b.textContent.trim(), R(b.querySelector('span')).width > 8]), unnamed: top.filter(x => !x.name).map(x => x.id), hscroll, right: Math.max(...top.map(x => x.r.right)) }; }""")
-            check(f'[{tag}] {w} px: the open version’s name “{r["nameText"]}” is shown whole ({r["nameW"]:.0f} px wide, two lines at most)', not r['cut'] and r['nameW'] >= 70 and r['nameText'] == 'Plan – Bigger kitchen' and r['pillRight'] <= r['msLeft'] + 1 and len(r['nameText']) > 2, r)
+            check(f'[{tag}] {w} px: the open version’s name “{r["nameText"]}” is shown whole ({r["nameW"]:.0f} px wide, three lines at most)', not r['cut'] and r['nameW'] >= 70 and r['nameText'] == 'Plan – Bigger kitchen' and r['pillRight'] <= r['msLeft'] + 1 and len(r['nameText']) > 2, r)
             check(f'[{tag}] {w} px: Build, Furnish and View show their names', all(ok for _, ok in r['modes']) and [n for n, _ in r['modes']] == ['Build', 'Furnish', 'View'], r['modes'])
             check(f'[{tag}] {w} px: every top-bar button has a name, nothing sticks out', not r['unnamed'] and r['right'] <= w + 1 and not r['hscroll'], r)
             check(f'[{tag}] {w} px: Export is in ⋯, not in the bar', not r['shareVisible'])
