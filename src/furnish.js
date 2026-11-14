@@ -270,7 +270,11 @@ Object.assign(app, {
   /* ───────── sheets ───────── */
   async catalogSheet() {
     if (this.comparing) { this.toast(t('Close the comparison to add furniture.')); return; }
-    let cat = this._catLast || 'living', q = '';
+    // (the library's list first: its models under Library, or the hint when it is not on this device)
+    try { await libraryInit(); } catch (e) { /* none */ }
+    // (Library: the models of the asset library – the owner's furniture, by room; task 0028)
+    const hasLib = () => libModelList().length > 0 || libModelsExpected() > 0;
+    let cat = this._catLast || (hasLib() ? 'lib' : 'living'), q = '', room = this._catRoom || 'all';
     const grid = h('div', { class: 'cat-grid' });
     const tabs = h('div', { class: 'seg cat-tabs' });
     const search = h('input', { class: 'input', type: 'search', placeholder: t('Search, e.g. bed, sink, lamp'), 'aria-label': t('Search furniture'), autocomplete: 'off' });
@@ -280,9 +284,11 @@ Object.assign(app, {
     const sub = (label, extra) => h('div', { class: 'cat-sub' }, h('span', null, label), extra ? h('span', { class: 'note-muted' }, extra) : null);
     const paint = () => {
       tabs.textContent = '';
-      for (const [k, lab] of [...FURN_CATS, ['mine', 'My models']]) tabs.appendChild(h('button', { 'aria-pressed': String(!q && k === cat), 'data-cat': k, onclick: () => { cat = k; q = ''; search.value = ''; paint(); } }, t(lab)));
+      if (cat === 'lib' && !hasLib()) cat = 'living';
+      for (const [k, lab] of [...(hasLib() ? [['lib', 'Library']] : []), ...FURN_CATS, ['mine', 'My models']]) tabs.appendChild(h('button', { 'aria-pressed': String(!q && k === cat), 'data-cat': k, onclick: () => { cat = k; q = ''; search.value = ''; paint(); } }, t(lab)));
       grid.textContent = '';
       mineList.textContent = '';
+      if (!q && cat === 'lib') { this.libCatalog(grid, room, r => { room = this._catRoom = r; paint(); }, pickModel, () => paint()); return; }
       if (!q && cat === 'mine') {
         grid.appendChild(h('button', { class: 'cat-card import-card', onclick: async () => {
           const files = await pickFiles('.glb,.gltf,.obj,.mtl,.ifc,.bin,.png,.jpg,.jpeg,.webp,model/gltf-binary,model/gltf+json');

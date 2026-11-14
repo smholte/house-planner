@@ -6,7 +6,9 @@
       item 'pack:kenney') the first time a model is shown.
    1b. Models of the asset library (task 0009; the owner's models in his library): key 'l:<name>', a .glb (meshopt-packed
       geometry) loaded the first time it is shown. On a device without that library a piece of it is a plain box in its
-      colour, and its panel says the library is not loaded – the piece itself stays as it was saved.
+      colour, and its panel says the library is not loaded – the piece itself stays as it was saved. In Add furniture they
+      are under Library, by room (the item's cat: the room column of the owner's contents.csv, task 0028), each with
+      the picture made when the library was built (house/models/thumbs, tools/model-thumbs.py) – never drawn at start.
    2. Your own models: .glb / .gltf, .obj (+ .mtl and pictures) and .ifc files. They are kept with the house as a
       .glb asset (project.models[id] = { name, cat, asset, file, fix: {ry, zup, unit}, size, o, u, rev }), so they
       travel with an export.
@@ -43,6 +45,25 @@ const MODELS = {
   user: new Map(),             // your model id → { sig, state, obj (unit-box template), p }
   types: new Map(),            // furniture type objects of models (see modelType)
 };
+
+/** a model you import is kept inside the house (like a photo): every save, backup and export carries it and a phone
+ *  holds it in memory while it is shown – 25 MB is about five of the owner's makers' sofas at full detail (task 0028) */
+const MODEL_MAX_BYTES = 25 * 1024 * 1024;
+
+/** the rooms of the library's models (the room column of contents.csv), in this order under Library */
+const LIB_ROOMS = [
+  ['living-room', 'Living room'], ['dining', 'Dining room'], ['kitchen', 'Kitchen'], ['bedroom', 'Bedroom'], ['office', 'Office'],
+  ['bathroom', 'Bathroom'], ['outside', 'Outside'], ['switches-sockets', 'Switches and sockets'], ['floors-materials', 'Floors and materials'],
+];
+const libRoomLabel = k => (LIB_ROOMS.find(r => r[0] === k) || [k, String(k || 'Other').replace(/[-_]+/g, ' ').replace(/^./, c => c.toUpperCase())])[1];
+/** the models of the asset libraries on this device (the owner's), by room order then name */
+function libModelList() {
+  const order = k => { const i = LIB_ROOMS.findIndex(r => r[0] === k); return i < 0 ? 99 : i; };
+  return [...LIB.items.values()].filter(it => it.kind === 'model').map(it => modelInfo(it.id)).filter(Boolean)
+    .sort((a, b) => order(a.room) - order(b.room) || a.name.localeCompare(b.name));
+}
+/** models this build expects in its library (the owner's app: his models; 0 in the public app and the web version) */
+const libModelsExpected = () => (typeof LIB_HOUSE_MODELS !== 'undefined' && LIB_HOUSE_MODELS) || 0;
 
 function loadModelLib() {
   if (!MODELS.blobP) {
@@ -101,7 +122,8 @@ function modelInfo(key) {
     // (on a device without that library: unknown – a plain box, see modelMesh)
     const it = libItem(key);
     if (!it || it.kind !== 'model') return null;
-    return it._info || (it._info = { key, lib: true, asset: true, name: it.name, cat: it.cat || 'other', size: it.size, flags: it.flags || {}, o: it.o || [], u: it.u || [], color: it.color || '#B7B2A8' });
+    return it._info || (it._info = { key, lib: true, asset: true, name: it.name, cat: it.cat || 'other', room: it.cat || 'other', size: it.size, flags: it.flags || {}, o: it.o || [], u: it.u || [], color: it.color || '#B7B2A8',
+      thumb: (it.files || []).find(v => v.thumb) || null });
   }
   if (key.startsWith('u:')) {
     const rec = app.project && app.project.models && app.project.models[key.slice(2)];
@@ -255,6 +277,32 @@ async function parseGlbBytes(buf) {
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   return await new Promise((res, rej) => loader.parse(buf, '', g => res(g.scene), e => rej(e && e.message ? new Error(e.message) : new Error('The model could not be read.'))));
 }
+/** a model's pictures no larger than this device asks for (libWantPx: 512 unless 0010 says more; the Pixel's PowerVR
+ *  driver is fragile, and a maker's model brings four or five 1024 px pictures – 10 of the owner's models were 11.5
+ *  million pixels before, task 0028); returns how many were made smaller */
+function capModelTextures(obj, max = libWantPx()) {
+  const seen = new Set();
+  let n = 0;
+  obj.traverse(o => {
+    if (!o.isMesh) return;
+    for (const m of [].concat(o.material || [])) for (const k in m) {
+      const tx = m[k];
+      if (!tx || !tx.isTexture || seen.has(tx)) continue;
+      seen.add(tx);
+      const im = tx.image;
+      const w = im && (im.width || im.naturalWidth), hh = im && (im.height || im.naturalHeight);
+      if (!w || !hh || Math.max(w, hh) <= max) continue;
+      try {
+        const k2 = max / Math.max(w, hh), cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(w * k2)); cv.height = Math.max(1, Math.round(hh * k2));
+        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+        if (im.close) im.close();
+        tx.image = cv; tx.needsUpdate = true; n++;
+      } catch (e) { /* kept as it is */ }
+    }
+  });
+  return n;
+}
 /** the unit-box template of a model of the asset library ('l:…'); null while it is being read (or not on this device) */
 function libModelTemplate(key) {
   const cur = MODELS.lib.get(key);
@@ -265,7 +313,9 @@ function libModelTemplate(key) {
       const it = libItem(key);
       const b = it && await libBlob(it.files[0].f);
       if (!b) throw new Error('not on this device');
-      entry.obj = unitTemplate(await parseGlbBytes(await b.arrayBuffer()));
+      const obj = await parseGlbBytes(await b.arrayBuffer());
+      capModelTextures(obj);
+      entry.obj = unitTemplate(obj);
       entry.state = 'ready';
     } catch (e) { entry.state = 'error'; entry.err = e; console.warn('library model', key, e); }
     modelsLoaded();
@@ -310,6 +360,7 @@ function userModelTemplate(id) {
       if (!a) throw new Error('The model file is missing.');
       const bytes = dataUrlBytes(a.url);
       const obj = await parseGlbBytes(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+      capModelTextures(obj);
       entry.obj = unitTemplate(obj, rec.fix);
       entry.state = 'ready';
     } catch (e) { entry.state = 'error'; entry.err = e; console.warn('model', id, e); }
@@ -441,6 +492,15 @@ async function renderThumb(key, color, opts = {}) {
   obj.traverse(o => { if (o.isMesh && !o.userData.keep) o.geometry.dispose(); });
   return url;
 }
+/** a picture of a .glb (tools/model-thumbs.py makes the library's pictures with it when the library is built):
+ *  as in the catalogue, at the model's real size [w, d, h] when given; a WebP data URL */
+async function glbThumb(bytes, size) {
+  const tpl = unitTemplate(await parseGlbBytes(bytes instanceof ArrayBuffer ? bytes : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)));
+  const s3 = size || tpl.userData.size;
+  tpl.scale.set(Math.max(0.01, s3[0]), Math.max(0.01, s3[2]), Math.max(0.01, s3[1]));
+  objThumb(tpl);
+  return THUMB.r.domElement.toDataURL('image/webp', 0.86);
+}
 /** a picture of any object: from the front right, a little above (or straight from above) */
 function objThumb(obj, opts = {}) {
   const scene = new THREE.Scene();
@@ -473,6 +533,9 @@ Object.assign(app, {
     this.furnMutate(l => { l.items.push(it); });
     this.select({ type: 'furn', ids: [it.id] });
     modelReady(key);
+    // (as addFurniture, task 0020: into view, big enough to grab)
+    const main = (this.panes || []).find(x => x.role === 'main');
+    if (main && main.kind === '2d' && main.view.showPoint) setTimeout(() => { if (main.view.showPoint && main.view.spec) main.view.showPoint([it.x, it.y], Math.max(1.6, Math.max(it.w, it.d) + 0.6)); }, 350);
     this.toast(t('{n} added. Drag it into place; the round handle turns it.', { n: furnName(it) }));
     return it;
   },
@@ -488,10 +551,43 @@ Object.assign(app, {
       const card = h('button', { class: 'cat-card model-card', 'data-model': info.key, onclick: () => onPick(info) }, holder,
         h('span', { class: 'cc-name' }, t(info.name)),
         h('span', { class: 'cc-size num' }, `${Math.round(info.size[0] * 100)} × ${Math.round(info.size[1] * 100)}`, h('span', { class: 'cc-3d' }, '3D')));
-      card._load = () => modelThumb(info.key).then(url => { if (url) { holder.textContent = ''; holder.appendChild(h('img', { src: url, alt: '', class: 'cc-img' })); } });
+      card._load = () => (info.thumb ? libUrl(info.thumb.f).then(u => u || modelThumb(info.key)) : modelThumb(info.key)).then(url => { if (url) { holder.textContent = ''; const img = h('img', { src: url, alt: '', class: 'cc-img' });
+        // (a damaged library picture: drawn here after all)
+        if (info.thumb && url.startsWith('blob:')) img.onerror = () => { img.onerror = null; modelThumb(info.key).then(u => { if (u) img.src = u; }); };
+        holder.appendChild(img); } });
       if (io) io.observe(card); else card._load();
       return card;
     });
+  },
+  /** Add furniture → Library: the library's models by room (chips: All + the rooms there are), or – the single file
+   *  without its library – one line on where to get it, with Load library… right there */
+  libCatalog(grid, room, setRoom, onPick, repaint) {
+    const all = libModelList();
+    if (!all.length) {
+      const inp = h('input', { type: 'file', accept: '.zip,application/zip', style: { display: 'none' } });
+      const prog = h('span', { class: 'note-muted' });
+      inp.addEventListener('change', async () => {
+        const f = inp.files && inp.files[0];
+        if (!f) return;
+        prog.textContent = t('Reading the library… {a} of {b}', { a: 0, b: '…' });
+        try {
+          await libLoadZip(f, (a, b) => { prog.textContent = t('Reading the library… {a} of {b}', { a, b }); });
+          libAfterLoad();
+          repaint();
+        } catch (e) { prog.textContent = t(e && e.message ? e.message : String(e)); }
+      });
+      grid.appendChild(h('div', { class: 'lib-hint' },
+        h('p', null, t('Your {n} furniture models are in the library, which is not on this device yet. Get house-planner-library.zip from the release page (next to this app file) and load it here or in Settings → Library.', { n: libModelsExpected() })),
+        h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'cat-lib-load', onclick: () => inp.click() }, icon('upload'), t('Load library…')), prog), inp));
+      return;
+    }
+    const rooms = LIB_ROOMS.map(r => r[0]).filter(k => all.some(i => i.room === k));
+    for (const i of all) if (!rooms.includes(i.room)) rooms.push(i.room);
+    if (room !== 'all' && !rooms.includes(room)) room = 'all';
+    grid.appendChild(h('div', { class: 'chips lib-rooms' }, ...['all', ...rooms].map(k => h('button', { class: 'chip', 'data-room': k, 'aria-pressed': String(k === room), onclick: () => setRoom(k) },
+      k === 'all' ? t('All') : t(libRoomLabel(k)), h('span', { class: 'note-muted' }, ' ' + (k === 'all' ? all.length : all.filter(i => i.room === k).length))))));
+    const shown = room === 'all' ? all : all.filter(i => i.room === room);
+    for (const c of this.modelCards(shown, onPick)) grid.appendChild(c);
   },
   libModels(cat, q) {
     const out = [];
@@ -499,6 +595,8 @@ Object.assign(app, {
       const info = modelInfo('k:' + m.id);
       if (q ? (t(info.name) + ' ' + info.name + ' ' + info.cat + ' ' + m.id).toLowerCase().includes(q) : info.cat === cat) out.push(info);
     }
+    // (the asset library's models – the owner's – come up in a search too; by room under Library)
+    if (q) for (const info of libModelList()) if ((info.name + ' ' + t(libRoomLabel(info.room))).toLowerCase().includes(q)) out.push(info);
     return out;
   },
   myModels(q) {
@@ -516,7 +614,19 @@ Object.assign(app, {
   },
   async importModelFiles(files) {
     const main = files.find(f => /\.(glb|gltf|obj|ifc)$/i.test(f.name));
-    if (!main) { this.toast(t('Pick a .glb, .gltf, .obj or .ifc file (for .obj also its .mtl and pictures).')); return null; }
+    if (!main) {
+      const other = files.find(f => /\.(fbx|3ds|dae|blend|skp|max|stl|usdz?|3dm)$/i.test(f.name));
+      if (other) await UI.dialog({ title: t('This kind of model can\'t be read yet'), body: t('{f}: the app reads .glb, .gltf, .obj and .ifc. Open it in Blender (free) and use File → Export → glTF 2.0 (.glb).', { f: other.name }), actions: [{ label: t('OK'), value: true, kind: 'primary' }] });
+      else this.toast(t('Pick a .glb, .gltf, .obj or .ifc file (for .obj also its .mtl and pictures).'));
+      return null;
+    }
+    // (a .glb as it is; a text model (.obj, .gltf, .ifc) with its files may be bigger before it is turned into a .glb –
+    //  the .glb made of it is checked against the limit below)
+    const total = ext0 => ext0 === 'glb' ? main.size : files.reduce((s2, f) => s2 + (f.size || 0), 0) / 3;
+    if (total(main.name.split('.').pop().toLowerCase()) > MODEL_MAX_BYTES) {
+      await UI.dialog({ title: t('This model is too big'), body: t('{n} – the limit is {m}. A model is kept inside the house, so every save, backup and export carries it, and a phone has to hold it in memory. Make it lighter first (fewer triangles, pictures of 1024 px), e.g. in Blender.', { n: fmtBytes(main.size), m: fmtBytes(MODEL_MAX_BYTES) }), actions: [{ label: t('OK'), value: true, kind: 'primary' }] });
+      return null;
+    }
     const ext = main.name.split('.').pop().toLowerCase();
     const busy = UI.busy(t('Reading {n} …', { n: main.name }));
     await new Promise(r => setTimeout(r, 30));
@@ -559,6 +669,7 @@ Object.assign(app, {
       obj.traverse(o => { if (o.isMesh && o.geometry) { const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; } });
       if (!tris) throw new Error(t('No shapes found in this file.'));
       if (!glb) glb = await exportGlb(obj);
+      if (glb.length > MODEL_MAX_BYTES) throw new Error(t('{n} – the limit is {m}. A model is kept inside the house, so every save, backup and export carries it, and a phone has to hold it in memory. Make it lighter first (fewer triangles, pictures of 1024 px), e.g. in Blender.', { n: fmtBytes(glb.length), m: fmtBytes(MODEL_MAX_BYTES) }));
       const tpl = unitTemplate(obj, {});
       const raw = tpl.userData.size;
       unit = ext === 'ifc' ? 1 : guessUnit(raw);
@@ -601,13 +712,33 @@ Object.assign(app, {
     const sizeTxt = h('span', { class: 'num' });
     const name = h('input', { class: 'input', id: 'md-name', value: rec.name, autocomplete: 'off' });
     const cat = h('select', { class: 'select', id: 'md-cat' }, h('option', { value: 'mine' }, t('My models')), ...FURN_CATS.map(([k, lab]) => h('option', { value: k, selected: rec.cat === k }, t(lab))));
-    const unitSel = h('select', { class: 'select', id: 'md-unit' }, ...[[1, t('metres')], [0.01, t('centimetres')], [0.001, t('millimetres')], [0.0254, t('inches')]].map(([v, lab]) => h('option', { value: String(v), selected: Math.abs(rec.fix.unit - v) < 1e-9 }, lab)));
+    const UNITS = [[1, t('metres')], [0.01, t('centimetres')], [0.001, t('millimetres')], [0.0254, t('inches')]];
+    const unitSel = h('select', { class: 'select', id: 'md-unit' });
+    // (task 0028: the real width typed in sets the scale – the unit list then says so)
+    const paintUnits = () => {
+      const known = UNITS.some(([v]) => Math.abs(rec.fix.unit - v) < 1e-9);
+      unitSel.replaceChildren(...UNITS.map(([v, lab]) => h('option', { value: String(v), selected: Math.abs(rec.fix.unit - v) < 1e-9 }, lab)),
+        known ? null : h('option', { value: String(rec.fix.unit), selected: true }, t('as the width says')));
+    };
+    paintUnits();
+    const widthIn = h('input', { class: 'input', id: 'md-width', type: 'text', inputmode: 'decimal', autocomplete: 'off' });
+    let raw = [1, 1, 1];
+    // (as it is typed: Enter keeps the model at once, with this width)
+    const applyWidth = final => {
+      const v = parseFloat(widthIn.value.replace(',', '.'));
+      if (!isFinite(v) || v < 1 || v > 2000 || !(raw[0] > 0)) { if (final) widthIn.value = String(Math.round(rec.size[0] * 1000) / 10).replace('.', ','); return; }
+      rec.fix.unit = +(v / 100 / raw[0]).toPrecision(6);
+      paintUnits(); refresh();
+    };
+    widthIn.addEventListener('input', () => applyWidth(false));
+    widthIn.addEventListener('change', () => applyWidth(true));
     const zup = h('input', { type: 'checkbox', id: 'md-zup', checked: !!rec.fix.zup });
     const refresh = () => {
       // the model with these settings: its size, outline and two pictures
       const tpl = unitTemplate(work.clone(true), rec.fix);
-      const raw = tpl.userData.size;
+      raw = tpl.userData.size;
       rec.size = raw.map(v => +(v * rec.fix.unit).toFixed(3));
+      if (document.activeElement !== widthIn) widthIn.value = String(Math.round(rec.size[0] * 1000) / 10).replace('.', ',');
       const ol = meshOutline(unitTris(tpl), rec.size[0], rec.size[1]);
       rec.o = ol.o; rec.u = ol.u;
       sizeTxt.textContent = rec.size.map(v => Math.round(v * 100)).join(' × ') + ' cm';
@@ -624,6 +755,8 @@ Object.assign(app, {
       h('div', { class: 'model-prevs' }, h('figure', null, canvas, h('figcaption', null, t('Front right'))), h('figure', null, topPrev, h('figcaption', null, t('From above: the front at the bottom')))),
       h('div', { class: 'field' }, h('label', { for: 'md-name' }, t('Name')), name),
       h('div', { class: 'field-row' }, h('div', { class: 'field' }, h('label', { for: 'md-cat' }, t('Category')), cat), h('div', { class: 'field' }, h('label', { for: 'md-unit' }, t('The file is in')), unitSel)),
+      h('div', { class: 'field' }, h('label', { for: 'md-width' }, t('Real width')), h('div', { class: 'input-unit', style: { maxWidth: '160px' } }, widthIn, h('span', { class: 'unit' }, 'cm')),
+        h('span', { class: 'note-muted' }, t('Type the width from the shop or the maker: the model is scaled to it.'))),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Which side is the front?')),
         h('div', { class: 'actions' }, h('button', { class: 'btn sm', onclick: () => turn(-90) }, icon('rotate', 'flipx'), t('Turn left')), h('button', { class: 'btn sm', onclick: () => turn(90) }, icon('rotate'), t('Turn right')), h('button', { class: 'btn sm', onclick: () => turn(180) }, t('Turn around')))),
       h('label', { class: 'check', for: 'md-zup' }, zup, h('span', null, t('It lies on its back (made with Z up)'))),

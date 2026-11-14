@@ -1907,6 +1907,10 @@
   "Eetkamerstoel",
   "Spisestol"
  ],
+ "Dining room": [
+  "Eetkamer",
+  "Spisestue"
+ ],
  "Dining table": [
   "Eettafel",
   "Spisebord"
@@ -2710,6 +2714,10 @@
  "Floors": [
   "Vloeren",
   "Gulv"
+ ],
+ "Floors and materials": [
+  "Vloeren en materialen",
+  "Gulv og materialer"
  ],
  "Foam underlay (2–3 mm)": [
   "Schuim-ondervloer (2–3 mm)",
@@ -3852,6 +3860,10 @@
   "Lister"
  ],
  "Living": [
+  "Woonkamer",
+  "Stue"
+ ],
+ "Living room": [
   "Woonkamer",
   "Stue"
  ],
@@ -5915,6 +5927,10 @@
   "Werkelijke lengte tussen de twee punten",
   "Faktisk lengde mellom de to punktene"
  ],
+ "Real width": [
+  "Echte breedte",
+  "Ekte bredde"
+ ],
  "Recliner": [
   "Relaxfauteuil",
   "Hvilestol"
@@ -7403,6 +7419,10 @@
   "Ga naar Bouwen om muren, deuren en ruimtes te wijzigen.",
   "Bytt til Bygge for å endre vegger, dører og rom."
  ],
+ "Switches and sockets": [
+  "Schakelaars en wandcontactdozen",
+  "Brytere og stikkontakter"
+ ],
  "Switches and sockets in this version": [
   "Schakelaars en stopcontacten in deze versie",
   "Brytere og stikkontakter i denne versjonen"
@@ -8287,6 +8307,10 @@
   "Dit is geen IFC-bestand.",
   "Dette er ikke en IFC-fil."
  ],
+ "This kind of model can't be read yet": [
+  "Dit soort model kan de app nog niet lezen",
+  "Denne typen modell kan ikke leses ennå"
+ ],
  "This layout has no furniture yet.": [
   "Deze indeling heeft nog geen meubels.",
   "Denne møbleringen har ingen møbler ennå."
@@ -8298,6 +8322,10 @@
  "This model is in the model library, which is not on this device yet: it shows as a plain box. Load the library in Settings → Library.": [
   "Dit model staat in de modellenbibliotheek, die nog niet op dit apparaat staat: het wordt als een gewoon blok getoond. Laad de bibliotheek via Instellingen → Bibliotheek.",
   "Denne modellen er i modellbiblioteket, som ennå ikke er på denne enheten: den vises som en enkel boks. Last inn biblioteket under Innstillinger → Bibliotek."
+ ],
+ "This model is too big": [
+  "Dit model is te groot",
+  "Denne modellen er for stor"
  ],
  "This moves the drawing so that corner is the reference point. Walls already drawn on this storey stay where they are, so they may no longer line up with the drawing.": [
   "De tekening wordt zo verplaatst dat die hoek het referentiepunt wordt. Muren die al op deze verdieping getekend zijn, blijven waar ze zijn, dus die liggen misschien niet meer gelijk met de tekening.",
@@ -8742,6 +8770,10 @@
  "Two-way + single": [
   "Wissel + enkel",
   "Trappebryter + enkel"
+ ],
+ "Type the width from the shop or the maker: the model is scaled to it.": [
+  "Typ de breedte van de winkel of de fabrikant: het model wordt daarop geschaald.",
+  "Skriv inn bredden fra butikken eller produsenten: modellen skaleres etter den."
  ],
  "U (half turn)": [
   "U (halfslag)",
@@ -9715,6 +9747,10 @@
   "Je tikken liggen {w} mm uit elkaar, de plattegrond zegt {p} mm ({d}).",
   "Trykkene dine er {w} mm fra hverandre, planen sier {p} mm ({d})."
  ],
+ "Your {n} furniture models are in the library, which is not on this device yet. Get house-planner-library.zip from the release page (next to this app file) and load it here or in Settings → Library.": [
+  "Je {n} meubelmodellen zitten in de bibliotheek, die nog niet op dit apparaat staat. Haal house-planner-library.zip van de releasepagina (naast dit app-bestand) en laad hem hier of in Instellingen → Bibliotheek.",
+  "Dine {n} møbelmodeller ligger i biblioteket, som ikke er på denne enheten ennå. Hent house-planner-library.zip fra utgivelsessiden (ved siden av denne app-filen) og last den inn her eller i Innstillinger → Bibliotek."
+ ],
  "Zinc yellow": [
   "Zinkgeel",
   "Sinkgul"
@@ -9758,6 +9794,10 @@
  "and {n} more": [
   "en nog {n}",
   "og {n} til"
+ ],
+ "as the width says": [
+  "volgens de breedte",
+  "etter bredden"
  ],
  "back": [
   "achter",
@@ -10379,6 +10419,10 @@
   "{f} {t} mm: R {a} + ondervloer {b}. ISSO 49: hoogstens 0,15 m²K/W, geadviseerd 0,10 of minder.",
   "{f} {t} mm: R {a} + underlag {b}. ISSO 49: høyst 0,15 m²K/W, anbefalt 0,10 eller mindre."
  ],
+ "{f}: the app reads .glb, .gltf, .obj and .ifc. Open it in Blender (free) and use File → Export → glTF 2.0 (.glb).": [
+  "{f}: de app leest .glb, .gltf, .obj en .ifc. Open het in Blender (gratis) en kies File → Export → glTF 2.0 (.glb).",
+  "{f}: appen leser .glb, .gltf, .obj og .ifc. Åpne den i Blender (gratis) og velg File → Export → glTF 2.0 (.glb)."
+ ],
  "{h} h": [
   "{h} u",
   "{h} t"
@@ -10618,6 +10662,10 @@
  "{n} {what} removed": [
   "{n} {what} verwijderd",
   "{n} {what} fjernet"
+ ],
+ "{n} – the limit is {m}. A model is kept inside the house, so every save, backup and export carries it, and a phone has to hold it in memory. Make it lighter first (fewer triangles, pictures of 1024 px), e.g. in Blender.": [
+  "{n} – de grens is {m}. Een model wordt in het huis bewaard, dus elke opslag, back-up en export neemt het mee, en een telefoon moet het in het geheugen houden. Maak het eerst lichter (minder driehoeken, afbeeldingen van 1024 px), bijvoorbeeld in Blender.",
+  "{n} – grensen er {m}. En modell lagres i huset, så hver lagring, sikkerhetskopi og eksport tar den med, og en telefon må holde den i minnet. Gjør den lettere først (færre trekanter, bilder på 1024 px), for eksempel i Blender."
  ],
  "{p} % of the budget planned": [
   "{p} % van het budget gepland",

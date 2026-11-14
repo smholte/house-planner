@@ -1,5 +1,5 @@
 {
- "total_seconds": 8351.0,
+ "total_seconds": 8551.0,
  "files": {
   "test_backup.py": {
    "seconds": 67.0,
@@ -769,14 +769,26 @@
     "checks": 72
    },
    "note": "task 0027"
+  },
+  "test_furniture_lib.py": {
+   "seconds": 200.0,
+   "ok": true,
+   "set": "public",
+   "checks": 26,
+   "made_up": {
+    "seconds": 200.0,
+    "ok": true,
+    "checks": 26
+   },
+   "note": "task 0028"
   }
  },
  "note": "seconds: on the owner's house (measured 12 Nov 2026, tasks 0007a / 0007b, two or three test files at a time); made_up: the same file on the made-up house (public app). ci: what GitHub's runs measured (python3 tools/ci_status.py --record), which tools/ci_groups.py balances by first. checks: the number of checks.",
  "sets": {
   "public": {
-   "files": 65,
-   "seconds": 8351.0,
-   "made_up_seconds": 5884.0
+   "files": 66,
+   "seconds": 8551.0,
+   "made_up_seconds": 6084.0
   }
  }
 }
