@@ -3,7 +3,7 @@
 /* the app's own version, shown at the bottom of the projects page (2 Nov): its number goes up by one with each round of
    changes that is delivered (the rounds in the notes), the date of that round, and the build – a code made from the app
    itself by build.py (the same code the offline copy's cache carries; the placeholder stays when run from the source) */
-const APP_VERSION = { n: 45, date: '2026-11-14', build: '__BUILD__' };
+const APP_VERSION = { n: 46, date: '2026-11-14', build: '__BUILD__' };
 
 /* the page as it was loaded, before the app changed anything: "Export for viewing" writes the app again with a
    house inside (share.js). Only the small parts are copied now; the script is read when it is needed. */
