@@ -61,17 +61,18 @@ with sync_playwright() as p:
     check('3D whole house: only the sets in view decoded', set(s3['sets']) <= set(u3) | set(s2['sets']) and len(s3['sets']) < 25, (s3['sets'], u3))
     print(f"   3D whole house: {len(s3['sets'])} of 25 sets, {s3['pictures']} pictures, {s3['bytes'] / 1048576:.1f} MB decoded")
 
-    # a material changed: its set is loaded then (a sofa in the fabric picture)
-    fab0 = 'Fabric028' in s3['sets']
+    # a material changed: its set is loaded then (a room's floor to carpet – a set the made-up house doesn't use)
+    car0 = 'Carpet003' in s3['sets']
     pg.evaluate("""() => { const a = window.__hp.app; a.setScope('storey'); const st = a.currentStorey();
-      a.furnMutate(l => { l.items.push({ id: 'f_sofa_0021', type: 'sofa3', storey: st.id, x: 3, y: 3, rot: 0, w: 2.2, d: 0.92, h: 0.84, color: '#7D8790', shop: {} }); }); }""")
+      const r = a.shownVersion().plan.rooms.find(r => r.storey === st.id && r.floor); r.floor = { material: 'carpet', color: '#8A8F96' }; a.refreshViews(false); }""")
     pg.wait_for_timeout(1500); still(pg); pg.wait_for_function(READY, timeout=120000)
     s4, u4 = pg.evaluate(STATS), pg.evaluate(USED)
-    check('a sofa added: the fabric set is loaded then and used', not fab0 and 'Fabric028' in s4['sets'] and 'Fabric028' in u4 and not pg.errors, (fab0, s4['sets'], pg.errors[:2]))
+    check('a floor changed to carpet: the carpet set is loaded then and used', not car0 and 'Carpet003' in s4['sets'] and 'Carpet003' in u4 and not pg.errors, (car0, s4['sets'], pg.errors[:2]))
+    b.close()
 
     # the photo render: its first pass only when the pictures are in (a fresh page, started at once after 2D → 3D)
-    pg.reload(); pg.wait_for_function(READY, timeout=60000)
-    pg.evaluate("() => window.__hp.Settings.set('ao', false)")
+    b, pg = open_app(p)
+    pg.wait_for_function(READY, timeout=60000)
     open_example(pg)
     r = pg.evaluate("""async () => { const H = window.__hp, a = H.app; a.setDim('3d'); a.setScope('storey');
       const pane = a.panes.find(p => p.kind === '3d'); const before = H.TEXLIB.ready;
@@ -99,7 +100,7 @@ with sync_playwright() as p:
     pg.wait_for_function("() => { const v = window.__hp.app.panes.find(p => p.kind === '3d'); return v && v.view.spec; }", timeout=60000)
     pg.wait_for_timeout(1500); pg.wait_for_function(READY, timeout=120000)
     s5, u5 = pg.evaluate(STATS), pg.evaluate(USED)
-    px = pg.evaluate("() => window.__hp.TEXLIB.px.get('HouseBrick|kit')")
+    px = pg.evaluate("() => window.__hp.TEXLIB.px.get('WoodFloor051|color')")
     check('… 3D: the built-in pictures of the sets in view decoded (512), only those', set(s5['sets']) <= set(u5) and 5 <= len(s5['sets']) < 25 and px == 512 and not errs, (s5['sets'], u5, px, errs[:2]))
     pg.screenshot(path=SHOTS + 'pictures-phone-3d.png')
     b.close()
