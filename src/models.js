@@ -254,6 +254,8 @@ function libAfterLoad() {
   if (!MODELS.blob) MODELS.blobP = null;
   for (const it of LIB.items.values()) delete it._info;
   if (app.project) { app.refreshViews(false); if (app.renderInspector) app.renderInspector(); }
+  // (documents whose files are in the library: copied into the open house now – task 0022)
+  if (app.project && (app.project.docs || []).some(d => d.lib) && typeof docsFromLibrary === 'function') docsFromLibrary(app.project).catch(e => console.warn('docs', e));
 }
 
 /** the Kenney models' packed geometry as base64, for a copy for viewing made from a hosted version (which has it in its

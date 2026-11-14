@@ -6,7 +6,9 @@
    wheel, two fingers or + / −, drag to move, swipe (or ← →) for the next page, turn it a quarter (kept with the
    document). A page can belong to a storey: the storey's details then show it, and it can become the storey's
    drawing to trace over.
-   project.docs: [{ id, name, file, type: 'pdf' | 'image', asset, thumb, pages, size, added, rot, storeys: { storeyId: [pages] } }]
+   project.docs: [{ id, name, file, type: 'pdf' | 'image', asset, thumb, pages, size, added, rot, storeys: { storeyId: [pages] },
+   lib }] – lib (task 0022): the library item ('doc:<name>') the file and thumb are copied from where they are not on
+   this device (docsFromLibrary)
    A copy for viewing (family, suppliers) leaves the documents at home. */
 
 const DOC_MAX_MB = 60;
@@ -33,6 +35,8 @@ Object.assign(app, {
   async documentsSheet() {
     const p = this.project;
     if (!p) return;
+    // (documents whose files are in the library: copied in now if it came meanwhile; else a line on where to get it)
+    let missing = (p.docs || []).some(d => d.lib) ? await docsFromLibrary(p) : [];
     await Assets.ensure((p.docs || []).map(d => d.thumb).filter(Boolean));
     const ro = !!p.viewer;
     const body = h('div', { class: 'docs-body', id: 'docs-body' });
@@ -47,6 +51,11 @@ Object.assign(app, {
         body.appendChild(h('p', { class: 'note-muted', id: 'docs-empty' }, ro ? t('No documents in this copy.') : t('No documents yet. Add the builder’s drawings, the extra work list, quotes or photos – they stay with the house.')));
         return;
       }
+      if (missing.length) body.appendChild(this.docsLibHint(missing.length, async () => {
+        missing = await docsFromLibrary(p);
+        await Assets.ensure((p.docs || []).map(d => d.thumb).filter(Boolean));
+        paint();
+      }));
       const grid = h('div', { class: 'docs-grid', id: 'docs-grid' });
       for (const d of docs) {
         const th = d.thumb && Assets.get(d.thumb);
@@ -55,6 +64,7 @@ Object.assign(app, {
           h('span', { class: 'doc-th' }, th ? h('img', { src: th.url, alt: '' }) : icon(d.type === 'pdf' ? 'doc' : 'image')),
           h('span', { class: 'doc-name', translate: 'no' }, d.name),
           h('span', { class: 'doc-meta' }, docMeta(d)),
+          missing.includes(d) ? h('span', { class: 'doc-meta doc-nofile' }, t('In the library – not on this device yet')) : null,
           links.length ? h('span', { class: 'doc-links' }, icon('layers'), h('span', { translate: 'no' }, links.join(', '))) : null));
       }
       body.appendChild(grid);
@@ -63,6 +73,27 @@ Object.assign(app, {
     };
     paint();
     UI.dialog({ title: t('Documents'), body, wide: true, onOpen: (dlg, c) => { close = c; dlg.classList.add('docs-dialog'); }, actions: [{ label: t('Done'), value: null, kind: 'primary' }] });
+  },
+
+  /** Documents without the library their files come from (task 0022): one line on where to get it, Load library…
+   *  right there; after loading, done() */
+  docsLibHint(n, done) {
+    const inp = h('input', { type: 'file', accept: '.zip,application/zip', style: { display: 'none' }, id: 'docs-lib-file' });
+    const prog = h('span', { class: 'note-muted' });
+    inp.addEventListener('change', async () => {
+      const f = inp.files && inp.files[0];
+      if (!f) return;
+      prog.textContent = t('Reading the library… {a} of {b}', { a: 0, b: '…' });
+      try {
+        await libLoadZip(f, (a, b) => { prog.textContent = t('Reading the library… {a} of {b}', { a, b }); });
+        prog.textContent = '';
+        if (typeof libAfterLoad === 'function') libAfterLoad();
+        await done();
+      } catch (e) { prog.textContent = t(e && e.message ? e.message : String(e)); }
+    });
+    return h('div', { class: 'lib-hint', id: 'docs-lib-hint' },
+      h('p', null, t('{n} of these documents are in the library, which is not on this device yet. Get house-planner-library.zip from the release page (next to this app file) and load it here or in Settings → Library.', { n })),
+      h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'docs-lib-load', onclick: () => inp.click() }, icon('upload'), t('Load library…')), prog), inp);
   },
 
   /** pick PDFs and pictures and keep them with the house; the number added */
@@ -136,7 +167,7 @@ Object.assign(app, {
     if (c) { try { c.pdf.destroy(); } catch (e) { /* gone */ } this._docPdf = null; }
     await Assets.ensure([d.asset]);
     const a = Assets.get(d.asset);
-    if (!a || !a.url) throw new Error(t('This document’s file is not on this device.'));
+    if (!a || !a.url) throw new Error(d.lib ? t('This document is in the library, which is not on this device yet: Documents → Load library….') : t('This document’s file is not on this device.'));
     const lib = await this.loadPdfJs();
     const pdf = await lib.getDocument({ data: docBytes(a.url) }).promise;
     this._docPdf = { id: d.id, asset: d.asset, pdf };
@@ -151,8 +182,10 @@ Object.assign(app, {
     if (!d) return;
     document.querySelectorAll('.docview').forEach(el => el.closeViewer && el.closeViewer(true));
     await Assets.ensure([d.asset]);
+    // (its file from the library, if it came since the house was opened)
+    if (!Assets.get(d.asset) && d.lib) { await docsFromLibrary({ docs: [d] }); await Assets.ensure([d.asset]); }
     const a = Assets.get(d.asset);
-    if (!a) { this.toast(t('This document’s file is not on this device.')); return; }
+    if (!a) { this.toast(d.lib ? t('This document is in the library, which is not on this device yet: Documents → Load library….') : t('This document’s file is not on this device.'), { ms: 6000 }); return; }
     const ro = !!p.viewer;
     const S = { page: clamp(page || 1, 1, d.pages || 1), zoom: 1, tx: 0, ty: 0, pw: 1, ph: 1, fit: 1, res: 0, busy: false, want: false };
     const phone = window.matchMedia('(pointer: coarse)').matches;
@@ -486,12 +519,53 @@ Object.assign(app, {
 });
 
 /** files kept with a house that the house's own data brings along (the example's documents; the house built into the
- *  app: HOUSE.files): written to this device when they are not here yet */
+ *  app: HOUSE.files; documents whose files are in the library: doc.lib) – written to this device when they are not here
+ *  yet. Returns the documents whose file is still not here (their library is not on this device). */
 async function docsEnsureFiles(p) {
+  let have;
+  try { have = new Set(await DB.allKeys('assets')); } catch (e) { have = null; }
+  const here = async id => have ? have.has(id) : !!(await DB.get('assets', id));
   for (const f of [...exampleFiles(p), ...(HOUSE.files ? HOUSE.files(p) : [])]) {
-    try { if (!(await DB.get('assets', f.id))) await Assets.putRecord(f); }
+    try { if (!(await here(f.id))) { await Assets.putRecord(f); if (have) have.add(f.id); } }
     catch (e) { console.warn('doc file', e); }
   }
+  return docsFromLibrary(p, here);
+}
+/** documents whose files come from the asset library (task 0022): doc.lib names the library item ('doc:<name>': a PDF
+ *  and its thumb). A house built into the app no longer carries its documents' files inside the app file; where they
+ *  are not on this device, they are copied from the library into the house's own files, under the ids the document
+ *  has. Only the documents the house lists are looked at – one you deleted does not come back, one you renamed,
+ *  turned or gave storeys stays so. Returns the documents still without their file (no library here). */
+let DOCS_LIB_JOB = null;
+function docsFromLibrary(p, here) {
+  // (one at a time: Load library… and libAfterLoad both ask – the second waits and then finds them there)
+  const job = (DOCS_LIB_JOB || Promise.resolve()).catch(() => {}).then(() => docsFromLibraryNow(p, here));
+  DOCS_LIB_JOB = job;
+  return job;
+}
+async function docsFromLibraryNow(p, here) {
+  here = here || (async id => !!(await DB.get('assets', id)));
+  const missing = [];
+  for (const d of (p && p.docs) || []) {
+    if (!d.lib || !d.asset) continue;
+    try {
+      const needA = !(await here(d.asset)), needT = !!d.thumb && !(await here(d.thumb));
+      if (!needA && !needT) continue;
+      await libraryInit();
+      const it = libItem(d.lib), files = it && it.kind === 'doc' ? it.files || [] : [];
+      const fp = files.find(v => !v.thumb), ft = files.find(v => v.thumb);
+      if (needA) {
+        const b = fp && await libBlob(fp.f);
+        if (!b) { missing.push(d); continue; }
+        await Assets.putRecord({ id: d.asset, kind: 'doc', dataUrl: await bytesToDataUrl(b, 'application/pdf'), w: 0, h: 0, created: Date.now() });
+      }
+      if (needT) {
+        const b = ft && await libBlob(ft.f);
+        if (b) await Assets.putRecord({ id: d.thumb, dataUrl: await bytesToDataUrl(b, 'image/jpeg'), w: ft.w || 0, h: ft.h || 0, created: Date.now() });
+      }
+    } catch (e) { console.warn('doc from library', d.id, e); missing.push(d); }
+  }
+  return missing;
 }
 /** the files of the example's documents (EXAMPLE_HOUSE.files: { asset id: { type, b64, w, h } }) that a document of
  *  this house still refers to */
