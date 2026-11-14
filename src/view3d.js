@@ -807,6 +807,9 @@ class View3D extends Emitter {
     const q = quality3d(app.settings || {});
     this.fast = q === 'fast';
     this.high = q === 'high' && !opts.mini;
+    // the level of this device (autoq.js, task 0010): Phone / Normal / PC high – the canvas, the sun's shadow, the trees
+    this.level = level3d(app.settings || {});
+    this.K = LEVELS[this.level];
     // the browser's own reason when it won't start 3D (it tells it to the canvas); once more without smooth edges
     let why = '';
     for (const attrs of [{ antialias: !this.fast, powerPreference: 'high-performance' }, { antialias: false }]) {
@@ -831,7 +834,7 @@ class View3D extends Emitter {
     // loses every 3D picture of the page): this view is started again, looking where it looked (app.view3dLost)
     r.domElement.addEventListener('webglcontextlost', () => { if (this.destroyed) return; this.lost = true; app.view3dLost(this); });
     r.domElement.addEventListener('webglcontextrestored', () => { if (this.destroyed) return; app.view3dLost(this, true); });
-    r.setPixelRatio(this.fast ? 1 : Math.min(window.devicePixelRatio || 1, 2));
+    r.setPixelRatio(this.fast ? 1 : Math.min(window.devicePixelRatio || 1, this.K.pr));
     this.smoothSetup();
     r.shadowMap.enabled = !this.fast;
     // (three r187: PCFSoftShadowMap is gone; PCF with a radius gives the same soft edge)
@@ -860,7 +863,7 @@ class View3D extends Emitter {
     this.scene.add(this.hemi);
     this.sun = new THREE.DirectionalLight(0xfff6ea, 1.25);
     this.sun.castShadow = true;
-    this.sun.shadow.mapSize.set(2048, 2048);
+    this.sun.shadow.mapSize.set(this.K.shadow, this.K.shadow);
     this.sun.shadow.bias = -0.0004;
     this.sun.shadow.normalBias = 0.02;
     this.sun.shadow.radius = 2;

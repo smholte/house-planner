@@ -127,14 +127,17 @@ function libPick(list, want) {
   for (const v of s) if (v.px <= want) best = v;
   return best;
 }
-/** safe pictures (view3d.js: the Pixel's PowerVR driver crashed once): nothing larger than 512 and no KTX2 until task
- *  0010 has tried them on that phone (lead, 13 Nov) */
+/** safe pictures (view3d.js: the Pixel's PowerVR driver crashed once): nothing larger than 512; KTX2 copies only with
+ *  their first picture (no smaller copies, as the safe pictures – task 0010) */
 const libSafe = () => (typeof SAFE_TEX !== 'undefined' && SAFE_TEX) || !!(typeof GPU_INFO !== 'undefined' && GPU_INFO && needSafeTex(GPU_INFO, (app && app.settings) || {}))
   || !!(app && app.settings && app.settings.safeTex);
-/** the picture size this device asks for (0010 sets it by device; default 512 = as before 0009) */
-const libWantPx = () => { const v = Math.max(256, +((app && app.settings && app.settings.texSize) || 512)); return libSafe() ? Math.min(512, v) : v; };
-/** GPU-compressed pictures (KTX2) where the library has them (0010 decides per device; default off) */
-const libWantGpu = () => !!(app && app.settings && app.settings.texGpu) && !libSafe();
+const libLevel = () => (typeof levelKnobs === 'function' ? levelKnobs((app && app.settings) || {}) : { texPx: 512, ktx2: false });
+/** the picture size this device asks for (settings.texSize, else its level – task 0010: Phone and Normal 512, PC high
+ *  2048) */
+const libWantPx = () => { const s = (app && app.settings) || {}; const v = Math.max(256, +(s.texSize || libLevel().texPx || 512)); return libSafe() ? Math.min(512, v) : v; };
+/** GPU-compressed pictures (KTX2) where the library has them: settings.texGpu, else the level (task 0010: Phone);
+ *  never with "Pictures as before" (settings.texPlain) */
+const libWantGpu = () => { const s = (app && app.settings) || {}; return !s.texPlain && (s.texGpu != null ? !!s.texGpu : !!libLevel().ktx2); };
 
 /** a library file as a Blob: kept on this device, else (hosted) fetched from lib/ and kept; null when it can't be had */
 function libBlob(f) {

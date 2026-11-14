@@ -534,13 +534,19 @@ Object.assign(app, {
       { label: 'Rename project', icon: 'edit', fn: () => this.renameProject() },
       { label: t('Undo history'), icon: 'history', fn: () => this.historySheet() },
       { heading: t('App') },
+      // (task 0010: the Phone level's compressed pictures off – or on again – in two taps, for a chip that shows them wrong)
+      this.setPicturesPlain && levelKnobs(this.settings).ktx2 ? { label: this.settings.texPlain ? t('3D pictures: compressed again') : t('3D pictures as before'), icon: 'eye', id: 'mi-pics', fn: () => {
+        const plain = !this.settings.texPlain;
+        this.setPicturesPlain(plain);
+        this.toast(plain ? t('3D pictures as before on this device (Settings → 3D on this device).') : t('3D pictures compressed again (less memory).'));
+      } } : null,
       { label: t('Search…'), icon: 'search', fn: () => this.searchOpen() },
       this.fullscreenMenuItem(),
       { label: t('Help: what each button does'), icon: 'question', fn: () => this.helpOverlay() },
       { label: t('Send feedback…'), icon: 'edit', id: 'mi-feedback', fn: () => this.feedbackDialog() },
       { label: 'Settings', icon: 'settings', fn: () => this.settingsSheet() },
       { label: 'All projects', icon: 'home', fn: () => this.showHome() },
-    ]);
+    ].filter(Boolean));
   },
 
   viewMenu(anchor) {
@@ -944,6 +950,7 @@ Object.assign(app, {
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, 'Appearance'), theme),
       this.pipSettings(),
       this.qualitySettings ? this.qualitySettings() : null,
+      this.levelSettings ? this.levelSettings() : null,
       this.walkSettings(),
       h('div', { class: 'field', id: 'set-library' }, h('span', { class: 'flabel' }, t('Library')), this.librarySettings()),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Start')),

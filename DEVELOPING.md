@@ -229,7 +229,12 @@ The modules of the owner's own house (its plot, neighbourhood, documents …) ar
     src/glow.js      Evening: an additive halo sprite at every lightSpot (not above a storey cut, not in Fast)
     src/autoq.js     the first 3D build on a device measures the still view for 1.2 s (measureStill): < 20 fps →
                      Fast with an Undo toast; ≥ 50 on a computer with Beautiful → a toast offering High; once
-                     (settings.autoQ; the tests set it so it never runs there)
+                     (settings.autoQ; the tests set it so it never runs there). The level of the device (task 0010):
+                     deviceSignals() (touch / screen / deviceMemory / MAX_TEXTURE_SIZE / BC vs ASTC-ETC / software
+                     renderer, one throwaway WebGL canvas) → deviceLevel() Phone / Normal / PC high; settings.level
+                     overrides; LEVELS = what a level changes (texPx → libWantPx, ktx2 → libWantGpu, the sun's
+                     shadow, the canvas's pixel ratio, the trees' vegNear / vegFar); settings.texPlain = "Pictures as
+                     before" (KTX2 off; also set by view3dLost when KTX2 was in use); Settings → 3D on this device
     src/sun.js       sun and north: NOAA sun position (Dutch summer time), the sun bar in 3D (day, time, play),
                      sun hours per room and in the garden (depth renders from the sun every 30 minutes)
     src/pdfplans.js  plans as PDF to scale: an own small PDF writer (JPEG pictures, Helvetica), plan pictures from a

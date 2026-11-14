@@ -10854,5 +10854,113 @@
  "“{n}” placed. Drag to move all of it; tap one piece to move it on its own.": [
   "“{n}” geplaatst. Sleep om alles te verplaatsen; tik op één meubel om alleen dat te verplaatsen.",
   "“{n}” plassert. Dra for å flytte alt; trykk på ett møbel for å flytte bare det."
+ ],
+ "a touch screen without a mouse, small screen": [
+  "een aanraakscherm zonder muis, klein scherm",
+  "en berøringsskjerm uten mus, liten skjerm"
+ ],
+ "a phone graphics chip (ASTC / ETC pictures only)": [
+  "een grafische chip van een telefoon (alleen ASTC- / ETC-afbeeldingen)",
+  "en grafikkbrikke fra en telefon (bare ASTC- / ETC-bilder)"
+ ],
+ "little memory ({m} GB)": [
+  "weinig geheugen ({m} GB)",
+  "lite minne ({m} GB)"
+ ],
+ "small textures only ({n} px)": [
+  "alleen kleine afbeeldingen ({n} px)",
+  "bare små bilder ({n} px)"
+ ],
+ "a touch screen without a mouse": [
+  "een aanraakscherm zonder muis",
+  "en berøringsskjerm uten mus"
+ ],
+ "a small screen": [
+  "een klein scherm",
+  "en liten skjerm"
+ ],
+ "3D drawn in software (no graphics chip)": [
+  "3D getekend door de processor (geen grafische chip)",
+  "3D tegnet av prosessoren (ingen grafikkbrikke)"
+ ],
+ "no WebGL 2": [
+  "geen WebGL 2",
+  "ingen WebGL 2"
+ ],
+ "no computer picture formats (BC)": [
+  "geen afbeeldingsformaten van een computer (BC)",
+  "ingen bildeformater fra en datamaskin (BC)"
+ ],
+ "textures up to {n} px": [
+  "afbeeldingen tot {n} px",
+  "bilder opptil {n} px"
+ ],
+ "{m} GB memory": [
+  "{m} GB geheugen",
+  "{m} GB minne"
+ ],
+ "{c} processor cores": [
+  "{c} processorkernen",
+  "{c} prosessorkjerner"
+ ],
+ "a computer with a graphics chip, a mouse and a big screen": [
+  "een computer met een grafische chip, een muis en een groot scherm",
+  "en datamaskin med grafikkbrikke, mus og stor skjerm"
+ ],
+ "Phone": [
+  "Telefoon",
+  "Telefon"
+ ],
+ "PC high": [
+  "PC hoog",
+  "PC høy"
+ ],
+ "Pictures": [
+  "Afbeeldingen",
+  "Bilder"
+ ],
+ "Compressed (less memory)": [
+  "Gecomprimeerd (minder geheugen)",
+  "Komprimert (mindre minne)"
+ ],
+ "As before": [
+  "Zoals voorheen",
+  "Som før"
+ ],
+ "If surfaces look black or wrong in 3D, choose “As before” (also in the ⋯ menu).": [
+  "Zien vlakken er in 3D zwart of vreemd uit, kies dan “Zoals voorheen” (ook in het ⋯-menu).",
+  "Ser flater svarte eller rare ut i 3D, velg «Som før» (også i ⋯-menyen)."
+ ],
+ "Auto ({l})": [
+  "Auto ({l})",
+  "Auto ({l})"
+ ],
+ "3D on this device": [
+  "3D op dit apparaat",
+  "3D på denne enheten"
+ ],
+ "Auto chose {l}: {why}.": [
+  "Auto koos {l}: {why}.",
+  "Auto valgte {l}: {why}."
+ ],
+ "Phone: compressed pictures, smaller shadows and canvas, lighter trees far away – less memory, smoother. Normal: as before. PC high: sharper pictures where the library has them.": [
+  "Telefoon: gecomprimeerde afbeeldingen, kleinere schaduwen en beeld, lichtere bomen in de verte – minder geheugen, vloeiender. Normaal: zoals voorheen. PC hoog: scherpere afbeeldingen waar de bibliotheek ze heeft.",
+  "Telefon: komprimerte bilder, mindre skygger og bilde, lettere trær langt unna – mindre minne, jevnere. Vanlig: som før. PC høy: skarpere bilder der biblioteket har dem."
+ ],
+ "3D pictures: compressed again": [
+  "3D-afbeeldingen: weer gecomprimeerd",
+  "3D-bilder: komprimert igjen"
+ ],
+ "3D pictures as before": [
+  "3D-afbeeldingen zoals voorheen",
+  "3D-bilder som før"
+ ],
+ "3D pictures as before on this device (Settings → 3D on this device).": [
+  "3D-afbeeldingen zoals voorheen op dit apparaat (Instellingen → 3D op dit apparaat).",
+  "3D-bilder som før på denne enheten (Innstillinger → 3D på denne enheten)."
+ ],
+ "3D pictures compressed again (less memory).": [
+  "3D-afbeeldingen weer gecomprimeerd (minder geheugen).",
+  "3D-bilder komprimert igjen (mindre minne)."
  ]
 }

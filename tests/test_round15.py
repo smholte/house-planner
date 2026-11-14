@@ -171,19 +171,20 @@ with sync_playwright() as p:
     open_example(pg)
     pg.evaluate("() => { const a = window.__hp.app; a.setDim('3d'); }"); settle(pg, 5000)
     st = pg.evaluate("() => { const v = " + V3 + "; return [v._adapt, v.renderer.getPixelRatio(), v._fullPR]; }")
-    check('P3 phone: a sharp phone screen (2×) is drawn sharp when still', st == [True, 2, 2], st)
+    # (the Phone level – task 0010: a 2× phone screen is drawn at 1.5× at most)
+    check('P3 phone: a sharp phone screen (2×) is drawn at the Phone level\'s 1.5× when still', st == [True, 1.5, 1.5], st)
     MOVE = """(ms) => new Promise(res => { const v = window.__hp.app.panes.find(p => p.kind === '3d').view; let lo = 9, t0 = performance.now();
       const f = () => { v.camMoved = true; lo = Math.min(lo, v.renderer.getPixelRatio()); if (performance.now() - t0 < ms) requestAnimationFrame(f); else res(lo); }; requestAnimationFrame(f); })"""
     lo = pg.evaluate(MOVE, 600)
-    check('… while turning: 60 % of the sharpness (1.2×), a third of the pixels', near(lo, 1.2, 1e-6), lo)
+    check('… while turning: 60 % of the sharpness (0.9×), a third of the pixels', near(lo, 0.9, 1e-6), lo)
     # (a moment: the next drawn frame after it stops – on the test computer, which draws in software, a frame of the
     # whole neighbourhood takes a few seconds)
-    try: pg.wait_for_function("() => " + V3 + ".renderer.getPixelRatio() === 2", timeout=15000)
+    try: pg.wait_for_function("() => " + V3 + ".renderer.getPixelRatio() === 1.5", timeout=15000)
     except Exception: pass
     pr = pg.evaluate("() => " + V3 + ".renderer.getPixelRatio()")
-    check('… sharp again a moment after it stops', pr == 2, pr)
+    check('… sharp again a moment after it stops', pr == 1.5, pr)
     cv = pg.evaluate("() => { const c = " + V3 + ".renderer.domElement; return [c.width, c.clientWidth]; }")
-    check('… the canvas back at full size (2 pixels per screen pixel)', cv[0] == cv[1] * 2, cv)
+    check('… the canvas back at full size (1.5 pixels per screen pixel)', cv[0] == int(cv[1] * 1.5), cv)
     # phone: search and help
     pg.tap('#btn-search'); pg.wait_for_timeout(700)
     pg.fill('#search-q', 'woon'); pg.wait_for_timeout(300)

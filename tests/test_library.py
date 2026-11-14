@@ -1,7 +1,7 @@
 """The asset library (task 0009): pictures and models outside the app file.
 
 PC light – the app folder (as the web version): the list lib/library.json (always asked again), the base pictures from
-lib/ and kept on the device, a second visit from the device and offline; safe pictures win over larger sizes and KTX2;
+lib/ and kept on the device, a second visit from the device and offline; safe pictures win over larger sizes;
 KTX2 pictures on the graphics card (less memory); a model of a library that is not on the device (a plain box: 3D, 2D
 plan, PDF plan, photo render – no error, the saved piece unchanged); Library → Remove leaves the houses alone.
 Phone dark – the single file: today's pictures built in (skies at 512); Settings → Library → Load library… with the
@@ -145,14 +145,15 @@ with sync_playwright() as p:
     check('offline (network cut): the app, its pictures, skies and the furniture models from the device', st3['sets'] == 25 and st3['pics'] >= 78 and st3['sky'].get('day') == 1024 and st3['models'] and not pg.errors, (st3, pg.errors[:2]))
     ctx.set_offline(False)
 
-    # safe pictures (the Pixel's PowerVR) win over a larger size and KTX2 until 0010 has tried them on that phone
+    # safe pictures (the Pixel's PowerVR) win over a larger size; KTX2 since task 0010 as asked (with their first picture
+    # only – as the safe plain ones); the default here (a computer drawing in software: Normal) 512 without KTX2
     sf = pg.evaluate("""() => { const H = window.__hp, S = H.Settings;
       S.values.texSize = 1024; S.values.texGpu = true; S.values.safeTex = true; const safe = [H.libWantPx(), H.libWantGpu()];
       S.values.safeTex = false; const not = [H.libWantPx(), H.libWantGpu()];
       S.values.safeTex = undefined; S.values.texSize = undefined; S.values.texGpu = undefined; const dflt = [H.libWantPx(), H.libWantGpu()];
       return { safe, not, dflt, pick: [H.libPick([{ px: 256 }, { px: 1024 }], 512).px, H.libPick([{ px: 1024 }], 512).px, H.libPick([{ px: 512 }, { px: 1024 }, { px: 2048 }], 1024).px] }; }""")
-    check('safe pictures: at most 512 px and no KTX2, whatever is asked; otherwise as asked; default 512 without KTX2',
-          sf['safe'] == [512, False] and sf['not'] == [1024, True] and sf['dflt'] == [512, False], sf)
+    check('safe pictures: at most 512 px whatever is asked (KTX2 as asked – 0010); otherwise as asked; default 512 without KTX2',
+          sf['safe'] == [512, True] and sf['not'] == [1024, True] and sf['dflt'] == [512, False], sf)
     check('… the size picked: the largest up to the size asked, else the smallest there is', sf['pick'] == [256, 1024, 1024], sf['pick'])
 
     # KTX2 on the graphics card: the made-up house in 3D, before and after

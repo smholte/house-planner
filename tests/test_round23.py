@@ -70,9 +70,18 @@ with sync_playwright() as p:
       return out; }""")
     check('the same look: a colour laid over the shared picture in the shader = the old coloured copy (mean within 3 of 255, the grain alike)', all(max(abs(x - y) for x, y in zip(c[1], c[2])) <= 3 and abs(c[3] - c[4]) <= max(2, 0.25 * c[3]) for c in cmp), cmp)
     # the path tracer: the soft-lit colours doubled only while it reads the scene, then back
-    pg.evaluate("async () => { const v = window.__hp.app.panes[0].view; await window.__hp.renderPathTraced(v, { W: 64, H: 40, passes: 1 }); v.resize(); v.needs = true; }")
+    # (task 0010 – steady: the path tracer's random numbers from a seeded sequence, as test_round26 (0008a); and the
+    #  colours must be put back whatever the picture – a one-sample picture of 64 × 40 came out black once on GitHub and
+    #  the app refused it ("came out black"), which stopped this file; that refusal is a picture's fate, not this check's)
+    pt = pg.evaluate("""async () => { const v = window.__hp.app.panes[0].view, rnd0 = Math.random; let a = 1;
+      Math.random = () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+      let out = 'ok';
+      try { await window.__hp.renderPathTraced(v, { W: 64, H: 40, passes: 1, meter: false }); } catch (e) { out = String(e.message || e); }
+      finally { Math.random = rnd0; v.resize(); v.needs = true; }
+      return out; }""")
+    print('   one-sample path traced picture:', pt)
     sm2 = pg.evaluate(SOFT)
-    check('the path tracer reads them with their colour doubled (its picture is multiplied) and puts it back', sm2 == sm and not any(x[4] for x in sm2), (sm[:3], sm2[:3]))
+    check('the path tracer reads them with their colour doubled (its picture is multiplied) and puts it back', sm2 == sm and not any(x[4] for x in sm2), (pt, sm[:3], sm2[:3]))
     pg.screenshot(path=SHOTS + 'r23-house.png', clip={'x': 56, 'y': 104, 'width': 884, 'height': 696})
     check('PC: no page errors, no shader errors', not pg.errors and not [l for l in logs if 'Shader' in l or 'WebGLProgram' in l], (pg.errors[:3], logs[:3]))
     b.close()

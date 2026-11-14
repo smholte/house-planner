@@ -9,7 +9,7 @@ const NEAR_SUN = { far: 70, mods: null, p: null, failed: false };
 Object.assign(View3D.prototype, {
   nearSunWanted() {
     if (!this.walker || this.fast || this.opts.mini || this.rendering || this._nearSunOff || NEAR_SUN.failed) return false;
-    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return false;
+    if ((window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || this.level === 'phone') return false;
     return !!(this.sun && this.sun.castShadow);
   },
   /** every frame (loop): switch to the SunLight while walking, back after; keep it in step with the usual sun */

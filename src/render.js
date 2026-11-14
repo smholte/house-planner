@@ -334,6 +334,11 @@ Object.assign(app, {
     if (!restored) {
       // the Pixel 10's PowerVR driver crashed: from now on safe pictures on this device (view3d.js)
       if (!SAFE_TEX && isPowerVR(GPU_INFO) && this.settings.safeTex == null) { SAFE_TEX = true; this.settings.safeTex = true; Settings.save(); }
+      // compressed pictures were in use (the Phone level, task 0010) and never chosen by hand: as before from now on
+      if (libWantGpu() && this.settings.texPlain == null && [...TEXLIB.gpu.values()].some(x => x && x.isTexture)) {
+        this.settings.texPlain = true; Settings.save(); texlibSettingsChanged();
+        setTimeout(() => this.toast(t('3D pictures as before on this device (Settings → 3D on this device).')), 3000);
+      }
       this._gpuLost.push(now);
       if (this._gpuLost.length > 3) { this.toast(t('The graphics card keeps stopping – the 3D view stays off for now. Reload the app to try again.')); return; }
       this.toast(t('The graphics card stopped for a moment – the 3D view is started again.'));

@@ -191,7 +191,8 @@ function texlibRefresh(keys) {
  *  (KTX2 copies on or off, the size from the library); returns how many pictures came anew */
 function texlibSettingsChanged() {
   const keys = [...TEXLIB.base.keys()].filter(k => !k.startsWith('d|'));
-  for (const [k, t] of [...TEXLIB.gpu]) if (!(t && t.isTexture)) TEXLIB.gpu.delete(k);
+  // (compressed copies no longer asked for – Pictures as before, another level – are let go: their bytes are held here)
+  for (const [k, t] of [...TEXLIB.gpu]) if (!(t && t.isTexture) || !libWantGpu()) TEXLIB.gpu.delete(k);
   texlibRefresh(keys.length ? keys : ['-|-']);
   return libUpgrade();
 }
@@ -230,8 +231,13 @@ function libGpuTex(id, kind) {
   const it = libItem(id), v = it && it.gpu && libPick(it.gpu[kind], libWantPx());
   if (!v) { TEXLIB.gpu.set(key, 'none'); return null; }
   TEXLIB.gpu.set(key, 'loading');
+  // (counted as loading: TEXLIB.ready waits for the compressed copies too – task 0010)
+  TEXLIB.loading++;
   libKtx2(v.f).then(t => {
+    TEXLIB.loading--;
     if (!t) { TEXLIB.gpu.set(key, 'failed'); return; }
+    // safe pictures (the Pixel's PowerVR driver): only the first picture, no smaller copies – as the plain ones
+    if (SAFE_TEX && t.mipmaps && t.mipmaps.length > 1) t.mipmaps = t.mipmaps.slice(0, 1);
     TEXLIB.gpu.set(key, t);
     texlibRefresh([key]);
   });
@@ -276,8 +282,9 @@ function libSet(id) {
 }
 function libImg(id, kind = 'color') { const im = TEXLIB.img.get(id + '|' + kind); return im && im.complete && im.naturalWidth ? im : null; }
 const libFast = () => quality3d(app.settings || {}) === 'fast';
-/** a phone (or Fast): the pictures that are made in the app are made smaller – less memory (1 Nov) */
-const libLowMem = () => libFast() || window.matchMedia('(pointer: coarse)').matches;
+/** a phone (or Fast, or the Phone level – task 0010): the pictures that are made in the app are made smaller – less
+ *  memory (1 Nov) */
+const libLowMem = () => libFast() || window.matchMedia('(pointer: coarse)').matches || level3d(app.settings || {}) === 'phone';
 /** [w, h] in metres of one picture: the given size (a number or [w, h]), else the set's own */
 const libSize = (s, size) => { const v = size == null ? s.size : size; return Array.isArray(v) ? v : [v, v]; };
 

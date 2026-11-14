@@ -26,8 +26,11 @@ const VEG_Q = {
    every tree in its light version, in squares of VEG_CELL m – the shadow map is only drawn again when something changes,
    so it must hold the trees out of view too. Nothing is kept hidden for tapping: a ray finds the tree drawn (far away the
    light one). Views that make drawings (not merged) keep one mesh per plant, as before. */
-const VEG_LOD = [null, { card: 2, dens: 1 / 4 }, { card: 3.3, dens: 1 / 10, stems: true }];
+// (index 3: the Phone level's far version instead of 2 – half its cards, a little bigger; task 0010)
+const VEG_LOD = [null, { card: 2, dens: 1 / 4 }, { card: 3.3, dens: 1 / 10, stems: true }, { card: 4.6, dens: 1 / 20, stems: true }];
 const VEG_NEAR = [32, 90];
+/** from where the lighter versions are drawn in this view: its level's (task 0010 – Phone 20 / 60 m), else VEG_NEAR */
+const vegNear = v => (v && v.K && v.K.vegNear) || VEG_NEAR;
 const VEG_CELL = 48;
 const VEG_SP = {
   broadleaf: { shape: 'round', leaf: 'broad', bark: 'grey', crownBot: 0.33, stems: 1, nb: 7, card: 0.42, thick: 1 },
@@ -630,7 +633,7 @@ Object.assign(View3D.prototype, {
     const sp = VEG_SP[spName] || VEG_SP.broadleaf;
     const tpl = vegTemplate(spName, d, hh, seed % 3, q, opts.far);
     // (shrubs are small and low: no lighter versions)
-    const lo = this._vegInst && sp.shape !== 'bush' ? [1, 2].map(k => vegTemplate(spName, d, hh, seed % 3, q, opts.far, k)) : [];
+    const lo = this._vegInst && sp.shape !== 'bush' ? [1, (this.K && this.K.vegFar) || 2].map(k => vegTemplate(spName, d, hh, seed % 3, q, opts.far, k)) : [];
     const sx = d / tpl.D, sy = hh / tpl.H, tk = [tpl, ...lo].map(x => x.key);
     put([tpl, ...lo].map(x => x.bark), vegBarkMat(sp.bark), pl.x, lv, pl.y, rot, sx, sy, tk);
     put([tpl, ...lo].map(x => x.leaves), vegLeaves(sp.leaf, q), pl.x, lv, pl.y, rot, sx, sy, tk);
@@ -744,7 +747,7 @@ Object.assign(View3D.prototype, {
     this._vegKey = key;
     _vegFr.setFromProjectionMatrix(_vegM);
     const G = L.G, gp = G.position, c = cam.position;
-    const full = typeof window !== 'undefined' && window.__hpVegFull;
+    const full = typeof window !== 'undefined' && window.__hpVegFull, near = vegNear(this);
     let any = false;
     for (const g of L) {
       let changed = !!force;
@@ -754,7 +757,7 @@ Object.assign(View3D.prototype, {
         if (_vegFr.intersectsSphere(_vegS)) {
           const d = _vegS.center.distanceTo(c);
           // (a few metres' margin both ways: a tree on the edge stays as it is)
-          const was = it.lv, edge = k => VEG_NEAR[k] + (was > k ? -3 : was >= 0 ? 3 : 0);
+          const was = it.lv, edge = k => near[k] + (was > k ? -3 : was >= 0 ? 3 : 0);
           lv = full ? 0 : d < edge(0) ? 0 : d < edge(1) ? 1 : 2;
         }
         if (lv !== it.lv) { it.lv = lv; changed = true; }
@@ -783,12 +786,12 @@ Object.assign(View3D.prototype, {
   vegFlatten() {
     const L = this.vegLod, added = [], hidden = [];
     if (!L) return () => {};
-    const G = L.G, c = this.camera.position.clone().sub(G.position);
+    const G = L.G, c = this.camera.position.clone().sub(G.position), near = vegNear(this);
     G.traverse(o => { if (o.userData.vegInst && o.visible) { o.visible = false; hidden.push(o); } });
     for (const g of L) {
       const by = new Map();
       for (const it of g.list) {
-        const d = it.c.distanceTo(c), im = g.ims[d < VEG_NEAR[0] ? 0 : d < VEG_NEAR[1] ? 1 : 2];
+        const d = it.c.distanceTo(c), im = g.ims[d < near[0] ? 0 : d < near[1] ? 1 : 2];
         if (!by.has(im)) by.set(im, []);
         by.get(im).push({ g: im.geometry, M: it.m, start: 0, count: Infinity });
       }
