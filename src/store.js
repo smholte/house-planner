@@ -379,5 +379,7 @@ const Settings = {
     try { const m = await DB.get('meta', 'settings'); if (m && m.values) Object.assign(this.values, m.values); } catch (e) { /* defaults */ }
   },
   set(k, v) { this.values[k] = v; this.save(); },
+  /** write the settings now (before a reload) */
+  flushNow() { this.save.cancel && this.save.cancel(); return DB.put('meta', { key: 'settings', values: Settings.values }).catch(() => {}); },
   save: debounce(function () { DB.put('meta', { key: 'settings', values: Settings.values }).catch(() => {}); if (Settings.onSave) Settings.onSave(); }, 300),
 };

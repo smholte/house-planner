@@ -175,6 +175,10 @@
   "Een dragende wand: weghalen of er een opening in maken vraagt een constructeur en goedkeuring van de bouwer.",
   "En bærende vegg: å fjerne den eller lage en åpning i den krever en byggingeniør og byggherrens godkjenning."
  ],
+ "A new version is ready.": [
+  "Er is een nieuwe versie klaar.",
+  "En ny versjon er klar."
+ ],
  "A newer copy from {n}: the house is updated, your notes are kept.": [
   "Een nieuwere kopie van {n}: het huis is bijgewerkt, je notities blijven bewaard.",
   "En nyere kopi fra {n}: huset er oppdatert, notatene dine er beholdt."
@@ -286,6 +290,10 @@
  "Add a photo": [
   "Foto toevoegen",
   "Legg til bilde"
+ ],
+ "Add a picture of the view": [
+  "Een plaatje van het beeld toevoegen",
+  "Legg ved et bilde av visningen"
  ],
  "Add a picture…": [
   "Afbeelding toevoegen…",
@@ -466,6 +474,10 @@
  "Any version or layout": [
   "Elke versie of indeling",
   "Alle versjoner og møbleringer"
+ ],
+ "App": [
+  "App",
+  "App"
  ],
  "App version {n} · {d}": [
   "App-versie {n} · {d}",
@@ -1182,6 +1194,10 @@
  "Changed": [
   "Gewijzigd",
   "Endret"
+ ],
+ "Changed {when}": [
+  "Gewijzigd {when}",
+  "Endret {when}"
  ],
  "Changed: {n}": [
   "Gewijzigd: {n}",
@@ -2423,6 +2439,10 @@
   "Nu exporteren",
   "Eksporter nå"
  ],
+ "Export this house…": [
+  "Dit huis exporteren…",
+  "Eksporter dette huset…"
+ ],
  "Export “": [
   "Exporteer “",
   "Eksporter “"
@@ -2430,6 +2450,14 @@
  "Export “{0}”": [
   "“{0}” exporteren",
   "Eksporter «{0}»"
+ ],
+ "Export “{n}”": [
+  "“{n}” exporteren",
+  "Eksporter «{n}»"
+ ],
+ "Exported {when}": [
+  "Geëxporteerd {when}",
+  "Eksportert {when}"
  ],
  "Exposure": [
   "Belichting",
@@ -3303,6 +3331,10 @@
   "Huis",
   "Hus"
  ],
+ "House Planner feedback": [
+  "House Planner-feedback",
+  "House Planner-tilbakemelding"
+ ],
  "House Planner works offline. Nothing is uploaded: your data only leaves this device when you export a file.": [
   "House Planner werkt offline. Er wordt niets geüpload: je gegevens verlaten dit apparaat alleen als je een bestand exporteert.",
   "House Planner fungerer uten nett. Ingenting lastes opp: dataene dine forlater bare denne enheten når du eksporterer en fil."
@@ -3815,6 +3847,10 @@
   "Link",
   "Lenke"
  ],
+ "Lists": [
+  "Lijsten",
+  "Lister"
+ ],
  "Living": [
   "Woonkamer",
   "Stue"
@@ -4255,6 +4291,10 @@
   "Nooit",
   "Aldri"
  ],
+ "Never exported": [
+  "Nooit geëxporteerd",
+  "Aldri eksportert"
+ ],
  "New": [
   "Nieuw",
   "Ny"
@@ -4603,6 +4643,14 @@
   "Geen specifieke ruimte",
   "Ikke et bestemt rom"
  ],
+ "Not protected – export a copy now and then": [
+  "Niet beschermd – exporteer af en toe een kopie",
+  "Ikke beskyttet – eksporter en kopi av og til"
+ ],
+ "Not protected: the browser may clear site data when the device runs out of space, so export a copy now and then.": [
+  "Niet beschermd: de browser kan sitegegevens wissen als het apparaat zonder ruimte komt, dus exporteer af en toe een kopie.",
+  "Ikke beskyttet: nettleseren kan slette nettstedsdata når enheten går tom for plass, så eksporter en kopi av og til."
+ ],
  "Not saved": [
   "Niet opgeslagen",
   "Ikke lagret"
@@ -4926,6 +4974,10 @@
  "Open the gate": [
   "Poort openen",
   "Åpne porten"
+ ],
+ "Open the last house when the app starts": [
+  "Het laatste huis openen als de app start",
+  "Åpne det siste huset når appen starter"
  ],
  "Open this copy to send your notes back.": [
   "Open deze kopie om je notities terug te sturen.",
@@ -5411,6 +5463,10 @@
   "Fotorealistische render van deze weergave",
   "Fotorealistisk gjengivelse av denne visningen"
  ],
+ "Photo render…": [
+  "Fotorender…",
+  "Fotogjengivelse…"
+ ],
  "Photo wallpaper": [
   "Fotobehang",
   "Fototapet"
@@ -5718,6 +5774,14 @@
  "Projects": [
   "Projecten",
   "Prosjekter"
+ ],
+ "Protected on this device": [
+  "Beschermd op dit apparaat",
+  "Beskyttet på denne enheten"
+ ],
+ "Protected on this device: your houses are kept when the device runs low on space.": [
+  "Beschermd op dit apparaat: je huizen blijven bewaard als het apparaat weinig ruimte heeft.",
+  "Beskyttet på denne enheten: husene dine beholdes når enheten går tom for plass."
  ],
  "Public library": [
   "Openbare bibliotheek",
@@ -6179,6 +6243,10 @@
   "Startweergave terugzetten naar standaard",
   "Tilbakestill startvisningen"
  ],
+ "Restart": [
+  "Opnieuw starten",
+  "Start på nytt"
+ ],
  "Restore": [
   "Herstellen",
   "Gjenopprett"
@@ -6375,6 +6443,10 @@
   "Sla een weergave op om er met één tik naar terug te gaan (ook tijdens het lopen).",
   "Lagre en visning for å komme tilbake til den med ett trykk (også mens du går)."
  ],
+ "Save and share": [
+  "Bewaren en delen",
+  "Lagre og dele"
+ ],
  "Save as a furniture set": [
   "Opslaan als meubelset",
   "Lagre som møbelsett"
@@ -6466,6 +6538,10 @@
  "Saved: {n}": [
   "Opgeslagen: {n}",
   "Lagret: {n}"
+ ],
+ "Saved: {n}. Send the files to the person who builds the app.": [
+  "Bewaard: {n}. Stuur de bestanden naar de bouwer van de app.",
+  "Lagret: {n}. Send filene til den som bygger appen."
  ],
  "Saving…": [
   "Opslaan…",
@@ -6594,6 +6670,18 @@
  "Selection": [
   "Selectie",
   "Utvalg"
+ ],
+ "Send": [
+  "Versturen",
+  "Send"
+ ],
+ "Send feedback": [
+  "Feedback sturen",
+  "Send tilbakemelding"
+ ],
+ "Send feedback…": [
+  "Feedback sturen…",
+  "Send tilbakemelding…"
  ],
  "Send notes back": [
   "Notities terugsturen",
@@ -7799,6 +7887,10 @@
   "Het licht wordt gevolgd zoals het echt gaat – het kaatst op muren, vloeren en meubels, door het glas, van de lucht en de zon. Het beeld wordt bij elke sample schoner; stop als je het mooi vindt. Op een computer met een goede grafische chip.",
   "Lyset følges slik det virkelig går – det spretter på vegger, gulv og møbler, gjennom glasset, fra himmelen og solen. Bildet blir renere for hver prøve; stopp når du liker det. På en datamaskin med god grafikkbrikke."
  ],
+ "The list of houses is one tap away: Back, top left.": [
+  "De lijst met huizen is één tik weg: Terug, linksboven.",
+  "Listen over hus er ett trykk unna: Tilbake, øverst til venstre."
+ ],
  "The look": [
   "Het uiterlijk",
   "Utseendet"
@@ -8211,6 +8303,10 @@
   "Alleen deze sessie; het huis wordt na elke wijziging opgeslagen zoals het is. Bewaarpunten (bovenbalk) bewaren een toestand voor later.",
   "Bare denne økten; huset lagres slik det er etter hver endring. Lagringspunkter (topplinjen) tar vare på en tilstand til senere."
  ],
+ "This version": [
+  "Deze versie",
+  "Denne versjonen"
+ ],
  "This version is locked.": [
   "Deze versie is vergrendeld.",
   "Denne versjonen er låst."
@@ -8591,6 +8687,10 @@
   "Twee deuren",
   "To dører"
  ],
+ "Two files are made: your words with the app version, the device and what was open, and the picture. Not your house. Send them to the person who builds the app.": [
+  "Er worden twee bestanden gemaakt: je tekst met de appversie, het apparaat en wat open stond, en het plaatje. Je huis zit er niet in. Stuur ze naar de bouwer van de app.",
+  "Det lages to filer: teksten din med appversjon, enhet og hva som var åpent, og bildet. Ikke huset ditt. Send dem til den som bygger appen."
+ ],
  "Two versions next to each other.": [
   "Twee versies naast elkaar.",
   "To versjoner ved siden av hverandre."
@@ -8742,6 +8842,10 @@
  "Using {0}.": [
   "{0} in gebruik.",
   "Bruker {0}."
+ ],
+ "Using {s}.": [
+  "{s} in gebruik.",
+  "{s} i bruk."
  ],
  "Valve": [
   "Ventiel",
@@ -9247,6 +9351,14 @@
   "Wat te tonen (tuin, meubels, notities, elektra, plafond), kleuren, licht, kwaliteit, fotorender, AR.",
   "Hva som vises (hage, møbler, notater, elektrisk, tak), farger, lys, kvalitet, fotogjengivelse, AR."
  ],
+ "What to show (garden, street, houses around, water and park, furniture, notes, electrics, ceiling), colours, light, quality, photo render, AR.": [
+  "Wat te tonen (tuin, straat, huizen eromheen, water en park, meubels, notities, elektra, plafond), kleuren, licht, kwaliteit, fotorender, AR.",
+  "Hva som vises (hage, gate, hus rundt, vann og park, møbler, notater, elektro, himling), farger, lys, kvalitet, fotogjengivelse, AR."
+ ],
+ "What went wrong, or what would you like?": [
+  "Wat ging er mis, of wat zou je willen?",
+  "Hva gikk galt, eller hva ønsker du?"
+ ],
  "What your plan changes: new walls red, removed walls dashed; the list in the details.": [
   "Wat je plan verandert: nieuwe wanden rood, verwijderde wanden gestippeld; de lijst in de details.",
   "Hva planen din endrer: nye vegger røde, fjernede vegger stiplet; listen i detaljene."
@@ -9502,6 +9614,10 @@
  "Your copy is newer than the file.": [
   "Jouw kopie is nieuwer dan het bestand.",
   "Din kopi er nyere enn filen."
+ ],
+ "Your feedback": [
+  "Je feedback",
+  "Din tilbakemelding"
  ],
  "Your garden: the plot and what is on it": [
   "Je tuin: het perceel en wat erop staat",
@@ -10051,6 +10167,10 @@
   "ja",
   "ja"
  ],
+ "yesterday": [
+  "gisteren",
+  "i går"
+ ],
  "yours": [
   "van jou",
   "fra deg"
@@ -10258,6 +10378,10 @@
  "{n} bar stools placed.": [
   "{n} barkrukken geplaatst.",
   "{n} barkrakker plassert."
+ ],
+ "{n} days ago": [
+  "{n} dagen geleden",
+  "{n} dager siden"
  ],
  "{n} documents added.": [
   "{n} documenten toegevoegd.",

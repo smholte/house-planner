@@ -263,11 +263,17 @@ const fmtMM = m => String(Math.round(m * 1000));
 const fmtDec = s => (I18N.lang === 'en' ? s : s.replace('.', ','));
 const fmtM = m => fmtDec((Math.round(m * 100) / 100).toFixed(2)) + ' m';
 const fmtArea = a => fmtDec((Math.round(Math.abs(a) * 10) / 10).toFixed(1)) + ' m²';
+/** the date formatters are made once per language (a new one for every line cost 12–72 ms at the start, 0018) */
+const FMT_CACHE = { loc: null, date: null, time: null };
 function fmtDate(ts, withTime = true) {
-  const d = new Date(ts);
-  const date = d.toLocaleDateString(i18nLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
-  if (!withTime) return date;
-  return date + ' ' + d.toLocaleTimeString(i18nLocale(), { hour: '2-digit', minute: '2-digit' });
+  const loc = i18nLocale();
+  if (FMT_CACHE.date === null || FMT_CACHE.loc !== loc) {
+    FMT_CACHE.loc = loc;
+    FMT_CACHE.date = new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'short', year: 'numeric' });
+    FMT_CACHE.time = new Intl.DateTimeFormat(loc, { hour: '2-digit', minute: '2-digit' });
+  }
+  const d = new Date(ts), date = FMT_CACHE.date.format(d);
+  return withTime ? date + ' ' + FMT_CACHE.time.format(d) : date;
 }
 function fmtTime(ts) { return new Date(ts).toLocaleTimeString(i18nLocale(), { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 function fmtAgo(ts) {
@@ -278,6 +284,14 @@ function fmtAgo(ts) {
   if (m < 60) return t('{n} min ago', { n: m });
   const hh = Math.round(m / 60);
   if (hh < 24) return t('{n} h ago', { n: hh });
+  return fmtDate(ts, false);
+}
+/** like fmtAgo, but in days up to two months ("12 days ago"), for "Exported …" */
+function fmtAgoDays(ts) {
+  const d = Math.floor((Date.now() - ts) / 864e5);
+  if (d < 1) return fmtAgo(ts);
+  if (d === 1) return t('yesterday');
+  if (d < 60) return t('{n} days ago', { n: d });
   return fmtDate(ts, false);
 }
 function fmtBytes(b) {

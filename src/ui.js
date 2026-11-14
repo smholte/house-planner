@@ -196,6 +196,7 @@ const UI = {
       if (!it) continue;
       if (it === '-') { m.appendChild(h('div', { class: 'msep' })); continue; }
       if (it.node) { m.appendChild(it.node); continue; }
+      if (it.heading) { m.appendChild(h('div', { class: 'mhead', role: 'presentation' }, it.heading)); continue; }
       m.appendChild(h('button', { class: 'mi' + (it.danger ? ' danger' : ''), role: 'menuitem', disabled: it.disabled, ...(it.id ? { id: it.id } : {}), onclick: () => { if (!it.keepOpen) close(); it.fn && it.fn(); } }, it.icon ? icon(it.icon) : null, h('span', null, it.label)));
     }
     const outside = e => { if (!m.contains(e.target) && !anchor.contains(e.target)) close(); };
