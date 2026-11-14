@@ -29,6 +29,7 @@ with sync_playwright() as p:
     logs = []
     pg.on('console', lambda m: logs.append(m.text[:200]) if m.type == 'error' else None)
     pg.wait_for_function(READY, timeout=60000)
+    load_pictures(pg, 'sky:day')         # (task 0021: loaded when a 3D view asks – here before one does)
     sk = pg.evaluate("() => { const s = window.__hp.TEXLIB.sky.day.userData; return [s.sunE, s.avg]; }")
     check('the sky photo\'s own sun measured: its light on a surface facing it (a few times the sky\'s)', sk[0] and 3 < sk[0] < 7, sk)
     open_example(pg)

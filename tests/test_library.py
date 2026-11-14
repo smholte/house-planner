@@ -121,6 +121,10 @@ with sync_playwright() as p:
     lib_reqs = []
     pg.on('request', lambda r: lib_reqs.append((r.url, r)) if '/lib/' in r.url else None)
     pg.wait_for_function(READY, timeout=90000)
+    # (task 0021: nothing is decoded at start; the base is kept on the device in the background, each set is loaded when
+    # a 3D view asks for it – here these at once)
+    pg.evaluate("() => window.__hp.TEXLIB.kept")
+    load_pictures(pg, 'WoodFloor051', 'Tiles050', 'sky:day', 'sky:sunset')
     st = pg.evaluate("""() => { const T = window.__hp.TEXLIB, L = window.__hp.LIB;
       return { sets: Object.keys(T.data.sets).length, src: T.source, wood: T.px.get('WoodFloor051|color'), tiles: T.px.get('Tiles050|color'), sky: T.skyPx, fetched: L.fetched, items: L.items.size }; }""")
     check('hosted: the pictures come from lib/ – 25 sets, the base sizes (512; the garden tiles\' colour 1024), skies at 1024',
@@ -130,14 +134,15 @@ with sync_playwright() as p:
     check('… what was fetched is kept on the device (database house-planner-lib)', kept >= st['fetched'] >= 78, (kept, st['fetched']))
     pg.evaluate("() => navigator.serviceWorker && navigator.serviceWorker.ready"); pg.wait_for_timeout(1000)
     pg.reload(); pg.wait_for_function(READY, timeout=90000)
+    pg.evaluate("() => window.__hp.TEXLIB.kept"); load_pictures(pg)
     st2 = pg.evaluate("() => ({ fetched: window.__hp.LIB.fetched, stored: window.__hp.LIB.stored, sets: Object.keys(window.__hp.TEXLIB.data.sets).length })")
     check('second visit: the pictures from the device, none downloaded again', st2['fetched'] == 0 and st2['stored'] >= 78 and st2['sets'] == 25, st2)
     man_req = [r.all_headers() for u, r in lib_reqs if u.endswith('lib/library.json')]
     check('… the list lib/library.json is asked again on every visit (never kept for good: no-cache)', len(man_req) >= 1 and any(x in (man_req[-1].get('cache-control', '') + man_req[-1].get('pragma', '')) for x in ('no-cache', 'max-age=0')), man_req[-1:])
     ctx.set_offline(True)
     pg.reload(); pg.wait_for_function(READY, timeout=90000)
-    st3 = pg.evaluate("async () => { const H = window.__hp; await H.loadModelLib(); return { sets: Object.keys(H.TEXLIB.data.sets).length, sky: H.TEXLIB.skyPx, models: !!H.MODELS.blob, fetched: H.LIB.fetched }; }")
-    check('offline (network cut): the app, its pictures, skies and the furniture models from the device', st3['sets'] == 25 and st3['sky'].get('day') == 1024 and st3['models'] and not pg.errors, (st3, pg.errors[:2]))
+    st3 = pg.evaluate("async () => { const H = window.__hp; await H.loadModelLib(); await H.TEXLIB.load(Object.keys(H.TEXLIB.data.sets).concat(['sky:day'])); return { sets: Object.keys(H.TEXLIB.data.sets).length, sky: H.TEXLIB.skyPx, models: !!H.MODELS.blob, fetched: H.LIB.fetched, pics: H.TEXLIB.stats().pictures }; }")
+    check('offline (network cut): the app, its pictures, skies and the furniture models from the device', st3['sets'] == 25 and st3['pics'] >= 78 and st3['sky'].get('day') == 1024 and st3['models'] and not pg.errors, (st3, pg.errors[:2]))
     ctx.set_offline(False)
 
     # safe pictures (the Pixel's PowerVR) win over a larger size and KTX2 until 0010 has tried them on that phone
@@ -207,6 +212,7 @@ with sync_playwright() as p:
     errs = []
     pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.goto('file://' + SINGLE); pg.wait_for_function(READY, timeout=90000)
+    load_pictures(pg)     # (task 0021: loaded when a 3D view asks – here all of them, from the built-in pictures)
     s1 = pg.evaluate("() => { const T = window.__hp.TEXLIB; return { sets: Object.keys(T.data.sets).length, src: T.source, sky: T.skyPx, wood: T.px.get('WoodFloor051|color'), items: window.__hp.LIB.items.size }; }")
     check('single file: today\'s pictures built in (25 sets at their base size), the skies at 512, no library yet',
           s1['sets'] == 25 and s1['src'] == 'built-in' and s1['sky'] == {'day': 512, 'sunset': 512} and s1['wood'] == 512 and s1['items'] == 0, s1)

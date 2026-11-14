@@ -43,6 +43,7 @@ with sync_playwright() as p:
     # ───────── PC (light) ─────────
     b, pg = open_app(p)
     pg.wait_for_function(READY, timeout=60000)
+    load_pictures(pg, 'HouseBrick')      # (task 0021: loaded when a 3D view asks – here before one does)
     sets = pg.evaluate("() => { const S = window.__hp.TEXLIB.data.sets; return { ids: Object.keys(S), hb: S.HouseBrick && Object.keys(S.HouseBrick).sort(), size: S.HouseBrick && S.HouseBrick.size }; }")
     check('textures: one brick set, the house brick (kit, detail, relief, gloss), 1.32 × 1.25 m', sets['hb'] and all(k in sets['hb'] for k in ['kit', 'detail', 'normal', 'rough']) and sets['size'] == [1.32, 1.25], sets['hb'])
     check('… the three loose brick pictures are gone (wrong colours, wrong sizes)', not any(i.startswith('Bricks') for i in sets['ids']), sets['ids'])

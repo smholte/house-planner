@@ -88,7 +88,9 @@ STILL = """() => new Promise(res => { const v = window.__hp.app.panes[0].view; l
   // (and the automatic exposure settled – measured and glided there – so two pictures of one view compare alike)
   const ae = () => { if (!v || !v.renderer || !v.aeOn || !v.aeOn()) return true; const T = (v.evening ? 1.1 : 1) * (v._aeT || 1);
     return !v._aeLight && !v._aeDue && !v._aeWant && !v._aeRead && Math.abs(v.renderer.toneMappingExposure - T) < 2e-3; };
-  let t1 = 0; const settled = () => { if (!t1) t1 = performance.now(); if (ae() || performance.now() - t1 > 20000) res(true); else setTimeout(settled, 100); };
+  // (and the material pictures the view asked for are in and it is built with them – task 0021: they load when 3D asks)
+  const tx = () => { const T = window.__hp.TEXLIB; return !T || !T.known || T.ready; };
+  let t1 = 0; const settled = () => { if (!t1) t1 = performance.now(); if ((ae() && tx()) || performance.now() - t1 > 30000) res(true); else setTimeout(settled, 100); };
   f(); })"""
 # the test browser draws 3D in software and lets pictures pile up: wait until the GPU has drawn them all
 GPU_SYNC = """() => { for (const pn of window.__hp.app.panes) { const v = pn.view; if (!v || !v.renderer) continue;
@@ -105,6 +107,11 @@ _Page.screenshot = _screenshot
 def still(pg):
     pg.evaluate(STILL)
     pg.evaluate(GPU_SYNC)
+# the material pictures load when a 3D view (a render, a walk …) asks for them (task 0021); a test that looks at pictures
+# without a 3D view loads the sets it needs as a view would ('sky:day' for a sky; none named: all of them) and waits
+def load_pictures(pg, *ids):
+    pg.evaluate("(ids) => { const T = window.__hp.TEXLIB; return T.load(ids.length ? ids : [...Object.keys(T.data.sets), 'sky:day', 'sky:sunset']); }", list(ids))
+    pg.wait_for_function("() => window.__hp.TEXLIB.ready", timeout=90000)
 def to_screen(pg, x, y): return pg.evaluate(S2, [x, y])
 def rooms(pg):
     return pg.evaluate("() => Object.fromEntries(window.__hp.app.shownVersion().plan.rooms.filter(r => r.storey === window.__hp.app.view.storeyId).map(r => [r.name, (()=>{const xs=r.poly.map(p=>p[0]), ys=r.poly.map(p=>p[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]})()]))")

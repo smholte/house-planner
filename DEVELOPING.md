@@ -357,7 +357,10 @@ Lengths are metres. Plan x to the right, y towards the back of the house.
                      map), grid (tile cells), squares (parts without a joint, from the height map); the two skies
                      (Poly Haven, CC0) 1024 × 512 RGBE, gzip + base64. The source zips (≈ 200 MB) are not kept.
                      Since task 0009 its result goes into the asset library (build/library/, below), not textures.json.
-    src/texlib.js    TEXLIB (decoded at start, then TEX/MAT/KMAT/FMAT cleared and 3D built again; TEXLIB.gen is in
+    src/texlib.js    TEXLIB (since task 0021 nothing decoded at start: libSet / libSky load a set or sky the first time a
+                     3D view, render or walk asks – libLoadSet, libLoadSky –, then TEX/MAT/KMAT/FMAT cleared and 3D built
+                     again, one rebuild for several arrivals; TEXLIB.ready = nothing loading and every 3D view built since
+                     (texlibSettled, View3D._texGen), TEXLIB.idle() / load(ids) / stats(); TEXLIB.gen is in
                      reuse.js's whole-picture signature); libTex (a picture repeating at its size: one GPU texture per
                      picture, clones repeat), libDetail/libTintCanvas/libTintTex (the picture's light and dark, soft-light
                      over a colour), libMaterial(id, {tint, contrast, rough, normal, side, metal}), libPiece (a plank or

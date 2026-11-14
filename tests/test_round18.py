@@ -22,6 +22,7 @@ with sync_playwright() as p:
     pg.on('console', lambda m: logs.append(m.text[:200]) if m.type == 'error' else None)
     check('three.js r187', pg.evaluate("() => window.__hp.THREE.REVISION") == '187', pg.evaluate("() => window.__hp.THREE.REVISION"))
     pg.wait_for_function(READY, timeout=60000)
+    load_pictures(pg)     # (task 0021: each set is loaded when a 3D view asks for it – here all of them at once)
     info = pg.evaluate("() => { const T = window.__hp.TEXLIB; return [Object.keys(T.data.sets).length, Object.keys(T.sky), T.sky.day && T.sky.day.userData.avg, T.img.size]; }")
     check('the material pictures arrive (hosted: from lib/): 25 sets, decoded', info[0] == 25 and info[3] >= 25 * 3, info)
     check('… and the two skies (day, sunset), high dynamic range', sorted(info[1]) == ['day', 'sunset'] and info[2] > 0, info)

@@ -117,6 +117,7 @@ with sync_playwright() as p:
     check('the message in Dutch too', pg.evaluate("() => window.__hp.trText ? true : true") and 'De grafische kaart is gestopt' in open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'i18n', 'translations.json'), encoding='utf-8').read())
     blank = pg.evaluate("() => { const H = window.__hp, c = document.createElement('canvas'); c.width = 40; c.height = 30; const e = H.canvasBlank(c); const g = c.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, 40, 30); const k = H.canvasBlank(c); g.fillStyle = '#7a5'; g.fillRect(5, 5, 10, 10); return [e, k, H.canvasBlank(c)]; }")
     check('a black or empty picture is recognised (never kept as a result)', blank == [True, True, False], blank)
+    load_pictures(pg, 'sky:day')
     sky = pg.evaluate("() => { const H = window.__hp, s = H.libSkyNoSun('day'), o = H.TEXLIB.sky.day; const F = H.THREE.DataUtils.fromHalfFloat; let mx = 0, mo = 0; for (let i = 0; i < s.image.data.length; i += 4) { mx = Math.max(mx, F(s.image.data[i + 1])); mo = Math.max(mo, F(o.image.data[i + 1])); } return [mx, mo]; }")
     check('the path tracer\'s sky has no sun of its own (the app\'s sun is the sun)', sky[0] < 10 and sky[1] > 50, sky)
     check('PC: no page errors, no shader errors', not pg.errors and not [l for l in logs if 'Shader' in l or 'WebGLProgram' in l], (pg.errors[:3], logs[:3]))

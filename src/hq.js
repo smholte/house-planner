@@ -322,7 +322,7 @@ Object.assign(View3D.prototype, {
     if (this.high && this._skyKey !== sk) {
       const first = this._skyKey == null;
       this._skyKey = sk;
-      if (!first || TEXLIB.ready) { if (this.hqEnv) this.hqEnv.dispose(); this.skySetup(); }
+      if (!first || libSky(ev ? 'sunset' : 'day')) { if (this.hqEnv) this.hqEnv.dispose(); this.skySetup(); }
     }
     // (the real sky is brighter than the drawn one: scaled to the same mean brightness)
     const k = this.skyInfo ? Math.min(2, 0.55 / Math.max(0.05, this.skyInfo.avg)) : 1;

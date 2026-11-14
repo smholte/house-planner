@@ -826,7 +826,7 @@ class View3D extends Emitter {
     this.ok = true;
     const r = this.renderer;
     GPU_INFO = gpuName(r);
-    if (!SAFE_TEX && needSafeTex(GPU_INFO, app.settings)) { SAFE_TEX = true; if (TEXLIB.ready) texlibSettingsChanged(); }
+    if (!SAFE_TEX && needSafeTex(GPU_INFO, app.settings)) { SAFE_TEX = true; if (TEXLIB.known) texlibSettingsChanged(); }
     // the graphics card was reset (Windows resets a card that is busy for 2 s with one piece of work; the browser then
     // loses every 3D picture of the page): this view is started again, looking where it looked (app.view3dLost)
     r.domElement.addEventListener('webglcontextlost', () => { if (this.destroyed) return; this.lost = true; app.view3dLost(this); });
@@ -1058,6 +1058,8 @@ class View3D extends Emitter {
   /* spec: {entries:[{storey, plan, basePlan, diff, offset:[x,z], y, label}], cut, labels, selection, fitKey, theme} */
   build(spec) {
     if (!this.ok) return;
+    // (the pictures known at this build: TEXLIB.ready waits until every 3D view is built with the ones that came since)
+    this._texGen = TEXLIB.gen;
     // after an edit (spec.reuse) the storeys that did not change are kept as they are (built, merged, with their
     // doors, pick pieces and lamps): only what changed is built again (reuse.js)
     const R = this.reusePlan(spec);

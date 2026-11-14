@@ -4,11 +4,11 @@
    metres and what one plank or tile can be cut from (rows of planks between their joints, the cells of a tile grid,
    squares without a joint). The single file has the base inside (TEXLIB_DATA: every set at its smallest size, the skies
    at 512); the hosted versions take the base from lib/ next to index.html (library.js keeps it on the device).
-   The base pictures are decoded once at start; until then – and if they can't be had – the drawn textures are used, as
-   before. When they arrive, the 3D views are built again with them. After that, only when this device asks for them
-   (app.settings.texSize, texGpu – task 0010 sets them by device) and the library has them: a larger size, KTX2 copies
-   (GPU-compressed: far less memory on the graphics card), the larger skies; sets that are not in the base load the first
-   time a material needs them. Each arrival builds the 3D views again.
+   No picture is decoded at start (task 0021): the projects page and 2D use none. A set – and each sky – is loaded the
+   first time a 3D view, a render or a walk asks for it, at the size this device asks for (app.settings.texSize, texGpu –
+   task 0010 sets them by device: a larger size, KTX2 copies, GPU-compressed); until it is in – and if it can't be had –
+   the drawn textures are used, as before. Each arrival builds the 3D views again (several at once: one rebuild).
+   TEXLIB.ready: nothing loading and every 3D view built with what came – the tests and the photo render wait for it.
    The bricks: one waalformaat wall in wildverband, coloured from a palette – the builder's three bricks as they are on
    the photo of the house, other brick colours (other houses, the neighbours) around their own colour (libBrick).
    Used as they are: the roof, the grass, gravel, bark, asphalt, decking, the kitchen's worktops and fronts, black metal (door handles,
@@ -16,12 +16,28 @@
    stone, concrete, carpet), roofs of the neighbours, the sofa fabric.
    Fast quality: colour only (no relief and gloss maps). */
 
-const TEXLIB = { data: null, img: new Map(), ready: false, gen: 0, base: new Map(), detail: new Map(), sky: {},
+const TEXLIB = { data: null, img: new Map(), known: false, gen: 0, base: new Map(), detail: new Map(), sky: {},
   px: new Map(),        // set|map → the width of the picture decoded (to know when the library has a better one)
   skyPx: {},            // day / sunset → the width of the sky decoded
   gpu: new Map(),       // set|map → a KTX2 texture ('loading', 'failed' while there is none)
-  lazy: new Map(),      // set id → null (not asked for yet), a Promise (loading) or true (here)
-  source: '' };         // 'built-in' (the single file's base) or 'library'
+  lazy: new Map(),      // set id → null (not asked for yet), a Promise (loading), true (here) or 'missing'
+  skyLazy: {},          // day / sunset → a Promise while it loads, 'missing' when it can't be had
+  loading: 0,           // sets and skies being loaded now
+  source: '',           // 'built-in' (the single file's base) or 'library'
+  /** the pictures the views asked for are in and the 3D views are built with them: nothing loading, no rebuild waiting
+   *  (task 0021 – on the projects page and in 2D as soon as the sets are known, since those ask for none). The tests and
+   *  the photo render wait for this. */
+  get ready() { return texlibSettled(); },
+  /** a promise: ready (or after ms) – true when ready */
+  idle: ms => texlibIdle(ms),
+  /** these sets (ids) and skies ('sky:day') loaded now, as a 3D view would ask for them; resolves when they are in */
+  load: ids => Promise.all(ids.map(id => /^sky:/.test(id) ? libLoadSky(id.slice(4)) : libLoadSet(id))),
+  /** what is decoded now: { pictures, sets (ids), bytes (decoded, 4 per pixel), skies } – for the tests */
+  stats() {
+    let bytes = 0; const sets = new Set();
+    for (const [k, im] of this.img) if (im && im.naturalWidth) { bytes += im.naturalWidth * im.naturalHeight * 4; sets.add(k.split('|')[0]); }
+    return { pictures: this.img.size, sets: [...sets].sort(), bytes, skies: Object.keys(this.sky).filter(k => this.sky[k]).sort() };
+  } };
 const LIB_MAPS = ['color', 'normal', 'rough', 'metal', 'kit', 'detail'];
 const LIB_GPU_MAPS = ['color', 'normal', 'rough', 'metal'];
 
@@ -31,28 +47,13 @@ function libDecode(src) {
   im.src = src;
   return im.decode().then(() => im, () => null);
 }
-/** the hosted versions' base, in the shape of TEXLIB_DATA: the base sets at the size this device asks for (object
- *  URLs of the library's files), the other sets as their description only (loaded when a material needs them) */
-async function libBaseData() {
-  const want = libWantPx(), sets = {}, skies = {};
-  const jobs = [];
-  for (const it of LIB.items.values()) {
-    if (it.kind === 'tex' && it.base) {
-      const e = sets[it.id] = Object.assign({}, it.meta);
-      for (const [k, list] of Object.entries(it.maps)) {
-        const v = libPick(list, want);
-        jobs.push(libUrl(v.f).then(u => { if (u) { e[k] = u; TEXLIB.px.set(it.id + '|' + k, v.px); } }));
-      }
-    } else if (it.kind === 'sky' && it.base) {
-      const v = libPick(it.files, want * 2);
-      jobs.push(libBlob(v.f).then(b => { if (b) skies[it.id.slice(4)] = { blob: b, size: [v.px, v.px / 2] }; }));
-    }
-  }
-  await Promise.all(jobs);
-  if (!Object.keys(sets).length) return null;
-  return { v: 1, source: (LIB.served || {}).source || '', sets, skies };
+/** the hosted versions' list of sets, in the shape of TEXLIB_DATA: every set as its description only (size, colour …);
+ *  its pictures are loaded the first time a material needs them */
+function libBaseData() {
+  if (![...LIB.items.values()].some(it => it.kind === 'tex')) return null;
+  return { v: 1, source: (LIB.served || {}).source || '', sets: {}, skies: {} };
 }
-/** the sets of the library that are not in the base: known (their size, colour …), their pictures loaded on demand */
+/** the sets of the library that are not described yet: known (their size, colour …), their pictures loaded on demand */
 function libAddLazySets() {
   for (const it of LIB.items.values()) {
     if (it.kind !== 'tex' || TEXLIB.data.sets[it.id]) continue;
@@ -60,46 +61,66 @@ function libAddLazySets() {
     TEXLIB.lazy.set(it.id, null);
   }
 }
+/** hosted: the base pictures (the size this device asks for) and skies kept on the device for offline use, in the
+ *  background and without decoding them (a first visit works offline later, as before 0021) */
+async function libKeepBase() {
+  try {
+    await new Promise(r => setTimeout(r, 1500));     // (after the start)
+    const have = new Set(await libKeys('files')), want = libWantPx(), files = [];
+    for (const it of LIB.items.values()) {
+      if (!it.base) continue;
+      if (it.kind === 'tex') for (const list of Object.values(it.maps || {})) { const v = libPick(list, want); if (v) files.push(v.f); }
+      else if (it.kind === 'sky') { const v = libPick(it.files, want * 2); if (v) files.push(v.f); }
+    }
+    for (const f of files) if (!have.has(f)) await libBlob(f);
+    return true;
+  } catch (e) { console.warn('library: base not kept', e); return false; }
+}
 
 async function texlibInit() {
   try {
     let data = typeof TEXLIB_DATA !== 'undefined' ? TEXLIB_DATA : null;
     try { await libraryInit(); } catch (e) { console.warn('library', e); }
     TEXLIB.source = data ? 'built-in' : 'library';
-    if (!data && libHosted()) data = await libBaseData();
+    if (!data && libHosted()) data = libBaseData();
     if (!data || !data.sets) return false;
     TEXLIB.data = data;
-    const jobs = [];
-    for (const [id, s] of Object.entries(data.sets)) {
-      for (const k of LIB_MAPS) {
-        if (!s[k]) continue;
-        const key = id + '|' + k;
-        jobs.push(libDecode(s[k]).then(im => {
-          if (!im) return;
-          TEXLIB.img.set(key, im);
-          if (!TEXLIB.px.has(key)) TEXLIB.px.set(key, im.naturalWidth);
-        }));
-      }
-    }
-    await Promise.all(jobs);
-    // the skies (Poly Haven, CC0): day and sunset, high dynamic range
-    for (const which of Object.keys(data.skies || {})) {
-      try { TEXLIB.sky[which] = await libSkyDecode(data.skies[which]); TEXLIB.skyPx[which] = data.skies[which].size[0]; } catch (e) { console.warn('sky', which, e); }
-    }
+    // nothing is decoded at start (task 0021: 67 MB the projects page and 2D never use): every set – and each sky –
+    // is loaded the first time a 3D view, a render or a walk asks for it (libSet, libSky); until then the drawn textures
+    for (const [id, s] of Object.entries(data.sets)) if (!TEXLIB.lazy.has(id)) { s.lazy = true; TEXLIB.lazy.set(id, null); }
     libAddLazySets();
-    TEXLIB.ready = true;
+    TEXLIB.known = true;
     TEXLIB.gen++;
-    // everything drawn before is made again with the pictures
+    // a 3D view drawn before is made again: now it can ask for its pictures
     TEX.clear(); MAT.clear(); KMAT.clear(); FMAT.clear();
     if (app.project && app.panes && app.panes.some(p => p.kind === '3d')) app.refreshViews(false);
     TEXLIB.upgraded = libUpgrade();
-    // (hosted: files no list names any more go – only now that the base of the new list is on the device)
-    if (libHosted() && LIB.served) Promise.all([LIB.kept, TEXLIB.upgraded]).then(() => libPrune()).catch(() => {});
+    // (hosted: the base kept for offline; then files no list names any more go – only once the new base is on the device)
+    if (libHosted() && LIB.served) {
+      TEXLIB.kept = libKeepBase();
+      Promise.all([LIB.kept, TEXLIB.kept, TEXLIB.upgraded]).then(() => libPrune()).catch(() => {});
+    }
     return true;
   } catch (e) {
     console.warn('material pictures', e);
     return false;
   }
+}
+/** the pictures the views asked for are in, and every 3D view was built since the last one arrived */
+function texlibSettled() {
+  if (!TEXLIB.known || TEXLIB.loading || _texRefreshT) return false;
+  for (const p of (typeof app !== 'undefined' && app.panes) || []) {
+    const v = p.kind === '3d' && p.view;
+    if (v && v.ok && v.spec && v._texGen !== TEXLIB.gen) return false;
+  }
+  return true;
+}
+/** waits until texlibSettled (at most ms); true when it is */
+async function texlibIdle(ms = 30000) {
+  try { if (!TEXLIB.known && window.__hp_texlib) await window.__hp_texlib; } catch (e) { /* no pictures */ }
+  const t0 = performance.now();
+  while (TEXLIB.known && !texlibSettled() && performance.now() - t0 < ms) await new Promise(r => setTimeout(r, 100));
+  return texlibSettled();
 }
 /** the pictures again from the library where it has the size this device asks for and it isn't the one shown (the
  *  single file with a library: the larger skies; a device that asks for 1K: the 1K pictures …); then the 3D views are
@@ -124,7 +145,7 @@ async function libUpgrade() {
     }
     for (const which of ['day', 'sunset']) {
       const it = libItem('sky:' + which), v = it && libPick(it.files, want * 2);
-      if (!v || v.px === TEXLIB.skyPx[which]) continue;
+      if (!v || !TEXLIB.sky[which] || v.px === TEXLIB.skyPx[which]) continue;
       jobs.push(libBlob(v.f).then(b => b && libSkyDecode({ blob: b })).then(t => {
         if (!t) return;
         if (TEXLIB.sky[which]) TEXLIB.sky[which].dispose();
@@ -140,7 +161,7 @@ async function libUpgrade() {
 }
 /** pictures changed (set|map keys): their textures go, the 3D views are built again (a little later: several
  *  arrivals at once give one rebuild) */
-let _texRefreshT = 0, _texRefreshIds = new Set(), _texOld = [];
+let _texRefreshT = 0, _texRefreshIds = new Set(), _texOld = [], _texRefreshSince = 0;
 function texlibRefresh(keys) {
   for (const key of keys) {
     _texRefreshIds.add(key.split('|')[0]);
@@ -150,15 +171,21 @@ function texlibRefresh(keys) {
   }
   TEXLIB.gen++;
   clearTimeout(_texRefreshT);
-  _texRefreshT = setTimeout(() => {
-    // (the old copies of those pictures off the graphics card once the views are built again with the new ones – before
-    // that a frame of the old view would only put them back)
-    const old = _texOld.concat([...TEX.values()].filter(t => t && t.isTexture && t.userData && _texRefreshIds.has(t.userData.lib)));
+  if (!_texRefreshSince) _texRefreshSince = performance.now();
+  const go = () => {
+    // (sets still loading that a view asked for together: one rebuild for all of them, unless one takes long)
+    if (TEXLIB.loading && performance.now() - _texRefreshSince < 1500) { _texRefreshT = setTimeout(go, 60); return; }
+    _texRefreshT = 0; _texRefreshSince = 0;
+    // (the old textures off the graphics card once the views are built again with new ones – before that a frame of the
+    // old view would only put them back): every texture of the cache, since the views make theirs anew – also the drawn
+    // stand-ins a view used while its pictures were loading (task 0021); a copy of a picture shares it on the card)
+    const old = _texOld.concat([...TEX.values()].filter(t => t && t.isTexture));
     _texRefreshIds = new Set(); _texOld = [];
     TEX.clear(); MAT.clear(); KMAT.clear(); FMAT.clear();
     if (app.project && app.panes && app.panes.some(p => p.kind === '3d')) app.refreshViews(false);
     setTimeout(() => { for (const t of old) t.dispose(); }, 2500);
-  }, 60);
+  };
+  _texRefreshT = setTimeout(go, 60);
 }
 /** this device's picture settings changed (app.settings.texSize, texGpu – task 0010): every picture again as asked
  *  (KTX2 copies on or off, the size from the library); returns how many pictures came anew */
@@ -168,18 +195,24 @@ function texlibSettingsChanged() {
   texlibRefresh(keys.length ? keys : ['-|-']);
   return libUpgrade();
 }
-/** a set that is not in the base: its pictures (the size this device asks for), once; the views are built again */
+/** a set's pictures (the size this device asks for: from the library when it has them, else the single file's own),
+ *  once – the first time a material needs them; the views are built again when they are in */
 function libLoadSet(id) {
-  if (TEXLIB.lazy.get(id) !== null) return TEXLIB.lazy.get(id);
-  const it = libItem(id), s = TEXLIB.data.sets[id];
-  if (!it || !s) return null;
-  const want = libWantPx();
-  const p = Promise.all(Object.entries(it.maps || {}).map(([k, list]) => {
-    const v = libPick(list, want);
-    if (!v) return null;
-    return libUrl(v.f).then(u => u && libDecode(u)).then(im => { if (im) { TEXLIB.img.set(id + '|' + k, im); TEXLIB.px.set(id + '|' + k, v.px); s[k] = im.src; } });
-  })).then(() => {
-    const ok = !!TEXLIB.img.get(id + '|color');
+  const st = TEXLIB.lazy.get(id);
+  if (st !== null) return st === undefined ? null : st;
+  const it = libItem(id), s = TEXLIB.data && TEXLIB.data.sets[id];
+  if (!s) return null;
+  const want = libWantPx(), maps = [...new Set([...Object.keys((it && it.maps) || {}), ...LIB_MAPS.filter(k => typeof s[k] === 'string')])];
+  TEXLIB.loading++;
+  const p = Promise.all(maps.map(async k => {
+    const v = it && it.maps && libPick(it.maps[k], want);
+    let im = null, px = 0;
+    if (v) { const u = await libUrl(v.f); im = u ? await libDecode(u) : null; px = v.px; }
+    if (!im && typeof s[k] === 'string') { im = await libDecode(s[k]); px = im ? im.naturalWidth : 0; }
+    if (im) { TEXLIB.img.set(id + '|' + k, im); TEXLIB.px.set(id + '|' + k, px); s[k] = im.src; }
+  })).catch(e => console.warn('pictures', id, e)).then(() => {
+    TEXLIB.loading--;
+    const ok = maps.some(k => TEXLIB.img.has(id + '|' + k));
     if (ok) { s.lazy = false; TEXLIB.lazy.set(id, true); texlibRefresh([id + '|color']); }
     else TEXLIB.lazy.set(id, 'missing');
     return ok;
@@ -234,7 +267,7 @@ async function libKtx2(f) {
     return await new Promise((res, rej) => loader.parse(buf, res, rej));
   } catch (e) { console.warn('KTX2', f, e); return null; }
 }
-const libOn = () => TEXLIB.ready && !(app.settings && app.settings.realTex === false);
+const libOn = () => TEXLIB.known && !(app.settings && app.settings.realTex === false);
 function libSet(id) {
   if (!libOn()) return null;
   const s = TEXLIB.data.sets[id];
@@ -644,8 +677,33 @@ async function libSkyDecode(sk) {
   t.userData.sunRGB = sunRGB;
   return t;
 }
-/** 'day' or 'sunset' (null until decoded, or without the pictures) */
-const libSky = which => (libOn() && TEXLIB.sky[which]) || null;
+/** 'day' or 'sunset' (null until decoded, or without the pictures): asked for the first time, it is loaded (the views
+ *  are built again when it is in) */
+function libSky(which) {
+  if (!libOn()) return null;
+  if (!TEXLIB.sky[which]) { libLoadSky(which); return null; }
+  return TEXLIB.sky[which];
+}
+/** a sky (the size this device asks for: from the library, else the single file's own), once */
+function libLoadSky(which) {
+  if (TEXLIB.sky[which]) return Promise.resolve(true);
+  if (TEXLIB.skyLazy[which]) return TEXLIB.skyLazy[which];
+  const it = libItem('sky:' + which), v = it && libPick(it.files, libWantPx() * 2), own = TEXLIB.data && (TEXLIB.data.skies || {})[which];
+  if (!v && !own) return null;
+  TEXLIB.loading++;
+  const p = (async () => {
+    if (v) { const b = await libBlob(v.f); if (b) return [await libSkyDecode({ blob: b }), v.px]; }
+    return own ? [await libSkyDecode(own), own.size[0]] : [null, 0];
+  })().catch(e => (console.warn('sky', which, e), [null, 0])).then(([t, px]) => {
+    TEXLIB.loading--;
+    if (!t) { TEXLIB.skyLazy[which] = 'missing'; return false; }
+    TEXLIB.sky[which] = t; TEXLIB.skyPx[which] = px; delete TEXLIB.skyLazy[which];
+    texlibRefresh(['sky|' + which]);
+    return true;
+  });
+  TEXLIB.skyLazy[which] = p;
+  return p;
+}
 /** the same sky without its sun (clipped to the bright clouds): for the path tracer, which has the app's sun as a
  *  light already – with the picture's sun too it had the sun twice (1 Nov: path traced pictures far too bright) */
 function libSkyNoSun(which) {

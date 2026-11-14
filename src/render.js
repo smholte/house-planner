@@ -38,7 +38,15 @@ function renderSize(v, size) {
 /** one render of a 3D view: progressive; onPaint(canvas, n) now and then; stop() → finish with what is there.
  *  keep: the render stays set up when done – res.more(extra, {onPass, onPaint, stop}) adds passes to the same picture
  *  (Continue), res.end() puts the view back */
+/** the material pictures and the sky this view needs are in before the first pass (task 0021: they are loaded when
+ *  first asked for; the view is built again when they arrive) */
+async function renderPictures(v) {
+  const ev = !!(v.evening || (v.spec && v.spec.light === 'evening'));
+  libSky('day'); if (ev) libSky('sunset');
+  await texlibIdle(20000);
+}
 async function renderView3d(v, opts) {
+  await renderPictures(v);
   const { passes, size } = opts;
   let { onPaint, stop, onPass } = opts;
   const r = v.renderer, gl = r.getContext(), cam = v.camera;
@@ -767,6 +775,7 @@ async function gpuDone(gl, lost) {
   return performance.now() - t0;
 }
 async function renderPathTraced(v, opts) {
+  await renderPictures(v);
   const { size } = opts;
   let { onPaint, stop, onPass } = opts;
   const r = v.renderer, cam = v.camera, gl = r.getContext();
