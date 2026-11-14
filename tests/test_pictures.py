@@ -100,7 +100,7 @@ with sync_playwright() as p:
     pg.wait_for_function("() => { const v = window.__hp.app.panes.find(p => p.kind === '3d'); return v && v.view.spec; }", timeout=60000)
     pg.wait_for_timeout(1500); pg.wait_for_function(READY, timeout=120000)
     s5, u5 = pg.evaluate(STATS), pg.evaluate(USED)
-    px = pg.evaluate("() => window.__hp.TEXLIB.px.get('WoodFloor051|color')")
+    px = pg.evaluate("() => window.__hp.TEXLIB.px.get('Concrete034|normal')")
     check('… 3D: the built-in pictures of the sets in view decoded (512), only those', set(s5['sets']) <= set(u5) and 5 <= len(s5['sets']) < 25 and px == 512 and not errs, (s5['sets'], u5, px, errs[:2]))
     pg.screenshot(path=SHOTS + 'pictures-phone-3d.png')
     b.close()

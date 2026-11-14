@@ -733,6 +733,18 @@
     "checks": 10
    },
    "set": "public"
+  },
+  "test_pictures.py": {
+   "seconds": 60.0,
+   "ok": true,
+   "set": "public",
+   "checks": 14,
+   "made_up": {
+    "seconds": 44.0,
+    "ok": true,
+    "checks": 14
+   },
+   "note": "task 0021"
   }
  },
  "note": "seconds: on the owner's house (measured 12 Nov 2026, tasks 0007a / 0007b, two or three test files at a time); made_up: the same file on the made-up house (public app). ci: what GitHub's runs measured (python3 tools/ci_status.py --record), which tools/ci_groups.py balances by first. checks: the number of checks.",

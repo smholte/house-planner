@@ -324,6 +324,7 @@ function kFrontMat(it) {
     g.translate(cv.width, 0); g.rotate(Math.PI / 2); g.drawImage(cv0, 0, 0);
     const t = new THREE.CanvasTexture(cv);
     t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1 / 1.0, 1 / 1.0); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = MAX_ANISO;
+    t.userData.lib = 'Wood048';
     return new THREE.MeshStandardMaterial({ color: 0xffffff, map: t, roughness: 0.62, metalness: 0 });
   });
   if (lib) return lib;
