@@ -101,6 +101,16 @@ function mergeChanges(mine, theirs) {
     const y = (mine[key] || {})[id];
     if (!y || !same(x, y)) add(key === 'images' ? t('Wallpaper pictures') : t('3D models'), x.name || id, y ? 'changed' : 'new', !y || pNewer, m => { m[key] = m[key] || {}; m[key][id] = clone(x); });
   }
+  // the loaded drawings under the plans (the picture files come along with the file), the people of the walking view, the section cuts
+  for (const [sid, u] of Object.entries(theirs.underlays || {})) {
+    const y = (mine.underlays || {})[sid];
+    if (u && (!y || !same(u, y))) add(t('Drawings under the plans'), t('Drawing under {s}', { s: stName(theirs, sid) || sid }), y ? 'changed' : 'new', !y || pNewer, m => { m.underlays = m.underlays || {}; m.underlays[sid] = clone(u); });
+  }
+  lists(t('People'), mine.people, theirs.people, x => x.name || t('Person'), m => (m.people = m.people || []), pNewer);
+  for (const [k, cuts] of Object.entries(theirs.slices || {})) {
+    const y = (mine.slices || {})[k];
+    if (cuts && cuts.length && !same(cuts, y)) add(t('Section cuts'), t('Section cuts: {k}', { k: k.split('|')[0] === 'storey' ? stName(theirs, k.split('|')[1]) || k : t('whole house') }), y ? 'changed' : 'new', !y || pNewer, m => { m.slices = m.slices || {}; m.slices[k] = clone(cuts); });
+  }
   if (theirs.site && !same(theirs.site, mine.site)) add(t('Plot and garden'), t('Plot, levels, water and north'), mine.site ? 'changed' : 'new', !mine.site || pNewer, m => { m.site = clone(theirs.site); });
   return out;
 }
@@ -137,7 +147,7 @@ Object.assign(app, {
     for (const c of changes) if (c.on) { try { c.apply(merged); } catch (e) { console.warn('merge step failed', c.label, e); } }
     merged.updated = Date.now();
     migrateProject(merged);
-    await Snapshots.create(mine, 'backup', t('Before merging a copy ({d})', { d: fmtDate(Date.now()) }));
+    await Snapshots.create(mine, 'backup', t('Before merging a copy ({d})', { d: fmtDate(Date.now()) }), 30);
     await DB.put('projects', merged);
     this._lastMerge = { taken: changes.filter(c => c.on).length, total: changes.length };
     return true;
@@ -147,14 +157,16 @@ Object.assign(app, {
   async mergeFileFlow() {
     const files = await pickFiles(HOUSE_ACCEPT);
     if (!files || !files.length) return;
-    let data;
-    try { data = await readHouseFile(files[0]); } catch (e) { this.toast(t('This file could not be read. Choose a file exported from House Planner.')); return; }
+    const data = await this.readHouseFileChecked(files[0]);
+    if (!data) return;
     if (!data || data.format !== 'house-planner' || !Array.isArray(data.projects)) { this.toast(t('This is not a House Planner file.')); return; }
+    if (this.fileNewerToast(data)) return;
     const entry = data.projects.find(x => x.project && this.project && x.project.id === this.project.id);
     if (!entry) { this.toast(t('This file is not a copy of this house. Use “Import a house file” instead.')); return; }
     for (const [id, a] of Object.entries(data.assets || {})) if (!(await DB.get('assets', id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
     await Saver.flushNow();
     const mine = clone(this.project);
+    if (this.houseProblem(entry)) { this.toast(t('This copy of the house could not be used: it is damaged. Nothing was changed.')); return; }
     const ok = await this.mergeDialog(mine, migrateProject(entry.project), files[0].name);
     if (!ok) return;
     await this.openProject(mine.id);

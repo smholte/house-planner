@@ -281,11 +281,12 @@ async function bytesToDataUrl(bytes, type) {
 
 /* ───────── snapshots ───────── */
 const Snapshots = {
-  async create(project, kind, name) {
+  async create(project, kind, name, keepDays) {
     const snap = {
       id: uid('sn_'), projectId: project.id, kind, name: name || '',
       created: Date.now(), projectName: project.name, project: clone(project),
     };
+    if (keepDays) snap.keepUntil = Date.now() + keepDays * 864e5;   // not pushed out by newer automatic ones (before an import or merge)
     snap.size = JSON.stringify(snap.project).length;
     await DB.put('snapshots', snap);
     if (kind === 'auto') await this.prune(project.id, 'auto', AUTO_KEEP);
@@ -295,7 +296,7 @@ const Snapshots = {
   /** Only ever removes snapshots of the given automatic kind. Save points ('manual') are never touched here. */
   async prune(projectId, kind, keep) {
     if (kind === 'manual') return;
-    const list = (await DB.byProject(projectId)).filter(s => s.kind === kind).sort((a, b) => b.created - a.created);
+    const list = (await DB.byProject(projectId)).filter(s => s.kind === kind && !(s.keepUntil > Date.now())).sort((a, b) => b.created - a.created);
     for (const sn of list.slice(keep)) await DB.del('snapshots', sn.id);
   },
   async list(projectId) {
