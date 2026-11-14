@@ -852,7 +852,7 @@ Object.assign(app, {
       const v = it.payload.version;
       if (p.versions.some(x => x.id === v.id)) v.id = uid('v_');
       if (isOpen) { this.mutate(proj => { proj.versions.push(v); }, { project: true }); this.renderEditorChrome(); }
-      else { p.versions.push(v); p.updated = Date.now(); await DB.put('projects', p); }
+      else { p.versions.push(v); p.updated = Date.now(); try { await DB.put('projects', p); } catch (e) { this.toast(e.message || String(e), { ms: 6000 }); return; } }
       await Trash.remove(it.id);
       this.toast(`Version “${v.name}” restored in “${p.name}”.`);
       return;

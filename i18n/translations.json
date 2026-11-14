@@ -4667,6 +4667,14 @@
   "Niet opgeslagen",
   "Ikke lagret"
  ],
+ "Not saved – the browser did not store the change.": [
+  "Niet opgeslagen – de browser heeft de wijziging niet bewaard.",
+  "Ikke lagret – nettleseren lagret ikke endringen."
+ ],
+ "Not saved – this device is full.": [
+  "Niet opgeslagen – dit apparaat is vol.",
+  "Ikke lagret – enheten er full."
+ ],
  "Not stored": [
   "Niet bewaard",
   "Ikke lagret lokalt"
@@ -6531,6 +6539,10 @@
   "Opgeslagen",
   "Lagret"
  ],
+ "Saved again.": [
+  "Weer opgeslagen.",
+  "Lagret igjen."
+ ],
  "Saved on this device": [
   "Opgeslagen op dit apparaat",
   "Lagret på denne enheten"
@@ -7211,6 +7223,10 @@
   "Treden omhoog",
   "Trinn opp"
  ],
+ "Still not saved. Export a copy now so nothing is lost.": [
+  "Nog steeds niet opgeslagen. Exporteer nu een kopie, zodat er niets verloren gaat.",
+  "Fortsatt ikke lagret. Eksporter en kopi nå, så ingenting går tapt."
+ ],
  "Still to buy": [
   "Nog te kopen",
   "Gjenstår å kjøpe"
@@ -7442,6 +7458,10 @@
  "Take out of the selection": [
   "Uit de selectie halen",
   "Fjern fra utvalget"
+ ],
+ "Take over": [
+  "Overnemen",
+  "Ta over"
  ],
  "Take the photos before the wall or floor is closed, with a tape measure in view: later you know where not to drill.": [
   "Maak de foto's voordat de wand of vloer dicht gaat, met een rolmaat in beeld: later weet je waar je niet moet boren.",
@@ -7947,6 +7967,10 @@
   "Het origineel is vergrendeld. Maak een geplande versie, of ontgrendel het via de lijst met versies.",
   "Originalen er låst. Lag en planlagt versjon, eller lås den opp fra versjonslisten."
  ],
+ "The other window still has this house. Close it there, then try again.": [
+  "Het andere venster heeft dit huis nog open. Sluit het daar en probeer het opnieuw.",
+  "Det andre vinduet har fortsatt dette huset åpent. Lukk det der, og prøv igjen."
+ ],
  "The page belongs to no storey now.": [
   "De pagina hoort nu bij geen verdieping.",
   "Siden hører nå ikke til noen etasje."
@@ -8243,6 +8267,14 @@
   "Dit huis heeft nog geen kavel. Maak er een in de werkbalk.",
   "Dette huset har ingen tomt ennå. Lag en i verktøylinjen."
  ],
+ "This house is open in another window – changes here are not saved.": [
+  "Dit huis is open in een ander venster – wijzigingen hier worden niet opgeslagen.",
+  "Dette huset er åpent i et annet vindu – endringer her blir ikke lagret."
+ ],
+ "This house was changed in another window – changes here are not saved.": [
+  "Dit huis is in een ander venster gewijzigd – wijzigingen hier worden niet opgeslagen.",
+  "Dette huset ble endret i et annet vindu – endringer her blir ikke lagret."
+ ],
  "This is a big model: the house file grows by about as much.": [
   "Dit is een groot model: het huisbestand wordt ongeveer even veel groter.",
   "Dette er en stor modell: husfilen blir omtrent like mye større."
@@ -8354,6 +8386,10 @@
  "This wall is too short for a": [
   "Deze muur is te kort voor een",
   "Denne veggen er for kort for"
+ ],
+ "This window saves the house now.": [
+  "Dit venster slaat het huis nu op.",
+  "Dette vinduet lagrer huset nå."
  ],
  "This zip file is not a House Planner library (no library.json in it).": [
   "Dit zipbestand is geen House Planner-bibliotheek (er zit geen library.json in).",
@@ -8615,6 +8651,10 @@
   "Probeer ook de andere kwaliteiten",
   "Prøv de andre kvalitetene også"
  ],
+ "Trying again every 30 seconds.": [
+  "Elke 30 seconden wordt het opnieuw geprobeerd.",
+  "Prøver igjen hvert 30. sekund."
+ ],
  "Tumble dryer": [
   "Droger",
   "Tørketrommel"
@@ -8818,6 +8858,10 @@
  "Unlock the view": [
   "Beeld ontgrendelen",
   "Lås opp visningen"
+ ],
+ "Unsaved changes from another window": [
+  "Niet-opgeslagen wijzigingen uit een ander venster",
+  "Ulagrede endringer fra et annet vindu"
  ],
  "Unterminated string": [
   "Niet-afgesloten tekst in het bestand",
@@ -9370,6 +9414,10 @@
  "What the buttons do": [
   "Wat de knoppen doen",
   "Hva knappene gjør"
+ ],
+ "What this window had not saved is kept under Save points → Automatic backups.": [
+  "Wat dit venster nog niet had opgeslagen, staat bij Herstelpunten → Automatische back-ups.",
+  "Det dette vinduet ikke hadde lagret, ligger under Lagringspunkter → Automatiske sikkerhetskopier."
  ],
  "What to place": [
   "Wat wil je plaatsen",
