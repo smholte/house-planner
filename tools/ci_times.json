@@ -757,6 +757,18 @@
     "checks": 14
    },
    "note": "task 0021"
+  },
+  "test_onewriter.py": {
+   "seconds": 80.0,
+   "ok": true,
+   "set": "public",
+   "checks": 72,
+   "made_up": {
+    "seconds": 77.0,
+    "ok": true,
+    "checks": 72
+   },
+   "note": "task 0027"
   }
  },
  "note": "seconds: on the owner's house (measured 12 Nov 2026, tasks 0007a / 0007b, two or three test files at a time); made_up: the same file on the made-up house (public app). ci: what GitHub's runs measured (python3 tools/ci_status.py --record), which tools/ci_groups.py balances by first. checks: the number of checks.",
