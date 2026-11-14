@@ -97,7 +97,8 @@ Object.assign(app, {
       h('dl', null, ...HELP_KEYS.flatMap(([k, what]) => [h('dt', null, k), h('dd', null, t(what))])));
     const panel = h('div', { class: 'help-panel', onclick: e => e.stopPropagation() },
       h('div', { class: 'help-head' }, h('h2', null, t('What the buttons do')), h('button', { class: 'btn ghost icon sm', id: 'help-close', 'aria-label': t('Close'), onclick: () => done() }, icon('close'))),
-      h('p', { class: 'note-muted' }, t('Each number is on a button on the screen now. Tap a number to see which.')), list, keys);
+      h('p', { class: 'note-muted' }, t('Each number is on a button on the screen now. Tap a number to see which.')), list, keys,
+      h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'help-feedback', onclick: () => { done(); this.feedbackDialog(); } }, icon('edit'), t('Send feedback…'))));
     ov.append(marks, panel);
     const pick = n => {
       for (const el of ov.querySelectorAll('[data-n]')) el.classList.toggle('on', +el.dataset.n === n);

@@ -491,6 +491,8 @@ button { cursor: pointer; }
 .menu button.mi:hover { background: var(--surface-2); }
 .menu button.mi.danger { color: var(--danger); }
 .menu .msep { height: 1px; background: var(--line); margin: 4px 6px; }
+.menu .mhead { font-family: var(--font-label); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); padding: 8px 12px 2px; }
+.menu .mhead:first-child { padding-top: 4px; }
 .menu .mrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 10px; }
 .menu .mrow > span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
 .menu input[type="range"] { width: 120px; accent-color: var(--accent); }
@@ -1546,4 +1548,37 @@ button.sun-lab:hover, button.sun-lab:focus-visible { background: var(--surface-2
   .docs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .doc-th { height: 104px; }
   .doc-th img { max-height: 104px; }
+}
+
+/* ───────── update bar, feedback, exported line (task 0019) ───────── */
+.update-bar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 70; display: flex; gap: 10px; align-items: center; background: var(--ink); color: var(--surface); border-radius: 10px; padding: 8px 8px 8px 14px; box-shadow: var(--shadow); font-size: 13.5px; max-width: calc(100vw - 24px); }
+.update-bar .btn.ghost { color: var(--surface); }
+@media (max-width: 860px) { .update-bar { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); } }
+.pcard-exp { font-size: 12px; margin: 2px 0 6px; }
+.storage-note .sn-export { margin-left: 8px; }
+
+/* ───────── phone top bar (task 0019, U1): the open version's name is always readable ─────────
+   Export moved into ⋯ (a viewer copy keeps its "Send notes back" button); Build / Furnish / View show their names
+   under the icon; the version name may take two lines. */
+@media (max-width: 860px) {
+  body:not([data-viewer]) .topbar #btn-share { display: none; }
+  .topbar { gap: 4px; padding-inline: 6px; }
+  .topbar #btn-back { flex: none; width: 32px; padding: 0; }
+  .title-block { flex: 1 1 0; min-width: 0; }
+  .version-pill { flex: 1 1 auto; min-width: 0; max-width: none; height: 44px; padding: 0 6px 0 9px; gap: 4px; }
+  .version-pill .vp-name { white-space: normal; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.1; font-size: 12.5px; text-align: left; overflow-wrap: anywhere; }
+  .mode-switch { padding: 2px; gap: 0; }
+  .mode-switch button { flex-direction: column; justify-content: center; gap: 1px; height: 42px; padding: 0 5px; min-width: 38px; }
+  .mode-switch button span { display: block; font-size: 10px; line-height: 1; letter-spacing: -.02em; }
+  .topbar .save-status { flex: none; padding: 0 4px; }
+  .topbar .top-actions { gap: 0; flex: none; }
+  .topbar .top-actions .btn.icon { width: 32px; padding: 0; }
+}
+@media (max-width: 420px) {
+  .version-pill .ic { display: none; }
+  .version-pill { padding: 0 8px; }
+}
+@media (max-width: 380px) {
+  .mode-switch button { padding: 0 3px; min-width: 34px; }
+  .mode-switch button span { font-size: 9.5px; }
 }
