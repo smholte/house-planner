@@ -16,6 +16,19 @@ const VEG_Q = {
   mid: { dens: 0.3, card: 1.6, sub: 2, nb: 0.7, radial: 5, trunkRadial: 7, strands: 0.45 },
   high: { dens: 1, card: 1, sub: 4, nb: 1, radial: 7, trunkRadial: 11, strands: 1 },
 };
+/* Many trees, one shape (task 0029). In a merged view (batch.js) the plants are not copied into the batches: each grown
+   shape (species, size, variant) is held once and drawn for all its trees in one go (three.js InstancedMesh: one draw
+   call per shape and material). Each tree has two lighter versions (VEG_LOD: the same branches and leaf clumps – the
+   same random numbers – but no twigs, thinner tubes, fewer and bigger cards covering the crown as fully (their area × count about the same)): the light one
+   from VEG_NEAR[0] m from the camera, the far one from VEG_NEAR[1] m. Which tree is drawn with which, and only the trees
+   in view, follows the camera (vegLodStep, from the view's frame loop; a few metres' margin so a tree on the edge
+   doesn't flip back and forth). The shadows come from a fixed set (layer 1, which only the sun's shadow cameras see):
+   every tree in its light version, in squares of VEG_CELL m – the shadow map is only drawn again when something changes,
+   so it must hold the trees out of view too. Nothing is kept hidden for tapping: a ray finds the tree drawn (far away the
+   light one). Views that make drawings (not merged) keep one mesh per plant, as before. */
+const VEG_LOD = [null, { card: 2, dens: 1 / 4 }, { card: 3.3, dens: 1 / 10, stems: true }];
+const VEG_NEAR = [32, 90];
+const VEG_CELL = 48;
 const VEG_SP = {
   broadleaf: { shape: 'round', leaf: 'broad', bark: 'grey', crownBot: 0.33, stems: 1, nb: 7, card: 0.42, thick: 1 },
   multistem: { shape: 'round', leaf: 'broad', bark: 'grey', crownBot: 0.26, stems: 4, lean: 0.3, nb: 10, card: 0.38, thick: 0.75 },
@@ -264,9 +277,10 @@ class VegBuf {
     if (!this.v) return null;
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3));
-    g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
+    // (normals and shades in bytes: 26 instead of 44 bytes a corner – task 0029)
+    g.setAttribute('normal', new THREE.BufferAttribute(Int8Array.from(this.n, v => Math.round(Math.max(-1, Math.min(1, v)) * 127)), 3, true));
     g.setAttribute('uv', new THREE.Float32BufferAttribute(this.uv, 2));
-    g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(Uint8Array.from(this.c, v => Math.round(Math.max(0, Math.min(1, v)) * 255)), 3, true));
     g.setIndex(this.v > 65535 ? new THREE.Uint32BufferAttribute(this.i, 1) : new THREE.Uint16BufferAttribute(this.i, 1));
     g.computeBoundingSphere(); g.computeBoundingBox();
     return g;
@@ -349,8 +363,12 @@ function vegShade(p, C, rnd) {
 function vegArea(R, RY) { const p = 1.6075, a = R, c = RY; return 4 * Math.PI * Math.pow((Math.pow(a * a, p) + 2 * Math.pow(a * c, p)) / 3, 1 / p); }
 
 /** grow one tree / shrub: { bark, leaves } geometries, base at (0, 0, 0) */
-function vegGrow(spName, D, H, variant, q, far) {
-  const sp = VEG_SP[spName] || VEG_SP.broadleaf, L = VEG_Q[q];
+function vegGrow(spName, D, H, variant, q, far, lod) {
+  const sp = VEG_SP[spName] || VEG_SP.broadleaf;
+  // (the lighter versions – task 0029: the same branches and clumps – the same random numbers – but no twigs, thinner
+  //  tubes and fewer, bigger cards covering the same crown; the far one has only its stems)
+  const LD = VEG_LOD[lod || 0];
+  const L = LD ? { ...VEG_Q[q], radial: 3, trunkRadial: LD.stems ? 4 : 5, card: VEG_Q[q].card * LD.card, dens: VEG_Q[q].dens * LD.dens, strands: VEG_Q[q].strands * LD.dens * 1.8 } : VEG_Q[q];
   const rnd = vegRng(spName.length * 7919 + variant * 104729 + Math.round(D * 10) * 31 + Math.round(H * 10));
   const R = D / 2;
   const crownBot = H * sp.crownBot;
@@ -373,7 +391,7 @@ function vegGrow(spName, D, H, variant, q, far) {
       const d2 = vNorm(vAdd(vAdd(vMul(dir, 0.5), vMul(vRand(rnd), 0.75)), vAdd(vMul(out, 0.4), [0, 0.3, 0])));
       const end = inCrown(vAdd(m, vMul(d2, len * (0.3 + rnd() * 0.25))), 0.97);
       const pts = vegCurve(m, vAdd(m, vMul(vSub(end, m), 0.5)), end, 3, rnd, 0.02 * len);
-      vegTube(bark, pts, rb * 0.42, 0.006, Math.max(3, L.radial - 2), white);
+      if (!LD) vegTube(bark, pts, rb * 0.42, 0.006, Math.max(3, L.radial - 2), white);
       tips.push(end);
     }
   };
@@ -383,7 +401,7 @@ function vegGrow(spName, D, H, variant, q, far) {
     for (let s = 0; s < n; s++) {
       const a = s * 2.399 + rnd() * 0.5, end = inCrown([Math.cos(a) * R * (0.4 + rnd() * 0.4), C.y + (rnd() - 0.2) * RY * 0.8, Math.sin(a) * R * (0.4 + rnd() * 0.4)], 0.9);
       const pts = vegCurve([Math.cos(a) * 0.05, 0, Math.sin(a) * 0.05], [end[0] * 0.3, end[1] * 0.5, end[2] * 0.3], end, 4, rnd, 0.02);
-      vegTube(bark, pts, 0.015, 0.004, 3, white);
+      if (!LD) vegTube(bark, pts, 0.015, 0.004, 3, white);
       tips.push(end);
       if (q === 'high') subBranches(pts, 0.015, R, 1);
     }
@@ -399,7 +417,7 @@ function vegGrow(spName, D, H, variant, q, far) {
       const p = [0, y, 0], rr = shellR(y + RY * 0.12);
       const end = inCrown([Math.cos(a) * rr * 0.85, y + rr * (1.5 + rnd()), Math.sin(a) * rr * 0.85], 0.95);
       const pts = vegCurve(p, vAdd(p, [Math.cos(a) * rr * 0.4, rr * 0.4, Math.sin(a) * rr * 0.4]), end, 3, rnd, 0.03);
-      vegTube(bark, pts, r0 * (0.3 - 0.2 * (y / H)), 0.008, Math.max(3, L.radial - 2), white);
+      if (!(LD && LD.stems)) vegTube(bark, pts, r0 * (0.3 - 0.2 * (y / H)), 0.008, Math.max(3, L.radial - 2), white);
       tips.push(end);
       if (q === 'high' && i % 2 === 0) subBranches(pts, r0 * 0.2, rr * 2, 1);
     }
@@ -429,7 +447,7 @@ function vegGrow(spName, D, H, variant, q, far) {
         const len = vLen(vSub(end, p));
         const ctrl = vAdd(vAdd(p, vMul(vSub(end, p), 0.45)), [0, len * (sp.shape === 'weep' ? 0.35 : 0.12), 0]);
         const pts = vegCurve(p, ctrl, end, 5, rnd, 0.025 * len);
-        vegTube(bark, pts, rs * (0.38 + rnd() * 0.15), 0.012, L.radial, white);
+        if (!(LD && LD.stems)) vegTube(bark, pts, rs * (0.38 + rnd() * 0.15), 0.012, L.radial, white);
         tips.push(end);
         subBranches(pts, rs * 0.42, len, L.sub);
       }
@@ -441,7 +459,7 @@ function vegGrow(spName, D, H, variant, q, far) {
   const area = vegArea(R, RY);
   const card = sp.card * L.card;
   let N = Math.round(area * 30 * L.dens * (far ? 0.6 : 1) * (sp.shape === 'bush' ? 1.5 : 1));
-  N = Math.max(q === 'high' ? 120 : 50, Math.min(q === 'high' ? 6000 : 2000, N));
+  N = Math.max(LD ? 24 : q === 'high' ? 120 : 50, Math.min(q === 'high' ? 6000 : 2000, N));
   if (sp.shape === 'weep') {
     // the willow: curtains of hanging twigs from the upper crown down to near the ground, plus the crown's top
     const strands = Math.round((60 + area * 0.8) * L.strands * (far ? 0.7 : 1));
@@ -483,11 +501,11 @@ function vegGrow(spName, D, H, variant, q, far) {
   return { bark: bark.geo(), leaves: leaves.geo() };
 }
 const VEG_TPL = new Map();
-function vegTemplate(spName, D, H, variant, q, far) {
+function vegTemplate(spName, D, H, variant, q, far, lod) {
   // per 50 cm of size: the cards keep their real size, the rest is scaled
   const d = Math.max(0.5, Math.round(D * 2) / 2), hh = Math.max(0.5, Math.round(H * 2) / 2);
-  const key = [spName, d, hh, variant, q, far ? 1 : 0].join('|');
-  if (!VEG_TPL.has(key)) VEG_TPL.set(key, { ...vegGrow(spName, d, hh, variant, q, far), D: d, H: hh });
+  const key = [spName, d, hh, variant, q, far ? 1 : 0].join('|') + (lod ? '|lod' + lod : '');
+  if (!VEG_TPL.has(key)) VEG_TPL.set(key, { ...vegGrow(spName, d, hh, variant, q, far, lod), D: d, H: hh, key });
   return VEG_TPL.get(key);
 }
 /** an ornamental grass: blades in crossed cards, leaning out */
@@ -583,8 +601,14 @@ Object.assign(View3D.prototype, {
     const seed = Math.floor(Math.abs(pl.x * 131 + pl.y * 17)) + 7;
     const pick = pl.id ? { plant: pl.id } : null;
     const spName = opts.species || vegSpecies(pl);
-    const put = (geo, material, x, y, z, rot, sx, sy) => {
+    const keys = G.userData.vegKeys || (G.userData.vegKeys = new Set());
+    // geos: the shape and its lighter versions (or only the shape), tk: the templates' names (kept while a garden uses them)
+    const put = (geos, material, x, y, z, rot, sx, sy, tk) => {
+      const geo = geos[0];
       if (!geo) return null;
+      for (const k of tk) keys.add(k);
+      const inst = this._vegInst;
+      if (inst) { vegInstAdd(inst, geos, material, x, y, z, rot, sx, sy, pick); return null; }
       const m = add(geo, material, { cast: true, pick });
       m.position.set(x, y, z); m.rotation.y = rot; m.scale.set(sx, sy, sx);
       m.userData.keep = true; m.userData.veg = true;
@@ -594,20 +618,22 @@ Object.assign(View3D.prototype, {
     if (spName === 'grass') {
       const key = 'grass|' + Math.round(d * 4) + '|' + Math.round(hh * 4) + '|' + (seed % 3) + '|' + q;
       if (!VEG_TPL.has(key)) VEG_TPL.set(key, vegGrassGeo(Math.round(d * 4) / 4 || 0.25, Math.round(hh * 4) / 4 || 0.25, q, seed % 3 + 5));
-      put(VEG_TPL.get(key), vegBlades('grass', q), pl.x, lv, pl.y, rot, 1, 1);
+      put([VEG_TPL.get(key)], vegBlades('grass', q), pl.x, lv, pl.y, rot, 1, 1, [key]);
       return;
     }
     if (spName === 'pot') {
       add(new THREE.CylinderGeometry(d * 0.42, d * 0.32, hh * 0.45, 20).translate(pl.x, lv + hh * 0.225, pl.y), mat('g|pot', () => new THREE.MeshStandardMaterial({ color: 0x8c5a3c, roughness: 0.8 })), { cast: true, pick });
       const tpl = vegTemplate('shrub', d * 0.95, hh * 0.6, seed % 3, q);
-      put(tpl.leaves, vegLeaves('small', q), pl.x, lv + hh * 0.4, pl.y, rot, d * 0.95 / tpl.D, hh * 0.6 / tpl.H);
+      put([tpl.leaves], vegLeaves('small', q), pl.x, lv + hh * 0.4, pl.y, rot, d * 0.95 / tpl.D, hh * 0.6 / tpl.H, [tpl.key]);
       return;
     }
     const sp = VEG_SP[spName] || VEG_SP.broadleaf;
     const tpl = vegTemplate(spName, d, hh, seed % 3, q, opts.far);
-    const sx = d / tpl.D, sy = hh / tpl.H;
-    put(tpl.bark, vegBarkMat(sp.bark), pl.x, lv, pl.y, rot, sx, sy);
-    put(tpl.leaves, vegLeaves(sp.leaf, q), pl.x, lv, pl.y, rot, sx, sy);
+    // (shrubs are small and low: no lighter versions)
+    const lo = this._vegInst && sp.shape !== 'bush' ? [1, 2].map(k => vegTemplate(spName, d, hh, seed % 3, q, opts.far, k)) : [];
+    const sx = d / tpl.D, sy = hh / tpl.H, tk = [tpl, ...lo].map(x => x.key);
+    put([tpl, ...lo].map(x => x.bark), vegBarkMat(sp.bark), pl.x, lv, pl.y, rot, sx, sy, tk);
+    put([tpl, ...lo].map(x => x.leaves), vegLeaves(sp.leaf, q), pl.x, lv, pl.y, rot, sx, sy, tk);
   },
   /** the leaves standing out of a hedge (the clipped box stays underneath) */
   vegHedge(LP, lv, l, add, pick) {
@@ -627,5 +653,173 @@ Object.assign(View3D.prototype, {
     if (!geo) return;
     const m = add(geo, vegBlades('reed', q), { cast: true });
     m.userData.veg = true;
+    // (merged: no hidden copy kept for tapping – batch.js)
+    m.userData.standIn = null;
+  },
+});
+
+/* ───────── many trees, one shape: instancing and the lighter versions far away (task 0029) ───────── */
+/** one plant into the garden's list of instances (per shape and material) */
+function vegInstAdd(inst, geos, material, x, y, z, rot, sx, sy, pick) {
+  const geo = geos[0], k = geo.uuid + '|' + material.uuid;
+  let e = inst.get(k);
+  // (a missing lighter version: the one before it)
+  if (!e) inst.set(k, e = { geos: [0, 1, 2].map(i => geos[Math.min(i, geos.length - 1)] || geo), material, list: [] });
+  if (!geo.boundingSphere) geo.computeBoundingSphere();
+  const bs = geo.boundingSphere, m = new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rot), new THREE.Vector3(sx, sy, sx));
+  // where it is (the middle of its shape) and how big, for the camera's distance and view
+  const c = bs.center.clone().applyMatrix4(m);
+  e.list.push({ m, c, r: bs.radius * Math.max(sx, sy) * 1.05, pick, lv: -2 });
+}
+/** the gardens built (their groups): the shapes they use stay, the others are let go (vegPrune) */
+const VEG_GARDENS = new Set();
+const _vegFr = new THREE.Frustum(), _vegM = new THREE.Matrix4(), _vegS = new THREE.Sphere();
+Object.assign(View3D.prototype, {
+  /** a garden is about to be built: collect its plants as instances when this view is merged (batch.js) */
+  vegInstBegin(G, cutH) {
+    VEG_GARDENS.add(G);
+    this._vegInst = this.batchOn() ? new Map() : null;
+    this._vegCut = cutH != null;
+  },
+  /** the garden is built: per shape and material an InstancedMesh for each version (drawn, layer 0) and the shadows
+   *  (layer 1, in squares) */
+  vegInstEnd(G) {
+    const inst = this._vegInst;
+    this._vegInst = null;
+    if (!inst) return;
+    const groups = [], full = typeof window !== 'undefined' && window.__hpVegFull;
+    const mk = (geo, material, n) => {
+      const im = new THREE.InstancedMesh(geo, material, n);
+      im.userData.veg = true; im.userData.vegInst = true; im.userData.keep = true;
+      material.userData.cutClip = this._vegCut;
+      G.add(im);
+      return im;
+    };
+    for (const e of inst.values()) {
+      // drawn: one per version (the same shape twice is one); the camera picks the trees for each (vegLodStep)
+      const ims = [];
+      e.geos.forEach((geo, i) => {
+        if (i && geo === e.geos[i - 1]) { ims.push(ims[i - 1]); return; }
+        const im = mk(geo, e.material, e.list.length);
+        im.count = 0; im.visible = false;
+        im.castShadow = false; im.receiveShadow = true;
+        // (vegLodStep leaves out what is out of view itself)
+        im.frustumCulled = false;
+        ims.push(im);
+      });
+      // the shadows: every tree, in squares (the sun's shadow cameras leave out the squares outside them)
+      const cells = new Map();
+      for (const it of e.list) {
+        const ck = Math.floor(it.c.x / VEG_CELL) + ',' + Math.floor(it.c.z / VEG_CELL);
+        if (!cells.has(ck)) cells.set(ck, []);
+        cells.get(ck).push(it);
+      }
+      for (const list of cells.values()) {
+        const sh = mk(e.geos[full ? 0 : 1], e.material, list.length);
+        list.forEach((it, i) => sh.setMatrixAt(i, it.m));
+        sh.castShadow = true; sh.receiveShadow = false;
+        sh.layers.set(1);
+        sh.userData.vegShadow = true;
+        sh.computeBoundingSphere();
+      }
+      groups.push({ list: e.list, ims });
+    }
+    groups.G = G;
+    G.userData.vegLod = groups;
+  },
+  /** the sun's shadow cameras also see layer 1 (the trees' shadows) */
+  vegShadowLayers() {
+    for (const o of this.scene.children) if (o.shadow && o.shadow.camera && !o.shadow.camera.layers.isEnabled(1)) o.shadow.camera.layers.enable(1);
+  },
+  /** which trees are in view, and in which version (by their distance from the camera); true when that changed */
+  vegLodStep(force) {
+    const L = this.vegLod;
+    if (!L || !L.length) return false;
+    this.vegShadowLayers();
+    const cam = this.camera;
+    cam.updateMatrixWorld();
+    _vegM.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
+    const key = _vegM.elements.map(v => v.toFixed(4)).join();
+    if (!force && key === this._vegKey) return false;
+    this._vegKey = key;
+    _vegFr.setFromProjectionMatrix(_vegM);
+    const G = L.G, gp = G.position, c = cam.position;
+    const full = typeof window !== 'undefined' && window.__hpVegFull;
+    let any = false;
+    for (const g of L) {
+      let changed = !!force;
+      for (const it of g.list) {
+        _vegS.center.copy(it.c).add(gp); _vegS.radius = it.r;
+        let lv = -1;
+        if (_vegFr.intersectsSphere(_vegS)) {
+          const d = _vegS.center.distanceTo(c);
+          // (a few metres' margin both ways: a tree on the edge stays as it is)
+          const was = it.lv, edge = k => VEG_NEAR[k] + (was > k ? -3 : was >= 0 ? 3 : 0);
+          lv = full ? 0 : d < edge(0) ? 0 : d < edge(1) ? 1 : 2;
+        }
+        if (lv !== it.lv) { it.lv = lv; changed = true; }
+      }
+      if (!changed) continue;
+      any = true;
+      const n = new Map(), picks = new Map();
+      for (const im of g.ims) { n.set(im, 0); picks.set(im, []); }
+      for (const it of g.list) {
+        if (it.lv < 0) continue;
+        const im = g.ims[it.lv];
+        im.setMatrixAt(n.get(im), it.m); n.set(im, n.get(im) + 1); picks.get(im).push(it.pick);
+      }
+      for (const [im, k] of n) {
+        im.count = k; im.visible = k > 0;
+        im.instanceMatrix.needsUpdate = true;
+        im.userData.picks = picks.get(im);
+        im.computeBoundingSphere();
+      }
+    }
+    return any;
+  },
+  /** for the photo render: the path tracer takes meshes one by one, not instances – the trees become plain meshes for
+   *  the render (each in the version for its distance, also those out of view: their shadows and reflections);
+   *  returns what puts it back */
+  vegFlatten() {
+    const L = this.vegLod, added = [], hidden = [];
+    if (!L) return () => {};
+    const G = L.G, c = this.camera.position.clone().sub(G.position);
+    G.traverse(o => { if (o.userData.vegInst && o.visible) { o.visible = false; hidden.push(o); } });
+    for (const g of L) {
+      const by = new Map();
+      for (const it of g.list) {
+        const d = it.c.distanceTo(c), im = g.ims[d < VEG_NEAR[0] ? 0 : d < VEG_NEAR[1] ? 1 : 2];
+        if (!by.has(im)) by.set(im, []);
+        by.get(im).push({ g: im.geometry, M: it.m, start: 0, count: Infinity });
+      }
+      for (const [im, items] of by) {
+        const geo = im.geometry, names = ['position', 'normal', ...['uv', 'uv1', 'color'].filter(n => geo.attributes[n])];
+        const flat = batchGeometry({ names, items });
+        if (!flat) continue;
+        const mesh = new THREE.Mesh(flat, im.material);
+        mesh.castShadow = true; mesh.receiveShadow = true;
+        G.add(mesh);
+        added.push(mesh);
+      }
+    }
+    return () => { for (const mesh of added) { mesh.removeFromParent(); mesh.geometry.dispose(); } for (const o of hidden) o.visible = true; };
+  },
+  /** how many grown shapes are held (for the tests: none once no view shows the site) */
+  vegHeld() { return VEG_TPL.size; },
+  /** the shapes no garden uses any more (the site switched off, another species …): let go of them */
+  vegPrune() {
+    const used = new Set();
+    for (const G of [...VEG_GARDENS]) {
+      // (a garden that is in no view any more – its view was cleared or closed)
+      let root = G;
+      while (root.parent) root = root.parent;
+      if (!root.isScene) { VEG_GARDENS.delete(G); continue; }
+      for (const k of G.userData.vegKeys || []) used.add(k);
+    }
+    for (const [k, t] of [...VEG_TPL]) {
+      if (used.has(k)) continue;
+      VEG_TPL.delete(k);
+      for (const geo of t && t.isBufferGeometry ? [t] : [t && t.bark, t && t.leaves]) if (geo) geo.dispose();
+    }
   },
 });

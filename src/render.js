@@ -87,6 +87,8 @@ async function renderView3d(v, opts) {
     sc.updateProjectionMatrix();
     sky.target.position.copy(C);
     v.scene.add(sky, sky.target);
+    // (its shadow camera also sees the trees' shadows – trees.js)
+    if (v.vegShadowLayers) v.vegShadowLayers();
     v.hemi.intensity = keep.hemi * (1 - RENDER_SKY) * L.sky;
     if (v.scene.environment) v.scene.environmentIntensity = keep.env * (1 - RENDER_SKY * 0.6) * L.sky;
   }
@@ -822,10 +824,11 @@ async function renderPathTraced(v, opts) {
     metered = pt.samples;
   };
   // everything back as it was
-  let ended = false, kept = false, meta = {}, tiles = 1, runTo = null;
+  let ended = false, kept = false, meta = {}, tiles = 1, runTo = null, unflat = null;
   const restore = () => {
     if (ended) return;
     ended = true;
+    if (unflat) { unflat(); unflat = null; }
     r.domElement.removeEventListener('webglcontextlost', onLost);
     if (pt) { try { pt.dispose(); } catch (e) { /* fine */ } }
     if (dn) { try { dn.dispose(); } catch (e) { /* fine */ } dn = null; }
@@ -888,6 +891,8 @@ async function renderPathTraced(v, opts) {
     const soft = new Set();
     v.scene.traverse(o => { if (o.material) for (const m of [].concat(o.material)) if (m && m.userData && m.userData.soft && m.map) soft.add(m); });
     for (const m of soft) { m.userData.ptColor = m.color.clone(); m.color.multiplyScalar(2); }
+    // (trees drawn many times: plain meshes for the path tracer while it renders – trees.js)
+    unflat = v.vegFlatten ? v.vegFlatten() : null;
     try { pt.setScene(v.scene, cam); } finally { for (const m of soft) { m.color.copy(m.userData.ptColor); delete m.userData.ptColor; } }
     // (the picture to the screen: cleaned of its grain when it is taken – grab)
     pt.renderToCanvasCallback = (target, rr, quad) => {

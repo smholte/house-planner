@@ -7,7 +7,11 @@
    Not merged: what moves (doors and their leaves, the gate's leaf, furniture), see-through materials (their order
    matters), overlays (depthTest / depthWrite off, renderOrder), meshes with children, instanced meshes.
    Same look: the same materials and the same triangles, only fewer, bigger pieces. A 3D view built for drawings
-   (sections, sun hours) is not merged: they change materials and hide pieces one by one. */
+   (sections, sun hours) is not merged: they change materials and hide pieces one by one.
+   Task 0029 (a lighter site): a piece alone in its buckets (one big piece – the plot, a street, the houses around per
+   material) is not copied: it stays as it is, drawn and found by rays itself. A piece with a light stand-in
+   (userData.standIn: the houses around as seen from far, or nothing for reeds) keeps only that for rays once merged.
+   The garden's trees, shrubs and grasses are not merged at all: they are one shape drawn many times (trees.js). */
 
 const BATCH_MATS = new Set(['MeshStandardMaterial', 'MeshPhysicalMaterial', 'MeshLambertMaterial', 'MeshPhongMaterial', 'MeshBasicMaterial']);
 
@@ -33,7 +37,7 @@ function batchStatic(root, moving, cell = 0) {
   root.updateMatrixWorld(true);
   const ctr = new THREE.Vector3();
   const inv = new THREE.Matrix4().copy(root.matrixWorld).invert();
-  const buckets = new Map();
+  const buckets = new Map(), bucketsOf = new Map();
   const merged = [];
   root.traverse(o => {
     if (!batchable(o, moving)) return;
@@ -56,13 +60,18 @@ function batchStatic(root, moving, cell = 0) {
       const key = m.uuid + '|' + sig + '|' + (o.castShadow ? 1 : 0) + (o.receiveShadow ? 1 : 0) + '|' + (m.vertexColors ? 1 : 0) + '|' + where;
       let b = buckets.get(key);
       if (!b) buckets.set(key, b = { m, names, cast: o.castShadow, receive: o.receiveShadow, items: [] });
-      b.items.push({ g, M, start, count });
+      b.items.push({ g, M, start, count, o });
+      bucketsOf.has(o) ? bucketsOf.get(o).push(b) : bucketsOf.set(o, [b]);
     }
     merged.push(o);
   });
+  // a piece alone in all its buckets (one big piece: the houses around, the plot, a street – already one mesh per
+  // material) stays as it is, drawn and found by rays itself: a copy would only hold its triangles twice (task 0029)
+  const alone = new Set(merged.filter(o => (bucketsOf.get(o) || []).every(b => b.items.length === 1)));
   // only worth it where pieces come together
   let n = 0;
   for (const b of buckets.values()) {
+    if (b.items.length === 1 && alone.has(b.items[0].o)) continue;
     const geo = batchGeometry(b);
     if (!geo) continue;
     const mesh = new THREE.Mesh(geo, b.m);
@@ -72,8 +81,20 @@ function batchStatic(root, moving, cell = 0) {
     root.add(mesh);
     n++;
   }
-  for (const o of merged) { o.visible = false; o.userData.merged = true; }
-  return merged.length;
+  let k = 0;
+  for (const o of merged) {
+    if (alone.has(o)) { if (o.userData.standIn) o.userData.standIn.dispose(); delete o.userData.standIn; continue; }
+    o.visible = false; o.userData.merged = true; k++;
+    // a light stand-in for tapping instead of the hidden piece (task 0029: the houses around – their walls and roofs –
+    // or nothing, for reeds): the piece's own triangles are only held in the merged mesh
+    if ('standIn' in o.userData) {
+      const g0 = o.geometry, sIn = o.userData.standIn;
+      delete o.userData.standIn;
+      if (sIn) o.geometry = sIn; else o.removeFromParent();
+      if (!(o.userData && o.userData.keep)) g0.dispose();
+    }
+  }
+  return k;
 }
 
 /** one geometry (in the root's frame) from the triangles of the items in a bucket */
@@ -135,9 +156,11 @@ function batchGeometry(b) {
 }
 
 Object.assign(View3D.prototype, {
+  /** is this view merged? (not the views that make drawings) */
+  batchOn() { return !(this.opts.noBatch || (typeof window !== 'undefined' && window.__hpNoBatch)); },
   /** after a build: merge the storeys and the garden (not for the views that make drawings) */
   batchAll() {
-    if (this.opts.noBatch || (typeof window !== 'undefined' && window.__hpNoBatch)) return;
+    if (!this.batchOn()) return;
     const moving = new Set();
     for (const list of this.doorMap.values()) for (const d of list) moving.add(d.grp);
     let n = 0;

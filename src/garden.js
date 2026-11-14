@@ -1051,6 +1051,9 @@ Object.assign(View3D.prototype, {
     const G = new THREE.Group();
     G.position.set(at.offset[0], at.y || 0, at.offset[1]);
     G.userData.garden = true;
+    // (trees and plants: one shape drawn many times where the view is merged – trees.js)
+    if (this.vegInstBegin) this.vegInstBegin(G, cutH);
+    const done = () => { if (this.vegInstEnd) this.vegInstEnd(G); this.group.add(G); };
     const add = (geo, material, opts = {}) => {
       const m = new THREE.Mesh(geo, material);
       m.receiveShadow = true; m.castShadow = !!opts.cast;
@@ -1106,7 +1109,7 @@ Object.assign(View3D.prototype, {
       add(geo, [gardenMaterial(show.garden ? (gd && gd.base) || 'lawn' : 'context'), gardenMaterial(show.garden ? 'path' : 'context')], { walk: true, pick: { plot: true } });
     }
     if (show.street) for (const f of gCornerFillers(site, spec.garden || emptyGarden())) add(gSlab(f, plotBottom, sl - 0.001), gardenMaterial('path'), { walk: true });
-    if (!gd) { this.group.add(G); return; }
+    if (!gd) { done(); return; }
     gd.areas.forEach((a, i) => {
       if (a.poly.length < 3) return;
       const y = lv + 0.012 + (i % 5) * 0.002 + (a.kind === 'water' ? -0.25 : 0);
@@ -1153,7 +1156,7 @@ Object.assign(View3D.prototype, {
       }
     }
     for (const pl of gd.plants) this.gTree(G, pl, lv, add);
-    this.group.add(G);
+    done();
   },
 
   gTree(G, pl, lv, add, opts) {

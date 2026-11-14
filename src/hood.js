@@ -298,21 +298,38 @@ Object.assign(View3D.prototype, {
     const mirrored = spec && spec.shell && this.buildLot3 ? this.buildLot3(G, spec, ground) : false;
     const bufs = new Map();
     const blds = (A.blds || []).filter(H => !(mirrored && H.lot === 3));
-    for (const H of blds) hoodHouse(H, ground, bufs, H.est ? Math.min(1, lodOf([H.m])) : lodOf(H.o || [H.m]));
-    for (const Fl of A.flats || []) {
-      if (mirrored && Fl.lot === 3) continue;
-      const lod = lodOf(Fl.o);
-      if (!Fl.a && !Fl.est && lod < 1) continue;
-      // an annex in the brick of the house it stands against
-      const c = polyCentroid(Fl.o);
-      let best = null;
-      for (const H of blds) { const d = V.dist(c, H.m); if (!best || d < best.d) best = { d, H }; }
-      hoodFlat(Fl, ground, bufs, lod, (best && best.H.b) || [0.55, 0.3, 0.22]);
-    }
+    // (cap: the most detail – the stand-in for rays below is built without the small parts close by)
+    const houses = (B, cap = 2) => {
+      for (const H of blds) hoodHouse(H, ground, B, Math.min(cap, H.est ? Math.min(1, lodOf([H.m])) : lodOf(H.o || [H.m])));
+      for (const Fl of A.flats || []) {
+        if (mirrored && Fl.lot === 3) continue;
+        const lod = lodOf(Fl.o);
+        if (!Fl.a && !Fl.est && lod < 1) continue;
+        // an annex in the brick of the house it stands against
+        const c = polyCentroid(Fl.o);
+        let best = null;
+        for (const H of blds) { const d = V.dist(c, H.m); if (!best || d < best.d) best = { d, H }; }
+        hoodFlat(Fl, ground, B, Math.min(cap, lod), (best && best.H.b) || [0.55, 0.3, 0.22]);
+      }
+    };
+    houses(bufs);
+    const meshes = [];
     for (const { B, make } of bufs.values()) {
       const geo = B.geo();
       if (!geo) continue;
-      add(geo, make(), { cast: true }).userData.around = true;
+      const m = add(geo, make(), { cast: true });
+      m.userData.around = true;
+      meshes.push(m);
+    }
+    // merged views: a tap on a house finds a light stand-in – its walls, roofs and annexes without the small parts
+    // close by (gutters, boards, ridge), pictures or shades – not a hidden copy of every material's triangles (batch.js;
+    // task 0029)
+    if (meshes.length && this.batchOn && this.batchOn()) {
+      const sb = new Map();
+      houses(sb, 1);
+      const parts = [...sb.values()].map(({ B }) => B.geo()).filter(Boolean);
+      const sIn = hoodStandIn(parts);
+      meshes.forEach((m, i) => { m.userData.standIn = i ? null : sIn; });
     }
     // along the plots: low brick walls with a course on edge, green screens, hedges
     const lv = site.level ?? -0.15, bins = new Map();
@@ -360,6 +377,7 @@ Object.assign(View3D.prototype, {
       }
     }
     if (!n) return false;
+    // (its pieces are the house's own shapes – shellGeometry keeps them for the house itself: no copy to drop here)
     G.add(grp);
     return true;
   },
@@ -406,6 +424,26 @@ Object.assign(View3D.prototype, {
     }
   },
 });
+/** one geometry of the corners alone (no normals, pictures or shades) from several: a stand-in for rays */
+function hoodStandIn(parts) {
+  let nv = 0, ni = 0;
+  for (const g of parts) { nv += g.attributes.position.count; ni += g.index ? g.index.count : g.attributes.position.count; }
+  const pos = new Float32Array(nv * 3), idx = nv > 65535 ? new Uint32Array(ni) : new Uint16Array(ni);
+  let vo = 0, io = 0;
+  for (const g of parts) {
+    const P = g.attributes.position;
+    pos.set(P.array, vo * 3);
+    if (g.index) for (let i = 0; i < g.index.count; i++) idx[io++] = vo + g.index.getX(i);
+    else for (let i = 0; i < P.count; i++) idx[io++] = vo + i;
+    vo += P.count;
+    g.dispose();
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setIndex(new THREE.BufferAttribute(idx, 1));
+  out.computeBoundingSphere(); out.computeBoundingBox();
+  return out;
+}
 /** a planter's outline (plan) */
 function hoodPlanterPoly([x, y, L, W, deg]) {
   const r = deg * Math.PI / 180, u = [Math.cos(r), Math.sin(r)], n = [-u[1], u[0]];

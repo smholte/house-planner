@@ -1007,6 +1007,8 @@ class View3D extends Emitter {
       // walking on a computer: the sun with two shadow maps that follow the view (sunnear.js)
       this.nearSunStep();
       if (this.csmSun && moved) this.shadowDirty = true;
+      // the trees in view, each in the version for its distance (trees.js; their shadows are a fixed set: no new shadows)
+      if (this.vegLod) this.vegLodStep();
       if (this.shadowDirty) { this.shadowDirty = false; this.renderer.shadowMap.needsUpdate = true; }
       this.renderer.render(this.scene, this.camera);
       if (withAO) this.renderAO();
@@ -1046,7 +1048,9 @@ class View3D extends Emitter {
   }
 
   clear() {
-    this.group.traverse(o => { if (o.geometry && !(o.userData && o.userData.keep)) o.geometry.dispose(); });
+    // (an InstancedMesh's own list of places goes too; its shape is shared – trees.js)
+    this.group.traverse(o => { if (o.isInstancedMesh) o.dispose(); if (o.geometry && !(o.userData && o.userData.keep)) o.geometry.dispose(); });
+    this.vegLod = null;
     this.group.clear();
     if (this.ao) this.ao.box = null;
     this.pickables = [];
@@ -1174,6 +1178,11 @@ class View3D extends Emitter {
         if (G) { G.userData.rsig = gs; G.userData.reg = this.regSince(snap); fresh.push(G); }
       }
     }
+    // the trees drawn many times, near the camera in full, far away light (trees.js); the shapes no garden uses let go
+    const GG = this.group.children.find(c => c.userData.garden);
+    this.vegLod = (GG && GG.userData.vegLod) || null;
+    this._vegKey = null;
+    if (this.vegPrune) this.vegPrune();
     // slices belong to this view (project + storey / all storeys / whole house)
     const key = spec.sliceKey || '';
     if (key !== this.sliceKey) {
@@ -1186,6 +1195,7 @@ class View3D extends Emitter {
     this.applyClip();
     // fewer draw calls: what never moves, one mesh per material (batch.js)
     this.batchAll();
+    if (this.vegLod) this.vegLodStep(true);
     this.renderSliceList();
     // walking: the house was rebuilt, so the floors and walls to walk on are new
     if (this.walker) { this.walker.collect(); this.walker.updateCamera(); }

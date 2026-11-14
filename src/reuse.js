@@ -61,9 +61,10 @@ Object.assign(View3D.prototype, {
   clearKeep(keep) {
     for (const r of [...this.group.children]) {
       if (keep.has(r)) continue;
-      r.traverse(o => { if (o.geometry && !(o.userData && o.userData.keep)) o.geometry.dispose(); });
+      r.traverse(o => { if (o.isInstancedMesh) o.dispose(); if (o.geometry && !(o.userData && o.userData.keep)) o.geometry.dispose(); });
     }
     this.group.clear();
+    this.vegLod = null;
     if (this.ao) this.ao.box = null;
     this.pickables = [];
     this.labels = [];

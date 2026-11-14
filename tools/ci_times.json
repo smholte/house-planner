@@ -646,6 +646,18 @@
     "checks": 23
    }
   },
+  "test_site3d.py": {
+   "seconds": 110.0,
+   "ok": true,
+   "checks": 18,
+   "made_up": {
+    "seconds": 67.0,
+    "ok": true,
+    "checks": 18
+   },
+   "set": "public",
+   "note": "task 0029"
+  },
   "test_sun.py": {
    "seconds": 167.0,
    "ok": true,
