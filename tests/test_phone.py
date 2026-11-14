@@ -41,6 +41,7 @@ for theme in ('light', 'dark'):
         pg.evaluate("() => window.__hp.app.toggleInspector(false)"); pg.wait_for_timeout(400)
         pg.tap('#mode-switch button[data-mode="view"]'); pg.wait_for_timeout(1200)
         pg.tap('#toolrail button[data-tool="note"]'); pg.wait_for_timeout(300)
+        pg.evaluate("() => window.__hp.app.panes[0].view.fit(36, false)"); pg.wait_for_timeout(400)   # (adding the run zoomed in on it – task 0020)
         pt = room_screen(pg, 'Keuken', 0.4, 0.5); pg.touchscreen.tap(pt[0], pt[1]); pg.wait_for_timeout(800)
         check(f'{theme}: note by tap', pg.evaluate("() => window.__hp.app.project.notes.length") == 1)
         pg.evaluate("() => window.__hp.app.toggleInspector(false)"); pg.wait_for_timeout(300)
