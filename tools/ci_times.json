@@ -713,6 +713,17 @@
    },
    "set": "public"
   },
+  "test_wallphotos.py": {
+   "seconds": 51.0,
+   "ok": true,
+   "checks": 42,
+   "made_up": {
+    "seconds": 51.0,
+    "ok": true,
+    "checks": 41
+   },
+   "set": "public"
+  },
   "test_voids.py": {
    "seconds": 62.0,
    "ok": true,
