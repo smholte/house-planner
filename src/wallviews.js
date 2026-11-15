@@ -212,6 +212,7 @@ Object.assign(app, {
       if (rows.length) card.appendChild(h('table', { class: 'wv-table' },
         h('thead', null, h('tr', null, h('th', null, t('On this wall')), h('th', null, t('Height')), h('th', null, t('From the left corner')))),
         h('tbody', null, ...rows.map(x => h('tr', null, h('td', null, x.what), h('td', { class: 'num' }, x.h), h('td', { class: 'num' }, x.x))))));
+      card.appendChild(this.wallPhotoStrip(D.f));
       body.appendChild(card);
     }
     UI.dialog({ title: t('Wall views · {r}', { r: r.name }), body, wide: true,
@@ -248,6 +249,24 @@ Object.assign(app, {
             for (const x of rows.slice(0, 13)) { y += 4.6; pg.text(x.what.slice(0, 80), 12, y, 8.5); pg.text(x.h, 160, y, 8.5); pg.text(x.x, 200, y, 8.5); }
             if (rows.length > 13) pg.text(t('and {n} more', { n: rows.length - 13 }), 12, y + 4.6, 8.5);
           }
+          // the photos of the bare wall: on pages of their own, six to a page, with the date and the text
+          const photos = wallPhotosOf(p, D.f);
+          if (photos.length) await Assets.ensure(photos.map(x => x.asset));
+          for (let k = 0; k < photos.length; k += 6) {
+            const pp = pdf.page(297, 210);
+            pp.text(`${p.name} · ${r.name} · ${t('Wall {l}', { l: D.letter })} · ${t('photos of the bare wall')}` + (photos.length > 6 ? ` (${k / 6 + 1}/${Math.ceil(photos.length / 6)})` : ''), 12, 14, 13, { bold: true });
+            pp.text(`${st ? st.name : ''} · ${t('before it was closed: pipes, cables and boxes')}`, 12, 20, 9, { color: [0.35, 0.38, 0.4] });
+            photos.slice(k, k + 6).forEach((x, j) => {
+              const a = Assets.get(x.asset);
+              const cx = 12 + (j % 3) * 92, cy = 26 + Math.floor(j / 3) * 90, bw = 88, bh = 74;
+              if (a && /^data:image\/jpeg;base64,/.test(a.url)) {
+                const pw = a.w || x.w || 4, ph = a.h || x.h || 3, kk = Math.min(bw / pw, bh / ph);
+                pp.image(b64ToBytes(a.url.slice(a.url.indexOf(',') + 1)), pw, ph, cx + (bw - pw * kk) / 2, cy, pw * kk, ph * kk);
+              }
+              pp.text(fmtDate(x.date, false), cx, cy + bh + 4.5, 8.5, { bold: true });
+              if (x.text) pp.text(x.text.slice(0, 60), cx, cy + bh + 8.5, 8);
+            });
+          }
         }
       } finally { host.remove(); document.documentElement.dataset.theme = theme || ''; if (!theme) delete document.documentElement.dataset.theme; }
       this.downloadBlob(`${slugify(p.name)}_${slugify(r.name)}_${slugify(t('wall views'))}.pdf`, pdf.blob());
@@ -272,4 +291,261 @@ async function svgJpeg(svg, pxW) {
   g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
   g.drawImage(img, 0, 0, W, H);
   return { data: await canvasJpeg(cv, 0.9), pxW: W, pxH: H, w: W, h: H };
+}
+
+/* ───────── photos of the bare walls (I25) ─────────
+   On a building visit: a photo of each wall before plaster and tiles close it (pipes, cables, boxes), attached to that
+   wall. The photos show the house as built, so they belong to the house, not to one version: project.wallPhotos =
+   [{ id, wall, side, u, room, asset, thumb, w, h, date, text, created }] – the wall's id (kept when a version is
+   copied), its side, where along it (u, metres from its start: one wall can run along two rooms) and the room it was
+   taken in. A wall view shows the photos of its wall side in every version that has that wall. The picture is made
+   smaller on the device (at most 1600 px, JPEG, as note photos) with a small thumbnail beside it; both are Assets, so
+   they go with exports, backups, merges and viewer copies (assetIdsOf). */
+const WP_MAX = 1600, WP_THUMB = 320;
+
+/** the photos of one wall face (a wall, one side, the part along one room), oldest first */
+function wallPhotosOf(p, f) {
+  const inF = (x, g) => x.u >= g.u0 - 0.1 && x.u <= g.u1 + 0.1;
+  let sib = null;   // the room's other faces of the same wall and side (an L-shaped room can meet one wall twice)
+  const others = () => sib || (sib = roomFaces(app.shownVersion().plan, f.room).filter(g => g.wall.id === f.wall.id && g.side === f.side && Math.abs(g.u0 - f.u0) > 0.01));
+  // where along the wall it was taken; if the wall changed in this version, the room it was taken in (the nearest face)
+  return ((p && p.wallPhotos) || []).filter(x => x.wall === f.wall.id && x.side === f.side &&
+    (inF(x, f) || (x.room === f.room.id && !others().some(g => inF(x, g) || Math.abs(x.u - (g.u0 + g.u1) / 2) < Math.abs(x.u - (f.u0 + f.u1) / 2)))))
+    .sort((a, b) => (a.date || 0) - (b.date || 0) || (a.created || 0) - (b.created || 0));
+}
+
+/** the date a JPEG was taken (EXIF DateTimeOriginal, else DateTime), or null */
+async function photoTakenAt(file) {
+  try {
+    const b = new DataView(await file.slice(0, 256 * 1024).arrayBuffer());
+    if (b.getUint16(0) !== 0xFFD8) return null;
+    let o = 2;
+    while (o + 10 < b.byteLength) {
+      const m = b.getUint16(o), len = b.getUint16(o + 2);
+      if ((m & 0xFF00) !== 0xFF00) return null;
+      if (m === 0xFFE1 && b.getUint32(o + 4) === 0x45786966) {
+        const T = o + 10, le = b.getUint16(T) === 0x4949;
+        const u16 = x => b.getUint16(T + x, le), u32 = x => b.getUint32(T + x, le);
+        const find = (ifd, tag) => { const n = u16(ifd); for (let i = 0; i < n && i < 500; i++) { const e = ifd + 2 + i * 12; if (u16(e) === tag) return e; } return -1; };
+        const str = e => { let s0 = ''; const at = u32(e + 8); for (let i = 0; i < 19; i++) s0 += String.fromCharCode(b.getUint8(T + at + i)); return s0; };
+        const ifd0 = u32(4);
+        let s0 = null;
+        const ex = find(ifd0, 0x8769);
+        if (ex >= 0) { const d = find(u32(ex + 8), 0x9003); if (d >= 0) s0 = str(d); }
+        if (!s0) { const d = find(ifd0, 0x0132); if (d >= 0) s0 = str(d); }
+        const q = s0 && /^(\d{4}):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/.exec(s0);
+        if (!q || +q[1] < 1990) return null;
+        const tm = new Date(+q[1], +q[2] - 1, +q[3], +q[4], +q[5], +q[6]).getTime();
+        return isFinite(tm) ? tm : null;
+      }
+      if (m === 0xFFDA) return null;
+      o += 2 + len;
+    }
+  } catch (_) { /* not a JPEG we can read: no date */ }
+  return null;
+}
+
+/** a picture file → { url (JPEG, at most WP_MAX px), thumb, w, h } – the big photo is decoded once, here */
+async function shrinkWallPhoto(file) {
+  let src, close = () => {};
+  try { src = await createImageBitmap(file); close = () => src.close && src.close(); } catch (_) { src = await loadImage(await readFileAs(file, 'dataurl')); }
+  try {
+    const W = src.width || src.naturalWidth, H = src.height || src.naturalHeight;
+    if (!W || !H) throw new Error('empty picture');
+    const draw = max => {
+      const k = Math.min(1, max / Math.max(W, H)), cw = Math.max(1, Math.round(W * k)), ch = Math.max(1, Math.round(H * k));
+      const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+      const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cw, ch); g.drawImage(src, 0, 0, cw, ch);
+      return { cv, cw, ch };
+    };
+    const big = draw(WP_MAX), url = big.cv.toDataURL('image/jpeg', 0.8);
+    const sm = draw(WP_THUMB), thumb = sm.cv.toDataURL('image/jpeg', 0.75);
+    big.cv.width = big.cv.height = 0;
+    return { url, w: big.cw, h: big.ch, thumb, tw: sm.cw, th: sm.ch };
+  } finally { close(); }
+}
+
+/** a file input: on a phone `capture` opens the camera directly; on a PC it is a file picker */
+function pickWallPhotos(camera) {
+  return new Promise(resolve => {
+    const inp = h('input', { type: 'file', accept: 'image/*', class: 'wp-input', style: { position: 'fixed', left: '-1000px' } });
+    if (camera) inp.setAttribute('capture', 'environment'); else inp.multiple = true;
+    inp.addEventListener('change', () => { resolve([...inp.files]); inp.remove(); });
+    inp.addEventListener('cancel', () => { resolve([]); inp.remove(); });
+    document.body.appendChild(inp);
+    inp.click();
+  });
+}
+
+const isTouchDevice = () => !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+
+Object.assign(app, {
+  /** add photos to wall face f; the files: from the camera (phone) or chosen; true when one was added */
+  async addWallPhotos(f, camera) {
+    if (this.project.viewer) return false;
+    const files = await pickWallPhotos(camera);
+    if (!files.length) return false;
+    const busy = UI.busy(t('Making the photo smaller…'));
+    const add = [];
+    try {
+      for (const file of files) {
+        try {
+          const date = (await photoTakenAt(file)) || Date.now();
+          const s0 = await shrinkWallPhoto(file);
+          const asset = await Assets.put(s0.url, s0.w, s0.h), thumb = await Assets.put(s0.thumb, s0.tw, s0.th);
+          add.push({ id: uid('wp_'), wall: f.wall.id, side: f.side, u: +((f.u0 + f.u1) / 2).toFixed(3), room: f.room.id, asset, thumb, w: s0.w, h: s0.h, date, text: '', created: Date.now() });
+        } catch (e) { console.error(e); this.toast(t('This picture could not be read.')); }
+      }
+    } finally { busy.close(); }
+    if (!add.length) return false;
+    this.mutate(p => { (p.wallPhotos = p.wallPhotos || []).push(...add); }, { project: true, keepInspector: true });
+    this.toast(add.length === 1 ? t('Photo added to wall {l}.', { l: f.letter }) : t('{n} photos added to wall {l}.', { n: add.length, l: f.letter }));
+    return true;
+  },
+  /** the photo strip of a wall face: thumbnails (loaded when shown), Take photo / Choose photos; repaints itself */
+  wallPhotoStrip(f, onChange) {
+    const box = h('div', { class: 'wp-strip', 'data-wall': f.wall.id, 'data-side': String(f.side) });
+    const ro = !!this.project.viewer;
+    const paint = async () => {
+      const list = wallPhotosOf(this.project, f);
+      await Assets.ensure(list.flatMap(x => [x.thumb, x.asset]).filter(Boolean));
+      box.textContent = '';
+      box.appendChild(h('div', { class: 'wp-head' }, icon('camera'), h('span', { class: 'wp-title' }, list.length ? t('Photos of the bare wall ({n})', { n: list.length }) : t('No photo of the bare wall yet'))));
+      if (list.length) {
+        const grid = h('div', { class: 'wp-grid' });
+        list.forEach((x, i) => {
+          const a = Assets.get(x.thumb) || Assets.get(x.asset);
+          grid.appendChild(h('button', { class: 'wp-th', 'data-id': x.id, 'aria-label': t('Show photo'), onclick: () => this.wallPhotoViewer(f, i, after) },
+            a ? h('img', { src: a.url, alt: '', loading: 'lazy' }) : h('span', { class: 'note-muted' }, '?'),
+            h('span', { class: 'wp-date' }, fmtDate(x.date, false))));
+        });
+        box.appendChild(grid);
+      }
+      if (!ro) {
+        const acts = h('div', { class: 'actions wp-acts' });
+        if (isTouchDevice()) {
+          acts.appendChild(h('button', { class: 'btn primary wp-camera', onclick: async () => { if (await this.addWallPhotos(f, true)) after(); } }, icon('camera'), t('Take photo')));
+          acts.appendChild(h('button', { class: 'btn wp-gallery', onclick: async () => { if (await this.addWallPhotos(f, false)) after(); } }, icon('image'), t('From the gallery')));
+        } else acts.appendChild(h('button', { class: 'btn sm wp-add', onclick: async () => { if (await this.addWallPhotos(f, false)) after(); } }, icon('camera'), t('Add photo')));
+        box.appendChild(acts);
+        if (!list.length) box.appendChild(h('p', { class: 'note-muted wp-hint' }, t('Photograph the bare wall (kale muur) before it is closed: pipes, cables and boxes. Years later you know where not to drill.')));
+      }
+    };
+    const after = () => { paint(); if (onChange) onChange(); };
+    paint();
+    box.repaint = paint;
+    return box;
+  },
+  /** a wall's photos full screen: swipe or arrows between them, the date and the text, change the text, delete */
+  wallPhotoViewer(f, start, onChange) {
+    let list = wallPhotosOf(this.project, f), i = clamp(start, 0, list.length - 1);
+    if (!list.length) return;
+    const ro = !!this.project.viewer;
+    const img = h('img', { alt: '', class: 'wp-big', draggable: 'false' });
+    const info = h('div', { class: 'wp-info' });
+    const count = h('span', { class: 'wp-count num' });
+    const prev = h('button', { class: 'btn ghost icon wp-prev', 'aria-label': t('Previous photo'), onclick: () => go(-1) }, icon('back'));
+    const next = h('button', { class: 'btn ghost icon wp-next', 'aria-label': t('Next photo'), onclick: () => go(1) }, icon('forward'));
+    const stage = h('div', { class: 'wp-stage' }, prev, img, next);
+    const paint = async () => {
+      const x = list[i];
+      await Assets.ensure([x.asset]);
+      const a = Assets.get(x.asset) || Assets.get(x.thumb);
+      img.src = a ? a.url : '';
+      count.textContent = `${i + 1} / ${list.length}`;
+      prev.disabled = i === 0; next.disabled = i === list.length - 1;
+      info.textContent = '';
+      info.appendChild(h('div', { class: 'wp-meta' }, count, ' · ', t('Wall {l}', { l: f.letter }), ' · ', fmtDate(x.date, false)));
+      info.appendChild(h('div', { class: 'wp-text' + (x.text ? '' : ' note-muted') }, x.text || (ro ? '' : t('No text yet – for example “cable to the switch at 1.10 m”.'))));
+      if (!ro) info.appendChild(h('div', { class: 'actions' },
+        h('button', { class: 'btn sm wp-edit', onclick: editText }, icon('edit'), t('Text')),
+        h('button', { class: 'btn sm danger wp-del', onclick: del }, icon('trash'), t('Delete photo'))));
+    };
+    const go = d => { const j = clamp(i + d, 0, list.length - 1); if (j !== i) { i = j; paint(); } };
+    const editText = async () => {
+      const x = list[i];
+      const v = await UI.prompt({ title: t('Text with the photo'), label: t('What is on it (optional)'), value: x.text || '', placeholder: t('cable to the switch at 1.10 m') });
+      if (v == null) return;
+      this.mutate(p => { const y = (p.wallPhotos || []).find(z => z.id === x.id); if (y) y.text = String(v).trim().slice(0, 200); }, { project: true, keepInspector: true });
+      list = wallPhotosOf(this.project, f); paint(); if (onChange) onChange();
+    };
+    const del = async () => {
+      const x = list[i];
+      if (!(await UI.confirm({ title: t('Delete photo'), message: t('Delete this photo of wall {l}? It goes in every version.', { l: f.letter }), confirmLabel: t('Delete'), danger: true }))) return;
+      this.mutate(p => { p.wallPhotos = (p.wallPhotos || []).filter(z => z.id !== x.id); }, { project: true, keepInspector: true });
+      list = wallPhotosOf(this.project, f);
+      if (onChange) onChange();
+      if (!list.length) { dlgClose && dlgClose(null); return; }
+      i = Math.min(i, list.length - 1); paint();
+    };
+    // swipe: a quick sideways move over the photo
+    let sx = null, sy = 0;
+    stage.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
+    stage.addEventListener('pointerup', e => { if (sx == null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1); });
+    stage.addEventListener('pointercancel', () => { sx = null; });
+    stage.addEventListener('dragstart', e => e.preventDefault());
+    let dlgClose = null;
+    let dlgEl = null;
+    const keys = e => {
+      // not while typing, and only when this window is on top (not under the text prompt)
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || (dlgEl && document.querySelector('#sheet-root > .scrim:last-child .dialog') !== dlgEl)) return;
+      if (e.key === 'ArrowLeft') go(-1); else if (e.key === 'ArrowRight') go(1);
+    };
+    document.addEventListener('keydown', keys);
+    paint();
+    return UI.dialog({ title: t('Wall {l} · photo', { l: f.letter }), body: h('div', { class: 'wp-viewer' }, stage, info), wide: true,
+      onOpen: (dlg, close) => { dlgClose = close; dlgEl = dlg; dlg.classList.add('wp-dialog'); },
+      actions: [{ label: t('Close'), value: null, kind: 'primary' }] }).finally(() => document.removeEventListener('keydown', keys));
+  },
+  /** which faces of a room have photos: { faces, withPhotos } */
+  roomWallPhotoCount(r, plan) {
+    const faces = roomFaces(plan || this.shownVersion().plan, r);
+    return { faces, n: faces.length, withPhotos: faces.filter(f => wallPhotosOf(this.project, f).length).length };
+  },
+});
+
+/* room details → Each wall, and a wall's details (the 2D plan's wall pick): a camera mark on walls with photos, the
+   count per room, and the photo strip in the open wall – added after finish.js has drawn those parts */
+{
+  const roomWalls = app.roomWallsSection, wallFinish = app.wallFinishSection;
+  app.roomWallsSection = function (el, r, ro, upd, plan) {
+    roomWalls.call(this, el, r, ro, upd, plan);
+    try {
+      const pl = plan || this.shownVersion().plan;
+      const { faces, n, withPhotos } = this.roomWallPhotoCount(r, pl);
+      if (!n) return;
+      const byLetter = new Map(faces.map(f => [f.letter, f]));
+      const list = el.querySelector('.face-list:last-of-type') || [...el.querySelectorAll('.face-list')].pop();
+      if (!list) return;
+      for (const row of list.querySelectorAll('.face-row')) {
+        const f = byLetter.get((row.querySelector('.face-letter') || {}).textContent);
+        if (!f) continue;
+        const k = wallPhotosOf(this.project, f).length;
+        if (k) row.querySelector('.face-letter').after(h('span', { class: 'wp-mark', title: t('{n} photos of the bare wall', { n: k }), 'aria-label': t('{n} photos of the bare wall', { n: k }) }, icon('camera'), h('span', { class: 'num' }, String(k))));
+        // the open wall: its photos under its editor
+        if (row.classList.contains('on') && row.nextElementSibling && !row.nextElementSibling.classList.contains('face-row')) {
+          row.nextElementSibling.appendChild(this.wallPhotoStrip(f, () => this.renderInspector()));
+        }
+      }
+      const actions = [...list.children].find(c => c.classList.contains('actions'));
+      const line = h('p', { class: 'note-muted wp-count-line', id: 'wp-count' }, icon('camera'), ' ', t('{k} of {n} walls have photos of the bare wall', { k: withPhotos, n }));
+      if (actions) actions.before(line); else list.appendChild(line);
+    } catch (e) { console.error(e); }
+  };
+  app.wallFinishSection = function (el, w) {
+    const before = el.childElementCount;
+    wallFinish.call(this, el, w);
+    try {
+      if (el.childElementCount === before) return;
+      const box = el.lastElementChild, v = this.shownVersion();
+      const faces = wallFaces(v.plan, w.storey).filter(f => f.wall.id === w.id);
+      [...box.querySelectorAll('.face-row')].forEach((row, i) => {
+        const f0 = faces[i];
+        if (!f0) return;
+        const f = roomFaces(v.plan, f0.room).find(x => x.wall.id === w.id && Math.abs(x.u0 - f0.u0) < 0.01) || f0;
+        const k = wallPhotosOf(this.project, f).length;
+        if (k) row.querySelector('.face-letter').after(h('span', { class: 'wp-mark', 'aria-label': t('{n} photos of the bare wall', { n: k }) }, icon('camera'), h('span', { class: 'num' }, String(k))));
+      });
+    } catch (e) { console.error(e); }
+  };
 }

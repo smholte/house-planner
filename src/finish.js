@@ -648,6 +648,132 @@ Object.assign(app, {
   },
 });
 
+/* ───────── room details: a jump row (task 0035) ─────────
+   The room's details are long on a phone. Its sections (Floor, Walls …) are put in groups (div.jump-sec); a row of
+   chips in the sticky head jumps to each, the chip of the group in view is marked, a group folds by its heading.
+   Kept on this device (localStorage): which groups are folded, and per room the group last in view – the details
+   of that room open there next time. */
+const JUMP_STORE = 'house-planner.roomjump';
+function jumpPrefs() {
+  try { const p = JSON.parse(localStorage.getItem(JUMP_STORE) || '{}'); return p && typeof p === 'object' ? { fold: p.fold || {}, last: p.last || {} } : { fold: {}, last: {} }; } catch (e) { return { fold: {}, last: {} }; }
+}
+function jumpSave(p) {
+  const keys = Object.keys(p.last);
+  if (keys.length > 300) for (const k of keys.slice(0, keys.length - 300)) delete p.last[k];
+  try { localStorage.setItem(JUMP_STORE, JSON.stringify(p)); } catch (e) { /* private window: not kept */ }
+}
+
+Object.assign(app, {
+  /** start the groups of a room's details */
+  jumpStart(el) { return { el, groups: [] }; },
+
+  /** run fn (which adds sections to el) and put what it added in one group */
+  jumpCall(J, key, label, fn) {
+    const n = J.el.children.length;
+    fn();
+    this.jumpWrap(J, key, label, [...J.el.children].slice(n));
+  },
+
+  /** put these sections in one group: its heading (the first section's eyebrow) folds it */
+  jumpWrap(J, key, label, nodes) {
+    nodes = nodes.filter(Boolean);
+    if (!nodes.length) return;
+    const w = h('div', { class: 'jump-sec', 'data-jump': key });
+    const first = nodes.find(n => n.parentNode === J.el);
+    if (first) J.el.insertBefore(w, first); else J.el.appendChild(w);
+    for (const n of nodes) w.appendChild(n);
+    let eb = w.firstElementChild.querySelector(':scope > .eyebrow');
+    if (!eb) { eb = h('div', { class: 'eyebrow' }, label); w.firstElementChild.prepend(eb); }
+    const lead = eb.firstChild && eb.firstChild.nodeType === 3 ? eb.firstChild : document.createTextNode(label);
+    const folded = !!jumpPrefs().fold[key];
+    const btn = h('button', { class: 'jump-fold', type: 'button', 'aria-expanded': String(!folded), title: t('Fold or unfold') }, h('span', { class: 'jump-chev', 'aria-hidden': 'true' }), lead);
+    eb.prepend(btn);
+    btn.addEventListener('click', () => this.jumpFold(w, !w.classList.contains('folded')));
+    if (folded) w.classList.add('folded');
+    J.groups.push({ key, label, w });
+  },
+
+  jumpFold(w, fold) {
+    w.classList.toggle('folded', fold);
+    const b = w.querySelector('.jump-fold');
+    if (b) b.setAttribute('aria-expanded', String(!fold));
+    const p = jumpPrefs();
+    if (fold) p.fold[w.dataset.jump] = true; else delete p.fold[w.dataset.jump];
+    jumpSave(p);
+    this.jumpMark();
+  },
+
+  /** the chip row in the sticky head; on a fresh open, the details go to the group last in view for this room */
+  jumpFinish(J, r) {
+    const el = J.el, head = el.querySelector('.insp-head');
+    if (!head || J.groups.length < 2) return;
+    const row = h('nav', { class: 'jump-row', 'aria-label': t('Jump to a section') },
+      ...J.groups.map(g => h('button', { class: 'jump-chip', type: 'button', 'data-jump': g.key, onclick: () => this.jumpTo(g.key, true) }, g.label)));
+    head.classList.add('has-jump');
+    head.appendChild(row);
+    if (this._inspFresh) this._jumpPad = 0;
+    el.appendChild(h('div', { class: 'jump-pad', 'aria-hidden': 'true', style: { height: (this._jumpPad || 0) + 'px' } }));
+    el.dataset.jumpRoom = r.id;
+    if (!el._jumpScroll) {
+      el._jumpScroll = true;
+      let raf = 0;
+      el.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; this.jumpMark(true); }); }, { passive: true });
+    }
+    const last = this._inspFresh ? (jumpPrefs().last[r.id] || null) : undefined;
+    this._inspAfter = () => {
+      if (last !== undefined) { if (last && el.querySelector(`.jump-sec[data-jump="${last}"]`)) this.jumpTo(last, false); else el.scrollTop = 0; }
+      this.jumpMark();
+    };
+  },
+
+  /** scroll the details so the group's heading sits just under the sticky head */
+  jumpTo(key, smooth) {
+    const el = $('#inspector');
+    const w = el && el.querySelector(`.jump-sec[data-jump="${key}"]`);
+    if (!w) return;
+    const head = el.querySelector('.insp-head'), pad = el.querySelector('.jump-pad');
+    const headH = head ? head.offsetHeight : 0;
+    const top = el.scrollTop + w.getBoundingClientRect().top - el.getBoundingClientRect().top - headH;
+    // room below the last groups, so their heading can reach the top too
+    if (pad) {
+      const need = top + el.clientHeight - (el.scrollHeight - pad.offsetHeight);
+      this._jumpPad = Math.max(0, Math.ceil(need));
+      pad.style.height = this._jumpPad + 'px';
+    }
+    const want = Math.min(Math.max(0, Math.round(top)), el.scrollHeight - el.clientHeight);
+    this._jumpWant = smooth ? { key, top: want, t: performance.now() } : null;
+    el.scrollTo({ top: want, behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
+    this.jumpMark(true);
+  },
+
+  /** mark the chip of the group in view (the last whose heading has passed under the head); keep it per room */
+  jumpMark(record) {
+    const el = $('#inspector');
+    const row = el && el.querySelector('.jump-row');
+    if (!row) return;
+    const head = el.querySelector('.insp-head');
+    const line = (head ? head.getBoundingClientRect().bottom : el.getBoundingClientRect().top) + 12;
+    let cur = null;
+    for (const w of el.querySelectorAll('.jump-sec')) if (w.getBoundingClientRect().top <= line) cur = w.dataset.jump;
+    // a smooth jump marks its chip at once, not the ones it passes on the way
+    const want = this._jumpWant;
+    if (want) {
+      if (Math.abs(el.scrollTop - want.top) > 2 && performance.now() - want.t < 1500) cur = want.key;
+      else this._jumpWant = null;
+    }
+    for (const c of row.querySelectorAll('.jump-chip')) {
+      const on = c.dataset.jump === cur;
+      c.classList.toggle('on', on);
+      if (on) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current');
+      if (on) { const l = c.offsetLeft - row.offsetLeft, rr = l + c.offsetWidth; if (l < row.scrollLeft) row.scrollLeft = l - 8; else if (rr > row.scrollLeft + row.clientWidth) row.scrollLeft = rr - row.clientWidth + 8; }
+    }
+    if (record && el.dataset.jumpRoom) {
+      const p = jumpPrefs(), id = el.dataset.jumpRoom;
+      if ((p.last[id] || null) !== cur) { if (cur) { delete p.last[id]; p.last[id] = cur; } else delete p.last[id]; jumpSave(p); }
+    }
+  },
+});
+
 /** old house files: "Wall tiles 300 × 600 to 1.2 m" written in the paint name (IFC import) becomes real tiles */
 function migrateFinishes(p) {
   const re = /^Wall tiles (\d+) × (\d+)(?:, full height| to ([\d.]+) m)$/;

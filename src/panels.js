@@ -7,6 +7,10 @@ Object.assign(app, {
     const el = $('#inspector');
     if (!el || !this.project) return;
     const scroll = el.scrollTop;
+    const was = this._inspKey, sel0 = this.selection;
+    this._inspKey = sel0 ? sel0.type + ':' + (sel0.id || '') : '';
+    this._inspFresh = this._inspKey !== was;
+    this._inspAfter = null;
     el.textContent = '';
     el.appendChild(this.inspGrip());
     const target = this.selectionTarget();
@@ -30,6 +34,7 @@ Object.assign(app, {
     else if (this.mode === 'view') this.viewOverview(el);
     else this.overviewPanel(el);
     el.scrollTop = scroll;
+    if (this._inspAfter) { const f = this._inspAfter; this._inspAfter = null; f(); }
   },
 
   /** phones: a handle on the details sheet — drag it to make the sheet taller or lower, tap it to switch
@@ -172,8 +177,9 @@ Object.assign(app, {
     const fc = h('input', { type: 'color', id: 'f-floor-col', value: r.floor.color || '#b9b5ac', disabled: ro, 'aria-label': 'Floor colour' });
     fc.addEventListener('input', () => upd(rr => { rr.floor.color = fc.value; }, { coalesce: 'fc:' + r.id }));
     const floorSw = ['#C49A6C', '#A77B4F', '#D8C3A0', '#8C8780', '#8D9192', '#5E6266', '#D9D4CA', '#B9B5AC'];
-    el.appendChild(h('div', { class: 'insp-sec' },
-      h('div', { class: 'eyebrow' }, 'Floor'),
+    const J = this.jumpStart(el);
+    this.jumpCall(J, 'floor', t('Floor'), () => el.appendChild(h('div', { class: 'insp-sec' },
+      h('div', { class: 'eyebrow' }, t('Floor')),
       h('div', { class: 'field' }, h('label', { for: 'f-floor-mat' }, 'Material'), mat),
       this.floorProductFields(r, ro, upd),
       r.heat && r.heat.on ? this.floorHeatLine(r) : null,
@@ -181,13 +187,15 @@ Object.assign(app, {
       this.floorPatternControls(r, ro, upd),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, 'Colour'),
         h('div', { class: 'color-row' }, fc, h('div', { class: 'swatches' }, ...floorSw.map(c => h('button', { class: 'swatch', style: { background: c }, disabled: ro, 'aria-label': 'Floor colour ' + c, 'aria-pressed': String((r.floor.color || '').toLowerCase() === c.toLowerCase()), onclick: () => upd(rr => { rr.floor.color = c; }, { keepInspector: false }) }))))),
-      ro ? null : h('div', { class: 'actions' }, h('button', { class: 'btn sm', onclick: async () => { const c = await this.colourPicker({ value: r.floor.color, title: t('Floor colour') }); if (c) upd(rr => { rr.floor.color = c.hex; }, { keepInspector: false }); } }, icon('eye'), t('Colour library')))));
-    // walls (the room's finish, tiles, each wall) and the ceiling
-    this.roomWallsSection(el, r, ro, upd, v.plan);
-    this.roomCeilingSection(el, r, ro, upd, v.plan);
-    this.roomInstallSection(el, r, ro, v.plan);
+      ro ? null : h('div', { class: 'actions' }, h('button', { class: 'btn sm', onclick: async () => { const c = await this.colourPicker({ value: r.floor.color, title: t('Floor colour') }); if (c) upd(rr => { rr.floor.color = c.hex; }, { keepInspector: false }); } }, icon('eye'), t('Colour library'))))));
+    // walls (the room's finish, tiles, each wall) and the ceiling; each group reached from the jump row (task 0035)
+    this.jumpCall(J, 'walls', t('Walls'), () => this.roomWallsSection(el, r, ro, upd, v.plan));
+    this.jumpCall(J, 'ceiling', t('Ceiling'), () => this.roomCeilingSection(el, r, ro, upd, v.plan));
+    { const n = el.children.length; this.roomInstallSection(el, r, ro, v.plan); const add = [...el.children].slice(n);
+      this.jumpWrap(J, 'electrics', t('Electrics'), add.filter(x => !x.classList.contains('heat-sec')));
+      this.jumpWrap(J, 'heating', t('Heating'), add.filter(x => x.classList.contains('heat-sec'))); }
     this.roomTasksSection(el, r);
-    this.roomQtySection(el, r, ro, v.plan);
+    this.jumpCall(J, 'qty', t('Quantities'), () => this.roomQtySection(el, r, ro, v.plan));
     // notes + items
     const notes = h('textarea', { class: 'textarea', id: 'f-notes', disabled: ro, placeholder: 'What happens in this room: walls, electrics, heating, choices still open…' });
     notes.value = r.notes || '';
@@ -201,10 +209,10 @@ Object.assign(app, {
     const add = h('input', { class: 'input', id: 'f-item-add', placeholder: 'Add item, e.g. walk-in shower 120 × 90', disabled: ro, autocomplete: 'off' });
     const addIt = () => { const t = add.value.trim(); if (!t) return; upd(rr => { (rr.items ||= []).push({ id: uid('i_'), text: t }); }, { keepInspector: false }); setTimeout(() => $('#f-item-add') && $('#f-item-add').focus(), 30); };
     add.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addIt(); } });
-    el.appendChild(h('div', { class: 'insp-sec' },
+    const notesSec = h('div', { class: 'insp-sec' },
       h('div', { class: 'field' }, h('label', { for: 'f-notes' }, 'Notes'), notes),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, 'Items (kitchen, bathroom, fittings…)'), items,
-        ro ? null : h('div', { class: 'item' }, add, h('button', { class: 'btn sm', onclick: addIt }, icon('plus'), 'Add')))));
+        ro ? null : h('div', { class: 'item' }, add, h('button', { class: 'btn sm', onclick: addIt }, icon('plus'), 'Add'))));
     // what changed vs the base
     const diff = this.currentDiff;
     if (this.display === 'diff' && diff && v && v.id === this.shownVersion().id) {
@@ -212,10 +220,14 @@ Object.assign(app, {
       const isNew = diff.rooms.added.some(x => x.id === r.id);
       if (ch || isNew) el.appendChild(h('div', { class: 'insp-sec' }, h('div', { class: 'eyebrow' }, 'Compared with ' + this.baseVersion().name), isNew ? h('p', { class: 'note-muted' }, 'This room is new.') : this.changeRows(ch.changes)));
     }
-    this.roomNotesSection(el, r);
+    // the building diary and the notes (roomNotesSection adds both; diary.js puts the diary first)
+    { const n = el.children.length; this.roomNotesSection(el, r); const add = [...el.children].slice(n);
+      this.jumpWrap(J, 'diary', t('Diary'), add.filter(x => x.classList.contains('diary-sec')));
+      this.jumpWrap(J, 'notes', t('Notes'), [...add.filter(x => !x.classList.contains('diary-sec')), notesSec]); }
     if (!ro) el.appendChild(h('div', { class: 'insp-sec' }, h('div', { class: 'actions' }, h('button', { class: 'btn sm danger', onclick: () => this.deleteSelection() }, icon('trash'), 'Delete room')),
       this.view.dim === '2d' ? h('p', { class: 'note-muted' }, 'Drag the small handles to adjust the corners.') : null));
     else if (this.mode !== 'build' && !sel.readOnly) el.appendChild(h('div', { class: 'insp-sec' }, h('p', { class: 'note-muted' }, t('Switch to Build to change this room.'))));
+    this.jumpFinish(J, r);
   },
 
   changeRows(changes) {

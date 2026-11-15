@@ -210,6 +210,8 @@ function assetIdsOf(project) {
   for (const it of (project.budget && project.budget.items) || []) if (it.photo) ids.push(it.photo);
   // documents: the file and the small picture of its first page
   for (const d of project.docs || []) { if (d.asset) ids.push(d.asset); if (d.thumb) ids.push(d.thumb); }
+  // photos of the bare walls (wallviews.js): the photo and its thumbnail
+  for (const x of project.wallPhotos || []) { if (x && x.asset) ids.push(x.asset); if (x && x.thumb) ids.push(x.thumb); }
   return ids;
 }
 

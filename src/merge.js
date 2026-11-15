@@ -96,6 +96,7 @@ function mergeChanges(mine, theirs) {
   lists(t('Colours'), mine.colours, theirs.colours, c => c.name || c.hex, m => (m.colours = m.colours || []), pNewer);
   lists(t('Saved views'), mine.viewpoints, theirs.viewpoints, x => x.name || t('View'), m => (m.viewpoints = m.viewpoints || []), pNewer);
   lists(t('Documents'), mine.docs, theirs.docs, x => x.name || t('Document'), m => (m.docs = m.docs || []), pNewer);
+  lists(t('Photos of the bare walls'), mine.wallPhotos, theirs.wallPhotos, x => fmtDate(x.date, false) + (x.text ? ' · ' + x.text : ''), m => (m.wallPhotos = m.wallPhotos || []), pNewer);
   lists(t('Walking routes'), mine.walk && mine.walk.routes, theirs.walk && theirs.walk.routes, x => x.name || t('Route'), m => { m.walk = m.walk || { nodes: [], edges: [], routes: [] }; return m.walk.routes; }, pNewer);
   for (const key of ['images', 'models']) for (const [id, x] of Object.entries(theirs[key] || {})) {
     const y = (mine[key] || {})[id];

@@ -10979,6 +10979,110 @@
   "3D-afbeeldingen weer gecomprimeerd (minder geheugen).",
   "3D-bilder komprimert igjen (mindre minne)."
  ],
+ "Delete photo": [
+  "Foto verwijderen",
+  "Slett bilde"
+ ],
+ "Delete this photo of wall {l}? It goes in every version.": [
+  "Deze foto van wand {l} verwijderen? Hij verdwijnt uit elke versie.",
+  "Slette dette bildet av vegg {l}? Det forsvinner fra alle versjoner."
+ ],
+ "From the gallery": [
+  "Uit de galerij",
+  "Fra galleriet"
+ ],
+ "Making the photo smaller…": [
+  "Foto wordt verkleind…",
+  "Gjør bildet mindre…"
+ ],
+ "Next photo": [
+  "Volgende foto",
+  "Neste bilde"
+ ],
+ "No photo of the bare wall yet": [
+  "Nog geen foto van de kale muur",
+  "Ennå ikke bilde av den nakne veggen"
+ ],
+ "No text yet – for example “cable to the switch at 1.10 m”.": [
+  "Nog geen tekst – bijvoorbeeld „kabel naar de schakelaar op 1,10 m”.",
+  "Ingen tekst ennå – for eksempel «kabel til bryteren på 1,10 m»."
+ ],
+ "Photo added to wall {l}.": [
+  "Foto toegevoegd aan wand {l}.",
+  "Bilde lagt til vegg {l}."
+ ],
+ "Photograph the bare wall (kale muur) before it is closed: pipes, cables and boxes. Years later you know where not to drill.": [
+  "Fotografeer de kale muur voor het dichtmaken: leidingen, kabels en inbouwdozen. Jaren later weet je waar je niet moet boren.",
+  "Ta bilde av den nakne veggen før den lukkes: rør, kabler og bokser. År etter vet du hvor du ikke skal bore."
+ ],
+ "Photos of the bare wall ({n})": [
+  "Foto’s van de kale muur ({n})",
+  "Bilder av den nakne veggen ({n})"
+ ],
+ "Photos of the bare walls": [
+  "Foto’s van de kale muren",
+  "Bilder av de nakne veggene"
+ ],
+ "Previous photo": [
+  "Vorige foto",
+  "Forrige bilde"
+ ],
+ "Take photo": [
+  "Foto maken",
+  "Ta bilde"
+ ],
+ "Text": [
+  "Tekst",
+  "Tekst"
+ ],
+ "Text with the photo": [
+  "Tekst bij de foto",
+  "Tekst til bildet"
+ ],
+ "Wall {l} · photo": [
+  "Wand {l} · foto",
+  "Vegg {l} · bilde"
+ ],
+ "What is on it (optional)": [
+  "Wat staat erop (niet verplicht)",
+  "Hva viser det (valgfritt)"
+ ],
+ "before it was closed: pipes, cables and boxes": [
+  "voor het dichtmaken: leidingen, kabels en inbouwdozen",
+  "før den ble lukket: rør, kabler og bokser"
+ ],
+ "cable to the switch at 1.10 m": [
+  "kabel naar de schakelaar op 1,10 m",
+  "kabel til bryteren på 1,10 m"
+ ],
+ "photos of the bare wall": [
+  "foto’s van de kale muur",
+  "bilder av den nakne veggen"
+ ],
+ "{k} of {n} walls have photos of the bare wall": [
+  "{k} van {n} wanden hebben foto’s van de kale muur",
+  "{k} av {n} vegger har bilder av den nakne veggen"
+ ],
+ "{n} photos added to wall {l}.": [
+  "{n} foto’s toegevoegd aan wand {l}.",
+  "{n} bilder lagt til vegg {l}."
+ ],
+ "{n} photos of the bare wall": [
+  "{n} foto’s van de kale muur",
+  "{n} bilder av den nakne veggen"
+ ],
+ "Heating": [
+  "Verwarming",
+  "Oppvarming"
+ ],
+ "Jump to a section": [
+  "Naar een onderdeel",
+  "Gå til en del"
+ ],
+ "Fold or unfold": [
+  "In- of uitklappen",
+  "Fell sammen eller ut"
+ ],
  "A copy for viewing cannot be exported for Fresing Render.": [
   "Een kopie om te bekijken kan niet voor Fresing Render worden geëxporteerd.",
   "En kopi for visning kan ikke eksporteres for Fresing Render."
