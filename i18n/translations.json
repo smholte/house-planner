@@ -10978,5 +10978,153 @@
  "3D pictures compressed again (less memory).": [
   "3D-afbeeldingen weer gecomprimeerd (minder geheugen).",
   "3D-bilder komprimert igjen (mindre minne)."
+ ],
+ "A copy for viewing cannot be exported for Fresing Render.": [
+  "Een kopie om te bekijken kan niet voor Fresing Render worden geëxporteerd.",
+  "En kopi for visning kan ikke eksporteres for Fresing Render."
+ ],
+ "A house scene for Fresing Render on your PC: it bakes real light, snow and photos for this version. Open the file there with File > Import > House Planner scene.": [
+  "Een huisscène voor Fresing Render op je pc: die bakt echt licht, sneeuw en foto's voor deze versie. Open het bestand daar met File > Import > House Planner scene.",
+  "En husscene for Fresing Render på PC-en din: den baker ekte lys, snø og bilder for denne versjonen. Åpne filen der med File > Import > House Planner scene."
+ ],
+ "A house scene to bake real light, snow and photos on your PC.": [
+  "Een huisscène om echt licht, sneeuw en foto's te bakken op je pc.",
+  "En husscene for å bake ekte lys, snø og bilder på PC-en din."
+ ],
+ "Afternoon": [
+  "Middag",
+  "Ettermiddag"
+ ],
+ "As the app shows one storey without the ones above it.": [
+  "Zoals de app één verdieping toont zonder de verdiepingen erboven.",
+  "Slik appen viser én etasje uten etasjene over."
+ ],
+ "Building the house…": [
+  "Het huis wordt opgebouwd…",
+  "Bygger huset…"
+ ],
+ "Draft": [
+  "Schets",
+  "Utkast"
+ ],
+ "Each storey also open from above": [
+  "Elke verdieping ook open van boven",
+  "Hver etasje også åpen ovenfra"
+ ],
+ "Fine": [
+  "Fijn",
+  "Fin"
+ ],
+ "For Fresing Render": [
+  "Voor Fresing Render",
+  "For Fresing Render"
+ ],
+ "For Fresing Render…": [
+  "Voor Fresing Render…",
+  "For Fresing Render…"
+ ],
+ "Laying out the light maps…": [
+  "De lichtkaarten worden ingedeeld…",
+  "Lyskartene legges ut…"
+ ],
+ "Light-map pages": [
+  "Pagina's van de lichtkaarten",
+  "Sider for lyskart"
+ ],
+ "Live": [
+  "Live",
+  "Direkte"
+ ],
+ "Making the house scene…": [
+  "De huisscène wordt gemaakt…",
+  "Husscenen lages…"
+ ],
+ "Moments": [
+  "Momenten",
+  "Øyeblikk"
+ ],
+ "Morning": [
+  "Ochtend",
+  "Morgen"
+ ],
+ "Night": [
+  "Nacht",
+  "Natt"
+ ],
+ "No 3D view or saved viewpoint yet.": [
+  "Nog geen 3D-weergave of opgeslagen standpunt.",
+  "Ingen 3D-visning eller lagret utsiktspunkt ennå."
+ ],
+ "Nothing baked: only snow and photos": [
+  "Niets gebakken: alleen sneeuw en foto's",
+  "Ingenting bakt: bare snø og bilder"
+ ],
+ "PC (2048)": [
+  "Pc (2048)",
+  "PC (2048)"
+ ],
+ "Phone (1024)": [
+  "Telefoon (1024)",
+  "Telefon (1024)"
+ ],
+ "Pick at least one season and one moment.": [
+  "Kies minstens één seizoen en één moment.",
+  "Velg minst én årstid og ett øyeblikk."
+ ],
+ "Quality": [
+  "Kwaliteit",
+  "Kvalitet"
+ ],
+ "Seasons": [
+  "Seizoenen",
+  "Årstider"
+ ],
+ "Sky and bounce light baked, the sun stays live": [
+  "Hemel- en strooilicht gebakken, de zon blijft live",
+  "Himmel- og reflektert lys bakt, solen forblir direkte"
+ ],
+ "Soft": [
+  "Zacht",
+  "Mykt"
+ ],
+ "Summer": [
+  "Zomer",
+  "Sommer"
+ ],
+ "Sun, sky and lamps baked": [
+  "Zon, hemel en lampen gebakken",
+  "Sol, himmel og lamper bakt"
+ ],
+ "The house scene could not be made: {e}": [
+  "De huisscène kon niet worden gemaakt: {e}",
+  "Husscenen kunne ikke lages: {e}"
+ ],
+ "The view on screen now": [
+  "De weergave die nu op het scherm staat",
+  "Visningen på skjermen nå"
+ ],
+ "What to include": [
+  "Wat erin komt",
+  "Hva som tas med"
+ ],
+ "Winter": [
+  "Winter",
+  "Vinter"
+ ],
+ "Winter with snow": [
+  "Winter met sneeuw",
+  "Vinter med snø"
+ ],
+ "Writing the file…": [
+  "Het bestand wordt geschreven…",
+  "Skriver filen…"
+ ],
+ "original": [
+  "origineel",
+  "original"
+ ],
+ "{name} saved: {n} surfaces, {size}.": [
+  "{name} opgeslagen: {n} vlakken, {size}.",
+  "{name} lagret: {n} flater, {size}."
  ]
 }

@@ -60,6 +60,7 @@ Object.assign(app, {
     act('Automatic backup into a folder…', 'folder', this.folderSupported() && (() => this.folderDialog()), 'backup reservekopie kopie map folder proton onedrive automatisch bestand file');
     act('Save a copy of this house now', 'download', this.project && !this.project.viewer && (() => this.quickBackup(this.project)), 'backup reservekopie kopie copy opslaan save bestand file proton');
     act('Export for viewing (family, suppliers)…', 'eye', has('viewerExportDialog') && (() => this.viewerExportDialog()), 'viewer bekijken familie');
+    act('For Fresing Render…', 'sun', has('hpsceneDialog') && (() => this.hpsceneDialog()), 'fresing render bake baked light licht lys snow sneeuw snø hpscene scene');
     act('Merge a copy of this house…', 'split', has('mergeFileFlow') && (() => this.mergeFileFlow()), 'samenvoegen merge');
     act('Storeys…', 'layers', has('storeysSheet') && (() => this.storeysSheet()), 'verdiepingen');
     act('Settings', 'settings', has('settingsSheet') && (() => { this.settingsSheet(); }), 'instellingen taal language theme donker dark');

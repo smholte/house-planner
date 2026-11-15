@@ -204,6 +204,24 @@ The modules of the owner's own house (its plot, neighbourhood, documents …) ar
                      with a slider; back to the starting version and camera on Close). The selection is cleared
                      while rendering (it tints the 3D) and selected again after; between passes the loop yields a
                      task (setTimeout 0) before the next frame, so taps (Stop) get through on slow devices
+    src/hphash.js    hp-hash/1 of the house scene format (smholte/house-scene-format, pinned v1.0.1): SHA-256 in plain
+                     JavaScript (Sha256), hpSurfaceHash(prims, uv1px) on the numbers as stored (float32 mm, round half
+                     away from zero – never Math.round), hpSceneHash. A port of hsf/surface.py, bit for bit (test_hpscene).
+    src/hpuv.js      hp-uv/1: hpProject / hpLayout / hpPack = hsf/uv1.py, bit for bit; the app's own part: hpChartsOf (the
+                     flat, edge-connected pieces of a mesh), hpProjectAny (sloping faces along the slope, unstretched),
+                     hpFolds (the checker's "covered twice" test: folds go to charts of their own and the layout is redone).
+    src/hpscene.js   Export → For Fresing Render… (task 0031): the .hpscene (zip: scene.json + house.glb). The version is built
+                     in a hidden View3D (noBatch; installs / ceiling / furniture switched on for the build; the garden's
+                     buildStreets / buildAround / buildHood wrapped on that instance so each piece knows its Show button);
+                     hpsCollect names every mesh from its userData (wall:<id>:a|b|edge split by face direction, floor:<room>,
+                     ceiling:<room>, opening:<id>, glass:…, furniture:<id>:0, lamp:<point> with a KHR light at the bulb,
+                     install:<point>, ground:plot, garden:<area|line>, plant: / foliage:, street:n, neighbour:n, park:n …),
+                     pieces of one thing → one surface, one primitive per material; MAP surfaces laid out (too many small
+                     charts → VERTEX; too big for a page → split :0 :1 or a lower texels_per_m of its own; more than 3.5
+                     pages a moment → all densities lower). Ids only from the house's ids and the build's order: the same
+                     version gives the same ids and hashes. Own glTF writer (HpsGlb: pictures as PNG / JPEG, flipped as
+                     three.js reads them) and zip writer (JSON deflated, the .glb stored). The format's checker is copied
+                     in tests/house-scene-format/ (pinned tag); test_hpscene.py; the owner's house: house/tests/test_hpscene_own.py.
     src/ar.js        AR (View → "AR: the plan in the real room"): arSupport() (secure context, navigator.xr,
                      immersive-ar), arNotHere() explains what is needed; arSetup() picks storey, room and corners A/B
                      (arCorners: the longest side; arCornerSvg); arGo() asks for the session first (inside the tap:

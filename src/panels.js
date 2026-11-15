@@ -516,6 +516,7 @@ Object.assign(app, {
       { heading: t('Save and share') },
       { label: t('Export this house…'), icon: 'share', id: 'mi-export', fn: () => this.exportDialog() },
       { label: t('Export for viewing (family, suppliers)…'), icon: 'eye', fn: () => this.viewerExportDialog() },
+      { label: t('For Fresing Render…'), icon: 'sun', id: 'mi-hpscene', fn: () => this.hpsceneDialog() },
       this.folderSupported() ? { label: t('Automatic backup into a folder…'), icon: 'folder', id: 'mi-folder', fn: () => this.folderDialog() } : null,
       { label: t('Save a picture of this view'), icon: 'camera', fn: () => this.savePicture() },
       { label: t('Photo render…'), icon: 'camera', id: 'mi-render-more', fn: () => this.renderSheet() },
@@ -1125,6 +1126,8 @@ Object.assign(app, {
       h('div', { class: 'kv' }, h('dt', null, 'File'), nameEl, h('dt', null, 'Size'), h('dd', null, sizeEl)),
       h('div', { class: 'export-alt' }, h('div', null, h('b', null, t('For family or suppliers')), h('span', { class: 'note-muted' }, t('A copy to look at and add notes to, as a page that opens in any browser.'))),
         h('button', { class: 'btn sm', id: 'btn-export-viewer', onclick: () => { const d = body.closest('.dialog'); if (d && d.closeWith) d.closeWith(null); this.viewerExportDialog(p); } }, icon('eye'), t('Export for viewing…'))),
+      h('div', { class: 'export-alt', id: 'ex-hpscene' }, h('div', null, h('b', null, t('For Fresing Render')), h('span', { class: 'note-muted' }, t('A house scene to bake real light, snow and photos on your PC.'))),
+        h('button', { class: 'btn sm', id: 'btn-export-hpscene', onclick: () => { const d = body.closest('.dialog'); if (d && d.closeWith) d.closeWith(null); this.hpsceneDialog(); } }, icon('sun'), t('For Fresing Render…'))),
       this.folderSupported() ? h('div', { class: 'export-alt', id: 'ex-folder' }, h('div', null, h('b', null, t('Automatic backup into a folder')), h('span', { class: 'note-muted' }, this._folder ? this.folderStatusText() : t('A copy after each change, for example into your Proton Drive or OneDrive folder.'))),
         h('button', { class: 'btn sm', id: 'btn-export-folder', onclick: () => { const d = body.closest('.dialog'); if (d && d.closeWith) d.closeWith(null); this.folderDialog(); } }, icon('folder'), this._folder ? t('Folder…') : t('Choose folder…'))) : null);
     await prep();

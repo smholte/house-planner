@@ -1,3 +1,4 @@
 # Python packages for building and testing House Planner (pinned)
 playwright==1.63.0
 pillow==12.3.0
+jsonschema==4.26.0

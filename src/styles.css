@@ -1584,6 +1584,15 @@ button.sun-lab:hover, button.sun-lab:focus-visible { background: var(--surface-2
   .version-pill .ic { display: none; }
   .version-pill { padding: 0 8px; }
 }
+/* Export → For Fresing Render… (hpscene.js, task 0031) */
+.hps-dialog .seg { flex-wrap: wrap; }
+.hps-season { display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; }
+.hps-season .check { align-items: center; min-width: 9em; }
+.hps-season input[type=date] { max-width: 100%; }
+.hps-groups, .hps-moments, .hps-cams { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.hps-groups .check, .hps-moments .check, .hps-cams .check { align-items: center; }
+.hps-more > summary { cursor: pointer; font-weight: 600; min-height: 32px; display: flex; align-items: center; }
+
 @media (max-width: 380px) {
   .mode-switch button { padding: 0 3px; min-width: 34px; }
   .mode-switch button span { font-size: 9.5px; }
