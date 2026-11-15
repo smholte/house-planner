@@ -10978,5 +10978,17 @@
  "3D pictures compressed again (less memory).": [
   "3D-afbeeldingen weer gecomprimeerd (minder geheugen).",
   "3D-bilder komprimert igjen (mindre minne)."
+ ],
+ "Heating": [
+  "Verwarming",
+  "Oppvarming"
+ ],
+ "Jump to a section": [
+  "Naar een onderdeel",
+  "Gå til en del"
+ ],
+ "Fold or unfold": [
+  "In- of uitklappen",
+  "Fell sammen eller ut"
  ]
 }
