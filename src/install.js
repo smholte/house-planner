@@ -578,14 +578,17 @@ Object.assign(app, {
     const heat = r.heat || {};
     const cb = h('input', { type: 'checkbox', id: 'f-heat', checked: !!heat.on, disabled: ro });
     cb.addEventListener('change', () => this.mutate(pl => { const rr = pl.rooms.find(x => x.id === r.id); if (rr) rr.heat = { ...(rr.heat || {}), on: cb.checked }; }, { keepInspector: false }));
-    sec.appendChild(h('label', { class: 'check-row', for: 'f-heat' }, cb, h('span', null, t('Floor heating in this room'))));
+    el.appendChild(sec);
+    // floor heating: its own section, so the room's jump row can reach it (task 0035)
+    const hs = h('div', { class: 'insp-sec heat-sec' }, h('div', { class: 'eyebrow' }, t('Floor heating')));
+    hs.appendChild(h('label', { class: 'check-row', for: 'f-heat' }, cb, h('span', null, t('Floor heating in this room'))));
     if (heat.on) {
       const z = h('input', { class: 'input', id: 'f-heat-zone', value: heat.zone || '', placeholder: t('e.g. group 3 on the manifold upstairs'), disabled: ro, autocomplete: 'off' });
       z.addEventListener('input', () => this.mutate(pl => { const rr = pl.rooms.find(x => x.id === r.id); if (rr) rr.heat = { ...(rr.heat || {}), zone: z.value }; }, { keepInspector: true, coalesce: 'hz:' + r.id }));
-      sec.appendChild(h('div', { class: 'field' }, h('label', { for: 'f-heat-zone' }, t('Heating zone')), z));
-      sec.appendChild(this.floorHeatCheck(r, ro));
+      hs.appendChild(h('div', { class: 'field' }, h('label', { for: 'f-heat-zone' }, t('Heating zone')), z));
+      hs.appendChild(this.floorHeatCheck(r, ro));
     }
-    el.appendChild(sec);
+    el.appendChild(hs);
   },
 });
 

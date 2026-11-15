@@ -11078,5 +11078,17 @@
  "{n} photos of the bare wall": [
   "{n} foto’s van de kale muur",
   "{n} bilder av den nakne veggen"
+ ],
+ "Heating": [
+  "Verwarming",
+  "Oppvarming"
+ ],
+ "Jump to a section": [
+  "Naar een onderdeel",
+  "Gå til en del"
+ ],
+ "Fold or unfold": [
+  "In- of uitklappen",
+  "Fell sammen eller ut"
  ]
 }

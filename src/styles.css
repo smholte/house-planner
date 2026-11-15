@@ -421,6 +421,18 @@ button { cursor: pointer; }
 .insp-sec:last-child { border-bottom: 0; }
 .insp-sec > .eyebrow { display: flex; justify-content: space-between; align-items: center; }
 .field { display: grid; gap: 4px; }
+.insp-head.has-jump { flex-wrap: wrap; padding-bottom: 8px; }
+/* room details: the jump row (task 0035) */
+.jump-row { flex: 1 0 100%; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 2px -14px 0; padding: 2px 14px; scroll-behavior: smooth; }
+.jump-row::-webkit-scrollbar { display: none; }
+.jump-chip { flex: none; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font: 600 13px var(--font-ui); white-space: nowrap; cursor: pointer; }
+.jump-chip.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.jump-fold { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; margin: -4px 0 -4px -4px; padding: 0 6px 0 4px; border: 0; border-radius: 6px; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; text-align: left; cursor: pointer; }
+.jump-fold:hover { background: var(--accent-soft); }
+.jump-chev { width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translate(-2px, -2px); transition: transform .15s ease; flex: none; }
+.jump-sec.folded .jump-chev { transform: rotate(-45deg); }
+.jump-sec.folded > .insp-sec:first-child > :not(.eyebrow), .jump-sec.folded > .insp-sec:not(:first-child) { display: none; }
+@media (max-width: 860px) { .jump-chip { height: 44px; padding: 0 14px; border-radius: 22px; } .jump-fold { min-height: 36px; } }
 .field > label, .field > .flabel { font-size: 12px; color: var(--ink-2); font-weight: 600; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .input, .select, .textarea { width: 100%; height: 36px; border: 1px solid var(--line); border-radius: var(--r); background: var(--paper); padding: 0 10px; min-width: 0; }
