@@ -17,6 +17,7 @@ const app = new (class App extends Emitter {
     this.swipe = false;          // compare slider: the original under the plan, a line to drag across
     this.swipePos = 0.5;
     this.compareBaseId = null;
+    this.compareShownId = null;  // side by side: the version on the right when it is not the open one (task 0034)
     this.mode = 'build';         // build | furnish | view
     this.furnCompare = null;     // furnish mode, side by side / compare: {versionId, layoutId} of the left side
     this.spaceDown = false;
@@ -404,7 +405,8 @@ const app = new (class App extends Emitter {
     if (this.view.scope === 'house' && this.view.dim === '2d') this.view.scope = 'side';
     // a house opens on its planned version (the original and the changes are one tap away)
     this.display = hasPlans ? 'plan' : 'original';
-    this.selection = null; this.tool = 'select'; this.sideBySide = false; this.swipe = false; this.compareBaseId = null;
+    this.selection = null; this.tool = 'select'; this.sideBySide = false; this.swipe = false; this.compareBaseId = null; this.compareShownId = null;
+    this.comparePair = Array.isArray(ui.pair) ? ui.pair : null;
     this.mode = ['build', 'furnish', 'view'].includes(ui.mode) ? ui.mode : 'build';
     // a copy to look at (Export for viewing) only has View
     if (p.viewer) this.mode = 'view';
@@ -437,7 +439,7 @@ const app = new (class App extends Emitter {
   loadUi(id) { try { return JSON.parse(localStorage.getItem('house-planner.ui.' + id) || '{}'); } catch (e) { return {}; } }
   saveUi() {
     if (!this.project) return;
-    try { localStorage.setItem('house-planner.ui.' + this.project.id, JSON.stringify({ dim: this.view.dim, scope: this.view.scope, storeyId: this.view.storeyId, display: this.display, mode: this.mode })); } catch (e) { /* ignore */ }
+    try { localStorage.setItem('house-planner.ui.' + this.project.id, JSON.stringify({ dim: this.view.dim, scope: this.view.scope, storeyId: this.view.storeyId, display: this.display, mode: this.mode, pair: this.comparePair || undefined })); } catch (e) { /* ignore */ }
   }
 
   /* ───────── versions ───────── */
@@ -445,6 +447,8 @@ const app = new (class App extends Emitter {
   shownVersion() {
     const p = this.project;
     if (!p) return null;
+    // side by side (Build / View): the right side can show any version, the open one stays open
+    if (this.sideBySide && this.mode !== 'furnish' && this.compareShownId) { const c = getVersion(p, this.compareShownId); if (c) return c; }
     if (this.display === 'original') return getOriginal(p);
     return getVersion(p, p.activeVersionId) || getOriginal(p);
   }
@@ -517,6 +521,7 @@ const app = new (class App extends Emitter {
     Saver.markDirty();
     if (this.display === 'original') this.display = 'plan';
     if (this.compareBaseId === id) this.compareBaseId = null;
+    this.compareShownId = null;
     this.selection = null;
     this.saveUi();
     this.renderEditorChrome();
@@ -524,11 +529,14 @@ const app = new (class App extends Emitter {
     this.renderInspector();
   }
 
-  toggleSideBySide() {
-    if (!this.sideBySide) {
+  /** side by side with a pair: left and right version ids (none: the pair compared last in this house, else the
+   *  Original on the left and the open version on the right) */
+  toggleSideBySide(pair) {
+    if (!this.sideBySide || pair) {
       const go = async () => {
         if (this.mode === 'furnish') this.startFurnCompare();
         else if (this.display !== 'diff') { await this.setDisplay('diff'); if (this.display !== 'diff') return; }
+        if (this.mode !== 'furnish') this.choosePair(pair || this.comparePair);
         this.sideBySide = true;
         this.swipe = false;
         this.setTool('select', true);
@@ -538,8 +546,42 @@ const app = new (class App extends Emitter {
       go();
     } else {
       this.sideBySide = false;
+      this.compareShownId = null;
       this.renderEditorChrome(); this.setupPanes(true); this.renderInspector();
     }
+  }
+
+  /** the two versions side by side; a version that is gone (or both the same) falls back to Original | the open one */
+  choosePair(pair) {
+    const p = this.project, orig = getOriginal(p);
+    const open = getVersion(p, p.activeVersionId) || orig;
+    let [l, r] = (pair || []).map(id => id && getVersion(p, id));
+    if (!r) r = open;
+    if (!l || l.id === r.id) l = r.id === orig.id ? (this.planVersions()[0] || orig) : orig;
+    this.compareBaseId = l.id;
+    this.compareShownId = r.id === open.id && this.display !== 'original' ? null : r.id;
+    this.comparePair = [l.id, r.id];
+    this.saveUi();
+  }
+
+  /** a side's ▾: pick a version (the other side's version: the two swap) */
+  pickPaneVersion(role, id) {
+    const [l, r] = [this.baseVersion().id, this.shownVersion().id];
+    let pair = role === 'base' ? [id, r] : [l, id];
+    if (pair[0] === pair[1]) pair = [r, l];
+    this.choosePair(pair);
+    this.selection = null;
+    this.renderEditorChrome(); this.refreshViews(false); this.renderInspector();
+  }
+
+  swapPanes() { this.pickPaneVersion('base', this.shownVersion().id); }
+
+  paneVersionMenu(anchor, role) {
+    const cur = role === 'base' ? this.baseVersion() : this.shownVersion();
+    const show = !!this.settings.showDisabled;
+    UI.menu(anchor, [{ heading: t(role === 'base' ? 'Left side' : 'Right side') },
+      ...this.project.versions.filter(v => v.status !== 'disabled' || show || v.id === cur.id).map(v => ({
+        label: v.name, icon: v.id === cur.id ? 'check' : (v.kind === 'original' ? 'lock' : 'blank'), fn: () => this.pickPaneVersion(role, v.id) }))], { alignLeft: true });
   }
 
   /** compare slider: Original on the left, Planned (or Changes) on the right, with a line to drag */
@@ -918,7 +960,7 @@ const app = new (class App extends Emitter {
     if (this.layoutKey !== key) {
       // only the layout changes (side by side / compare on or off): keep looking at the same spot
       const old = this.panes.find(p => p.role === 'main');
-      if (old && old.kind === this.view.dim && this.layoutProject === (this.project && this.project.id) && old.view.viewState) keep = old.view.viewState();
+      if (old && old.kind === this.view.dim && this.layoutProject === (this.project && this.project.id) && old.view.viewState && !(this.sideBySide && this.view.dim === '2d')) keep = old.view.viewState();
       for (const pane of this.panes) pane.view.destroy();
       this.panes = [];
       stage.textContent = '';
@@ -937,7 +979,8 @@ const app = new (class App extends Emitter {
       if (this._ovRO) this._ovRO.disconnect();
       // (the bars changing size, and the panes: a wider or narrower window moves the corner also when the bars keep their
       //  size – measured again once the panes have their final size)
-      if (window.ResizeObserver) { this._ovRO = new ResizeObserver(() => this.overlayPush()); this._ovRO.observe(this.overlayEl); for (const pn of this.panes) this._ovRO.observe(pn.el); }
+      this._splitSize = null;
+      if (window.ResizeObserver) { this._ovRO = new ResizeObserver(() => { this.overlayPush(); this.refitSplit(); }); this._ovRO.observe(this.overlayEl); for (const pn of this.panes) this._ovRO.observe(pn.el); }
       if (this.swipe) this.buildSwipeBar(stage);
       this.layoutKey = key;
       this.layoutProject = this.project && this.project.id;
@@ -951,6 +994,16 @@ const app = new (class App extends Emitter {
     if (keep) for (const pane of this.panes) if (pane.view.setViewState) pane.view.setViewState(keep);
     if (fresh) this.updateInsets();
     this.updatePip();
+  }
+
+  /** side by side in 2D: a new pane size (the phone turned, the window resized) fits both panes to the storey again */
+  refitSplit() {
+    if (!this.sideBySide || this.view.dim !== '2d' || this.panes.length !== 2) return;
+    const r = this.panes[0].el.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const key = Math.round(r.width) + 'x' + Math.round(r.height);
+    if (this._splitSize && this._splitSize !== key) for (const pn of this.panes) { pn.view.updateSize(); pn.view.fit(); }
+    this._splitSize = key;
   }
 
   fitViews() {
@@ -993,6 +1046,8 @@ const app = new (class App extends Emitter {
     const doFit = fit || fitKey !== this.lastFitKey;
     this.lastFitKey = fitKey;
     const shown = this.shownVersion(), base = this.baseVersion();
+    // the pair side by side is remembered for this house (also when the Changes details pick the left one)
+    if (this.sideBySide && this.mode !== 'furnish' && (!this.comparePair || this.comparePair[0] !== base.id || this.comparePair[1] !== shown.id)) { this.comparePair = [base.id, shown.id]; this.saveUi(); }
     // after an edit: the 3D views may keep the storeys that did not change (reuse.js)
     const reuse = !!this._editRefresh; this._editRefresh = false;
     // only the furniture (or its selection) changed: the 3D views redo just the furniture
@@ -1119,7 +1174,15 @@ const app = new (class App extends Emitter {
     if (this.sideBySide) {
       const base = this.baseVersion();
       const lay = role => this.mode === 'furnish' ? ' · ' + ((role === 'base' ? this.layoutById(this.furnCompare && this.furnCompare.layoutId) : this.activeLayout()) || {}).name : '';
-      this.panes.forEach(pn => pn.el.appendChild(h('div', { class: 'pane-label' }, (pn.role === 'base' ? base.name : shown.name) + lay(pn.role))));
+      if (this.mode === 'furnish') this.panes.forEach(pn => pn.el.appendChild(h('div', { class: 'pane-label' }, (pn.role === 'base' ? base.name : shown.name) + lay(pn.role))));
+      else this.panes.forEach(pn => {
+        // each side's name is a picker: any version, the Original included; ⇄ swaps the two
+        const v = pn.role === 'base' ? base : shown;
+        const pick = h('button', { class: 'pane-pick', 'data-role': pn.role, 'aria-haspopup': 'menu', title: t('Pick a version for this side') }, h('span', { class: 'pp-name' }, v.name), icon('chevron'));
+        pick.onclick = () => this.paneVersionMenu(pick, pn.role);
+        const swap = pn.role === 'base' ? h('button', { class: 'pane-swap', 'aria-label': t('Swap the two sides'), title: t('Swap the two sides'), onclick: () => this.swapPanes() }, icon('swipearrows')) : null;
+        pn.el.appendChild(h('div', { class: 'pane-label pane-label-pick' }, pick, swap));
+      });
     }
     if (this.swipe && this.mode === 'furnish') {
       if (this.swipeEls) {

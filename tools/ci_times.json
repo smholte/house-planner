@@ -816,6 +816,17 @@
    },
    "set": "public"
   },
+  "test_sidebyside.py": {
+   "seconds": 36.0,
+   "ok": true,
+   "checks": 30,
+   "made_up": {
+    "seconds": 36.0,
+    "ok": true,
+    "checks": 30
+   },
+   "set": "public"
+  },
   "test_hpscene.py": {
    "made_up": {
     "seconds": 44.0,

@@ -164,7 +164,9 @@ class PlanView extends Emitter {
     }
     const bb = bboxOfPoints(pts) || { minX: -1, minY: -1, maxX: 11, maxY: 11, w: 12, h: 12 };
     const ins = this.insets || { top: 0, bottom: 0 };
-    const padTop = 64 + ins.top, padBottom = 40 + ins.bottom;   // room for the tool bar and the scale bar (and a sheet)
+    // room for the tool bar and the scale bar (and a sheet); a low pane side by side (a turned phone) uses all its height
+    const tight = this.linked.length && this.H < 300;
+    const padTop = (tight ? 14 : 64) + ins.top, padBottom = (tight ? 14 : 40) + ins.bottom;
     const W = Math.max(50, this.W - pad * 2), H = Math.max(50, this.H - padTop - padBottom - (this.spec.entries.length > 1 ? 24 : 0));
     const sc = clamp(Math.min(W / Math.max(bb.w, 1), H / Math.max(bb.h, 1)), 4, 400);
     const to = { s: sc, tx: (this.W - bb.w * sc) / 2 - bb.minX * sc, ty: padTop + (H - bb.h * sc) / 2 - bb.minY * sc + (this.spec.entries.length > 1 ? 24 : 0) };
