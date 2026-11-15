@@ -10978,5 +10978,13 @@
  "3D pictures compressed again (less memory).": [
   "3D-afbeeldingen weer gecomprimeerd (minder geheugen).",
   "3D-bilder komprimert igjen (mindre minne)."
+ ],
+ "Pick a version for this side": [
+  "Kies een versie voor deze kant",
+  "Velg en versjon for denne siden"
+ ],
+ "Swap the two sides": [
+  "Wissel de twee kanten om",
+  "Bytt om de to sidene"
  ]
 }

@@ -671,7 +671,7 @@ Object.assign(app, {
         more.onclick = () => UI.menu(more, [
           { label: 'Rename', icon: 'edit', fn: async () => { const n = await UI.prompt({ title: 'Rename version', label: 'Name', value: v.name }); if (n && n.trim()) { this.mutate(() => { v.name = n.trim(); }, { project: true }); this.renderEditorChrome(); render(); } } },
           { label: 'Copy into a new version', icon: 'copy', fn: () => { close(); this.newVersionDialog(v.id); } },
-          !isShown ? { label: 'Compare with the open version', icon: 'split', fn: () => { close(); this.compareBaseId = v.id; this.setDisplay('diff'); } } : null,
+          !isShown ? { label: 'Compare with the open version', icon: 'split', fn: () => { close(); this.toggleSideBySide([v.id, this.shownVersion().id]); } } : null,
           { label: v.locked ? 'Unlock' : 'Lock', icon: v.locked ? 'unlock' : 'lock', fn: () => { this.toggleLock(v); setTimeout(render, 50); } },
           !isOrig ? { label: v.status === 'disabled' ? 'Enable' : 'Disable (hide from list)', icon: 'eye', fn: () => this.toggleDisabled(v, render) } : null,
           !isOrig ? '-' : null,
