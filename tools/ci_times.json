@@ -716,7 +716,7 @@
   "test_wallphotos.py": {
    "seconds": 51.0,
    "ok": true,
-   "checks": 41,
+   "checks": 42,
    "made_up": {
     "seconds": 51.0,
     "ok": true,

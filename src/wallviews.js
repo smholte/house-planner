@@ -305,8 +305,13 @@ const WP_MAX = 1600, WP_THUMB = 320;
 
 /** the photos of one wall face (a wall, one side, the part along one room), oldest first */
 function wallPhotosOf(p, f) {
+  const inF = (x, g) => x.u >= g.u0 - 0.1 && x.u <= g.u1 + 0.1;
+  let sib = null;   // the room's other faces of the same wall and side (an L-shaped room can meet one wall twice)
+  const others = () => sib || (sib = roomFaces(app.shownVersion().plan, f.room).filter(g => g.wall.id === f.wall.id && g.side === f.side && Math.abs(g.u0 - f.u0) > 0.01));
+  // where along the wall it was taken; if the wall changed in this version, the room it was taken in (the nearest face)
   return ((p && p.wallPhotos) || []).filter(x => x.wall === f.wall.id && x.side === f.side &&
-    ((x.u >= f.u0 - 0.1 && x.u <= f.u1 + 0.1) || x.room === f.room.id)).sort((a, b) => (a.date || 0) - (b.date || 0) || a.created - b.created);
+    (inF(x, f) || (x.room === f.room.id && !others().some(g => inF(x, g) || Math.abs(x.u - (g.u0 + g.u1) / 2) < Math.abs(x.u - (f.u0 + f.u1) / 2)))))
+    .sort((a, b) => (a.date || 0) - (b.date || 0) || (a.created || 0) - (b.created || 0));
 }
 
 /** the date a JPEG was taken (EXIF DateTimeOriginal, else DateTime), or null */
@@ -480,11 +485,16 @@ Object.assign(app, {
     stage.addEventListener('pointercancel', () => { sx = null; });
     stage.addEventListener('dragstart', e => e.preventDefault());
     let dlgClose = null;
-    const keys = e => { if (e.key === 'ArrowLeft') go(-1); else if (e.key === 'ArrowRight') go(1); };
+    let dlgEl = null;
+    const keys = e => {
+      // not while typing, and only when this window is on top (not under the text prompt)
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || (dlgEl && document.querySelector('#sheet-root > .scrim:last-child .dialog') !== dlgEl)) return;
+      if (e.key === 'ArrowLeft') go(-1); else if (e.key === 'ArrowRight') go(1);
+    };
     document.addEventListener('keydown', keys);
     paint();
     return UI.dialog({ title: t('Wall {l} · photo', { l: f.letter }), body: h('div', { class: 'wp-viewer' }, stage, info), wide: true,
-      onOpen: (dlg, close) => { dlgClose = close; dlg.classList.add('wp-dialog'); },
+      onOpen: (dlg, close) => { dlgClose = close; dlgEl = dlg; dlg.classList.add('wp-dialog'); },
       actions: [{ label: t('Close'), value: null, kind: 'primary' }] }).finally(() => document.removeEventListener('keydown', keys));
   },
   /** which faces of a room have photos: { faces, withPhotos } */
