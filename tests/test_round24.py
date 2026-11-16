@@ -9,7 +9,10 @@ from common import *
 
 READY = "() => window.__hp && window.__hp.TEXLIB.ready"
 PT = """async ([W, H, N, light]) => { const A = window.__hp, v = A.app.panes.find(p => p.kind === '3d').view;
-  const res = await A.renderPathTraced(v, { W, H, passes: N, light });
+  // (the same seeded random numbers for every render: two renders differ only by their settings – task 0040)
+  const sd = (s) => { let a = s >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+  const rnd0 = Math.random; v.rendering = true; Math.random = sd(12345);
+  let res; try { res = await A.renderPathTraced(v, { W, H, passes: N, light }); } finally { Math.random = rnd0; v.rendering = false; }
   const d = res.canvas.getContext('2d').getImageData(0, 0, W, H).data, top = [0, 0, 0], all = [0, 0, 0]; let nt = 0, na = 0;
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const i = (y * W + x) * 4; for (let k = 0; k < 3; k++) all[k] += d[i + k]; na++; if (y < H * 0.12) { for (let k = 0; k < 3; k++) top[k] += d[i + k]; nt++; } }
   v.resize(); v.needs = true;
