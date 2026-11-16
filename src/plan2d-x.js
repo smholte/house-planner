@@ -401,3 +401,45 @@ function snapFurniture(f, plan, storeyId, others, tol, alignTurn) {
   }
   return { x, y, rot, marks };
 }
+
+/* camera marks on the plan (task 0038): a wall side with photos of the bare wall gets a small camera at its letter (or at
+   the middle of the face), while a room or wall is selected or "colour rooms by walls" is on; a tap opens the photos */
+Object.assign(PlanView.prototype, {
+  drawWallPhotoMarks(g) {
+    const sel = this.spec.selection, all = this.spec.colorBy === 'walls';
+    const proj = this.app.project;
+    if (!proj || !(proj.wallPhotos || []).length || this.spec.mode !== 'build' || !(all || (sel && (sel.type === 'room' || sel.type === 'wall')))) return;
+    for (const en of this.spec.entries) {
+      if (en.wallsOnly || en.edit === false) continue;
+      const rooms = all ? en.plan.rooms.filter(r => r.storey === en.storey.id) : sel.type === 'room' ? en.plan.rooms.filter(r => r.id === sel.id && r.storey === en.storey.id) : en.plan.rooms.filter(r => r.storey === en.storey.id);
+      const letters = !all && sel.type === 'room' && this.cam.s >= 18;
+      for (const r of rooms) for (const f of roomFaces(en.plan, r)) {
+        if (!all && sel.type === 'wall' && f.wall.id !== sel.id) continue;
+        const k = wallPhotosOf(proj, f).length;
+        if (!k) continue;
+        const w = f.wall, d = wallDir(w), n = V.mul(V.perp(d), f.side);
+        const m = V.add(V.add(w.a, V.mul(d, (f.u0 + f.u1) / 2)), V.mul(n, w.t / 2 + 0.035));
+        const p = this.toScreen([m[0] + en.offset[0], m[1] + en.offset[1]]);
+        const sd = this.toScreen([m[0] + en.offset[0] + d[0], m[1] + en.offset[1] + d[1]]);
+        const dl = Math.hypot(sd[0] - p[0], sd[1] - p[1]) || 1, ux = (sd[0] - p[0]) / dl, uy = (sd[1] - p[1]) / dl;
+        const off = letters ? 20 : 0;   // beside the letter
+        const q = [p[0] + n[0] * 14 + ux * off, p[1] + n[1] * 14 + uy * off];
+        const tg = s('g', { class: 'wp-plan-mark', transform: `translate(${q[0].toFixed(1)} ${q[1].toFixed(1)})`, 'data-wpmark': r.id + '|' + w.id + '|' + f.u0.toFixed(3), role: 'button', 'aria-label': t('{n} photos of the bare wall', { n: k }) });
+        tg.appendChild(s('circle', { r: 10 }));
+        tg.appendChild(s('path', { d: 'M-5 -2.5h2l1-1.6h4l1 1.6h2a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1z', class: 'wp-cam' }));
+        tg.appendChild(s('circle', { r: 1.9, cy: 0.6, class: 'wp-lens' }));
+        if (k > 1) tg.appendChild(s('text', { x: 9, y: -6, class: 'wp-n' }, String(k)));
+        g.appendChild(tg);
+      }
+    }
+  },
+  /** a tap on a camera mark: that wall side's photos */
+  openWallPhotoMark(key) {
+    const [rid, wid, u0] = key.split('|');
+    for (const en of this.spec.entries) {
+      const r = en.plan.rooms.find(x => x.id === rid);
+      const f = r && roomFaces(en.plan, r).find(x => x.wall.id === wid && Math.abs(x.u0 - parseFloat(u0)) < 0.01);
+      if (f) { if (wallPhotosOf(this.app.project, f).length) this.app.wallPhotoViewer(f, 0, () => this.draw && this.draw()); return; }
+    }
+  },
+});
