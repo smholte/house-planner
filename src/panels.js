@@ -536,6 +536,7 @@ Object.assign(app, {
       { label: t('Merge a copy of this house…'), icon: 'split', fn: () => this.mergeFileFlow() },
       { heading: t('Lists') },
       { label: t('Quantities and materials…'), icon: 'table', fn: () => this.quantitiesSheet() },
+      { label: t('Kitchen parts list…'), icon: 'table', id: 'mi-kparts', fn: () => this.kitchenPartsSheet() },
       { label: t('Budget…'), icon: 'euro', fn: () => this.budgetSheet() },
       { label: t('Task board…'), icon: 'board', fn: () => this.tasksSheet() },
       { label: t('Documents (PDFs and pictures)…'), icon: 'doc', id: 'mi-docs', fn: () => this.documentsSheet() },
