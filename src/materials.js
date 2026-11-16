@@ -360,6 +360,14 @@ Object.assign(app, {
     box.appendChild(this.segRow(t('Direction'), [['0', '↔ ' + t('Left–right')], ['90', '↕ ' + t('Top–bottom')]], String(F.dir), k => set({ dir: +k || null }), ro, 'floor-dir'));
     if (F.kind === 'wood') box.appendChild(h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Wood tone')),
       h('div', { class: 'chips wood-tones' }, ...WOOD_TONES.map(([name, c]) => h('button', { class: 'chip tone', disabled: ro, 'aria-pressed': String((r.floor.color || '').toLowerCase() === c.toLowerCase()), onclick: () => set({ color: c }) }, h('span', { class: 'tone-dot', style: { background: c } }), t(name))))));
+    // floor tiles: the cuts at the sides of the room, slivers, and where the tiles start (task 0036)
+    const lay = F.kind === 'tile' ? floorTileLayout(this.shownVersion().plan, r) : null;
+    if (lay) {
+      const list = floorCutsSummary(lay.cuts);
+      box.appendChild(h('p', { class: 'note-muted fs-cuts' }, (lay.start ? t('Tiles start: chosen') : t('Tiles start: centre of the room')) + ' · ' + t('{w} whole and {c} cut pieces', { w: lay.count.whole, c: lay.count.cut }) + (list.length ? ' · ' + list.map(x => x.text).join(' · ') : '')));
+      for (const x of list.filter(q => q.sliver)) box.appendChild(h('p', { class: 'wv-warn' }, icon('alert'), ' ', t('{where} {c} mm is a sliver (under ⅓ tile)', { where: x.place.charAt(0).toUpperCase() + x.place.slice(1), c: fmtMM(x.c) })));
+      box.appendChild(h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'f-floor-start', onclick: () => this.wallViewsSheet(r, { focus: 'floor' }) }, icon('grid'), t('Where the tiles start…'))));
+    }
     if (F.kind === 'tile') {
       const gc = h('input', { type: 'color', id: 'f-floor-grout', value: F.grout, disabled: ro, 'aria-label': t('Grout colour') });
       gc.addEventListener('input', () => set({ grout: gc.value }, { coalesce: 'fg:' + r.id, keepInspector: true }));

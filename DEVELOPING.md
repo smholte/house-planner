@@ -108,7 +108,12 @@ The modules of the owner's own house (its plot, neighbourhood, documents …) ar
                      color, grout, lay, waste}) and a wall's own finish for one room (wall.fin[roomId], any of color,
                      name, base, paper, tiles); faceArea() (to the ceiling, without openings), tileCount(); 3D: tile
                      textures (canvas), wallpaper from project.images (asset), finishMat(); 2D bands + letters; room
-                     panel Walls / Each wall / Ceiling (ceilingColor, ceilingName, ceilingFinish, ceilingH)
+                     panel Walls / Each wall / Ceiling (ceilingColor, ceilingName, ceilingFinish, ceilingH).
+                     Task 0036: where the tiles start – wall.tileStart[roomId] {x centre|left|right|at, at, joint,
+                     ref, dx, y floor|at|top, yh} and r.floor.start {at centre|nw|ne|sw|se|door, p, n, dx, dy};
+                     faceTileLayout() / floorTileLayout() (the grid, gridCount(): whole + cut pieces, the cuts and
+                     slivers < ⅓ tile), bestTileStart() / bestFloorStart(); the tile count is from the grid. The
+                     wall-photo marks of 0033 are drawn here (no wrapper in wallviews.js any more)
     src/quantities.js per room and the whole house: floor (+ waste per material), walls by covering, ceiling, skirting,
                      paint (2 coats), primers, renovlies rolls, wallpaper rolls (strips per roll width), tiles,
                      sealant; rates in project.qty; room.noQty leaves a room out; CSV (; and decimal comma) and print
@@ -280,7 +285,10 @@ The modules of the owner's own house (its plot, neighbourhood, documents …) ar
                      from the floor, one tile less instead of a sliver under a third of a tile –, points on that
                      face incl. units, kitchen runs whose long back edge lies on the face), wallViewSvg() (metres,
                      y up = negative; the kitchen via runElevation), the dialog and wallViewsPdf() (A4 landscape a
-                     wall, the SVG made a JPEG with its computed light-theme styles by svgJpeg)
+                     wall, the SVG made a JPEG with its computed light-theme styles by svgJpeg). Task 0036: the tiles
+                     drawn from faceTileLayout() (cut pieces, slivers), the cut at each corner, the start controls,
+                     Best start and dragging per wall card (wallViewCard), the tiled floor card (floorTileCard,
+                     floorViewSvg) and its PDF page
     src/i18n.js      t() and the on-screen translation layer: a MutationObserver translates every text node (and
                      title / aria-label / placeholder) found in the dictionary; keys with {0} / {n} are patterns;
                      " · "-joined pieces and a trailing number are handled; skips inputs and translate="no".

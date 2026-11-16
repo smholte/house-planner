@@ -105,7 +105,7 @@ function roomQuantities(plan, r, st, S) {
   const painted = byBase.paint + byBase.renovlies;
   return {
     room: r, counted: roomCounted(r), stats,
-    floor, floorMat: mat, floorColor: r.floor && r.floor.color, floorPat, floorWaste: fw, floorBuy: floor * (1 + fw / 100), floorProd: floorProduct(r.floor), floorKey: floorProduct(r.floor) ? floorProductKey(r.floor) : null,
+    floor, floorMat: mat, floorColor: r.floor && r.floor.color, floorPat, floorWaste: fw, floorTiles: floorTilesOf(plan, r, fw), floorBuy: floor * (1 + fw / 100), floorProd: floorProduct(r.floor), floorKey: floorProduct(r.floor) ? floorProductKey(r.floor) : null,
     ceiling, ceilFinish: ch, ceilPainted, ceilColor: r.ceilingColor || CEIL_DEFAULT, ceilName: r.ceilingName || '',
     ceilPaintL: ceilPainted * S.ceilCoats / S.ceilCov,
     walls: stats.wall, tiled: stats.tiled, byBase, painted, colours: [...colours.values()], papers: [...papers.values()],
@@ -114,6 +114,13 @@ function roomQuantities(plan, r, st, S) {
   };
 }
 
+/** a tiled floor counted from its grid (task 0036): { whole, cut, tiles } or null */
+function floorTilesOf(plan, r, waste) {
+  let lay = null;
+  try { lay = floorTileLayout(plan, r); } catch (e) { console.error(e); }
+  if (!lay) return null;
+  return { whole: lay.count.whole, cut: lay.count.cut, tiles: Math.ceil((lay.count.whole + lay.count.cut) * (1 + waste / 100) - 1e-9), size: [lay.F.l, lay.F.w] };
+}
 /** the whole house (the version shown): every room, and the materials added up */
 function houseQuantities(p, plan) {
   const S = qtySettings(p);
@@ -151,21 +158,22 @@ function houseQuantities(p, plan) {
   }
   // tiles per kind
   const tl = new Map();
-  for (const x of use) for (const k of x.tiles) { const key = tileKey(k.T); if (!tl.has(key)) tl.set(key, { T: k.T, area: 0, rooms: new Set() }); tl.get(key).area += k.area; tl.get(key).rooms.add(x.room.name); }
-  for (const g of tl.values()) { const c = tileCount(g.area, g.T); M.push({ key: 'tiles|' + tileKey(g.T), group: 'wall', what: t('Wall tiles') + ' · ' + tileLabel(g.T), color: g.T.color, detail: t('{a} of wall + {w} %: {m} of tiles', { a: fmtArea(g.area), w: g.T.waste ?? 0, m: fmtArea(c.m2) }) + roomsOf(g.rooms), amount: c.tiles, unit: t('tiles'), show: t('{n} tiles', { n: c.tiles }) }); }
+  // (counted from the grid of each wall – whole tiles and cut pieces – with the extra on top; task 0036)
+  for (const x of use) for (const k of x.tiles) { const key = tileKey(k.T); if (!tl.has(key)) tl.set(key, { T: k.T, area: 0, whole: 0, cut: 0, grid: true, rooms: new Set() }); const g = tl.get(key); g.area += k.area; g.whole += k.whole || 0; g.cut += k.cut || 0; if (!k.grid) g.grid = false; g.rooms.add(x.room.name); }
+  for (const g of tl.values()) { const c = tileCount(g.area, g.T, g.grid ? g.whole + g.cut : null); M.push({ key: 'tiles|' + tileKey(g.T), group: 'wall', what: t('Wall tiles') + ' · ' + tileLabel(g.T), color: g.T.color, detail: (g.grid ? t('{w} whole and {c} cut pieces + {p} %', { w: g.whole, c: g.cut, p: g.T.waste ?? 0 }) + ' · ' + fmtArea(g.area) : t('{a} of wall + {w} %: {m} of tiles', { a: fmtArea(g.area), w: g.T.waste ?? 0, m: fmtArea(c.m2) })) + roomsOf(g.rooms), amount: c.tiles, unit: t('tiles'), show: t('{n} tiles', { n: c.tiles }), cuts: g.grid ? g.cut : null }); }
   // ceilings per colour
   const cc = new Map();
   for (const x of use) if (x.ceilPainted > 0) { const k = x.ceilColor.toUpperCase() + '|' + x.ceilName; if (!cc.has(k)) cc.set(k, { color: x.ceilColor, name: x.ceilName, area: 0, rooms: new Set() }); cc.get(k).area += x.ceilPainted; cc.get(k).rooms.add(x.room.name); }
   for (const c of cc.values()) { const L = c.area * S.ceilCoats / S.ceilCov; M.push({ key: 'ceil|' + c.color.toUpperCase() + '|' + c.name, group: 'ceil', what: S.ceilPaint + (c.name ? ' · ' + c.name : ''), color: c.color, detail: t('{a} of ceiling, {n} coats, {r} m² per litre', { a: fmtArea(c.area), n: S.ceilCoats, r: S.ceilCov }) + (cc.size > 1 ? roomsOf(c.rooms) : ''), amount: L, unit: 'L', show: fmtL(L) }); }
   // floors per material and colour
   const fl = new Map();
-  for (const x of use) if (x.floorMat !== 'screed' && x.floorMat !== 'casco') { const k = x.floorKey || x.floorMat + '|' + (x.floorColor || '') + '|' + x.floorPat; if (!fl.has(k)) fl.set(k, { mat: x.floorMat, color: x.floorColor, pat: x.floorPat, prod: x.floorProd, key: x.floorKey, area: 0, buy: 0, waste: x.floorWaste, rooms: new Set() }); const g = fl.get(k); g.area += x.floor; g.buy += x.floorBuy; g.rooms.add(x.room.name); }
+  for (const x of use) if (x.floorMat !== 'screed' && x.floorMat !== 'casco') { const k = x.floorKey || x.floorMat + '|' + (x.floorColor || '') + '|' + x.floorPat; if (!fl.has(k)) fl.set(k, { mat: x.floorMat, color: x.floorColor, pat: x.floorPat, prod: x.floorProd, key: x.floorKey, area: 0, buy: 0, waste: x.floorWaste, rooms: new Set(), tiles: 0, whole: 0, cut: 0, gridRooms: 0, n: 0 }); const g = fl.get(k); g.area += x.floor; g.buy += x.floorBuy; g.rooms.add(x.room.name); g.n++; if (x.floorTiles) { g.tiles += x.floorTiles.tiles; g.whole += x.floorTiles.whole; g.cut += x.floorTiles.cut; g.gridRooms++; } }
   for (const g of fl.values()) {
     if (g.prod) {
       // a product: bought in whole packs
       const pack = g.prod.pack > 0 ? g.prod.pack : 0, n = pack ? Math.ceil(g.buy / pack - 1e-9) : 0, buy = pack ? n * pack : g.buy;
-      M.push({ key: g.key, group: 'floor', what: t('Floor') + ' · ' + g.prod.name.trim(), color: g.color, detail: t('{a} of floor + {w} %', { a: fmtArea(g.area), w: g.waste }) + (pack ? ' · ' + t('{n} packs of {p} m²', { n, p: String(+pack.toFixed(3)) }) : '') + (g.pat ? ' · ' + g.pat : '') + roomsOf(g.rooms), amount: buy, unit: 'm²', show: fmtArea(buy) + (pack ? ' · ' + t('{n} packs', { n }) : '') });
-    } else M.push({ key: 'floor|' + g.mat + '|' + (g.color || '').toUpperCase() + (g.pat ? '|' + g.pat : ''), group: 'floor', what: t('Floor') + ' · ' + t(floorLabel(g.mat)) + (g.pat ? ' · ' + g.pat : ''), color: g.color, detail: t('{a} of floor + {w} %', { a: fmtArea(g.area), w: g.waste }) + roomsOf(g.rooms), amount: g.buy, unit: 'm²', show: fmtArea(g.buy) });
+      M.push({ key: g.key, group: 'floor', what: t('Floor') + ' · ' + g.prod.name.trim(), color: g.color, detail: t('{a} of floor + {w} %', { a: fmtArea(g.area), w: g.waste }) + (pack ? ' · ' + t('{n} packs of {p} m²', { n, p: String(+pack.toFixed(3)) }) : '') + (g.pat ? ' · ' + g.pat : '') + floorTilesDetail(g) + roomsOf(g.rooms), amount: buy, unit: 'm²', show: fmtArea(buy) + (pack ? ' · ' + t('{n} packs', { n }) : '') });
+    } else M.push({ key: 'floor|' + g.mat + '|' + (g.color || '').toUpperCase() + (g.pat ? '|' + g.pat : ''), group: 'floor', what: t('Floor') + ' · ' + t(floorLabel(g.mat)) + (g.pat ? ' · ' + g.pat : ''), color: g.color, detail: t('{a} of floor + {w} %', { a: fmtArea(g.area), w: g.waste }) + floorTilesDetail(g) + roomsOf(g.rooms), amount: g.buy, unit: 'm²', show: fmtArea(g.buy) });
   }
   const skirt = sum('skirting');
   if (skirt > 0) { const n = Math.ceil(skirt * 1.05 / S.skirt - 1e-9); M.push({ key: 'skirt', group: 'floor', what: t('Skirting boards'), detail: t('{m} + 5 %, lengths of {l} m', { m: fmtM(skirt), l: S.skirt }), amount: n, unit: t('lengths'), show: t('{n} lengths', { n }) }); }
@@ -174,6 +182,8 @@ function houseQuantities(p, plan) {
   if (kit > 0) { const n = Math.ceil(kit / S.kitTube - 1e-9); M.push({ key: 'kit', group: 'paint', what: t('Acrylic sealant (no silicone)'), detail: t('{m} of joints: wall–ceiling, skirting, frames; {l} m per tube', { m: fmtM(kit), l: S.kitTube }), amount: n, unit: t('tubes'), show: t('{n} tubes', { n }) }); }
   return { S, rooms, use, materials: M, totals: { floor: sum('floor'), walls: sum('walls'), ceiling: sum('ceiling'), painted, skirt, paintL: sum('paintL'), ceilPaintL: sum('ceilPaintL') } };
 }
+/** a tiled floor's count from the grid, for the materials list (only when every room of it has a grid) */
+const floorTilesDetail = g => (g.gridRooms && g.gridRooms === g.n ? ' · ' + t('{n} tiles: {w} whole and {c} cut pieces', { n: g.tiles, w: g.whole, c: g.cut }) : '');
 /** the rooms a material is for, in short */
 function roomsOf(set) { const a = [...set]; return a.length ? ' · ' + (a.length > 4 ? a.slice(0, 4).join(', ') + ' ' + t('+{n} more', { n: a.length - 4 }) : a.join(', ')) : ''; }
 const fmtL = L => (L < 10 ? fmtDec((Math.ceil(L * 10) / 10).toFixed(1)) : String(Math.ceil(L))) + ' L';
@@ -187,6 +197,7 @@ Object.assign(app, {
     const kv = h('dl', { class: 'kv' });
     const row = (a, b) => { kv.append(h('dt', null, a), h('dd', null, b)); };
     row(t('Floor'), q.floorMat === 'screed' || q.floorMat === 'casco' ? fmtArea(q.floor) : `${fmtArea(q.floor)} → ${fmtArea(q.floorBuy)}`);
+    if (q.floorTiles) row(t('Floor tiles'), t('{n} tiles: {w} whole and {c} cut pieces', { n: q.floorTiles.tiles, w: q.floorTiles.whole, c: q.floorTiles.cut }));
     row(t('Walls'), fmtArea(q.walls));
     if (q.painted > 0) row(t('Wall paint, {n} coats', { n: qtySettings(this.project).wallCoats }), fmtL(q.paintL));
     row(t('Ceiling'), fmtArea(q.ceiling) + (q.ceilPaintL > 0 ? ' · ' + fmtL(q.ceilPaintL) : ''));

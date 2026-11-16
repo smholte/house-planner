@@ -11238,5 +11238,253 @@
  "{name} saved: {n} surfaces, {size}.": [
   "{name} opgeslagen: {n} vlakken, {size}.",
   "{name} lagret: {n} flater, {size}."
+ ],
+ "10 mm to the left": [
+  "10 mm naar links",
+  "10 mm til venstre"
+ ],
+ "10 mm to the right": [
+  "10 mm naar rechts",
+  "10 mm til høyre"
+ ],
+ "A sliver of tile on this wall": [
+  "Een smal reepje snijtegel op deze wand",
+  "En smal flisstripe på denne veggen"
+ ],
+ "Best start": [
+  "Beste start",
+  "Beste start"
+ ],
+ "Best start: no cut tiles.": [
+  "Beste start: geen snijtegels.",
+  "Beste start: ingen kappede fliser."
+ ],
+ "Best start: the smallest cut is now {c} mm.": [
+  "Beste start: de kleinste snijtegel is nu {c} mm.",
+  "Beste start: den minste kappede biten er nå {c} mm."
+ ],
+ "Centre of the room": [
+  "Midden van de ruimte",
+  "Midt i rommet"
+ ],
+ "Centre of the wall": [
+  "Midden van de wand (starten vanuit het midden)",
+  "Midt på veggen (starte fra midten)"
+ ],
+ "Centre on a line at {x} mm": [
+  "Midden op een lijn op {x} mm",
+  "Midt på en linje ved {x} mm"
+ ],
+ "Centre on: {what}": [
+  "Midden op: {what}",
+  "Midt på: {what}"
+ ],
+ "Corner bottom left": [
+  "Hoek linksonder",
+  "Hjørne nederst til venstre"
+ ],
+ "Corner bottom right": [
+  "Hoek rechtsonder",
+  "Hjørne nederst til høyre"
+ ],
+ "Corner top left": [
+  "Hoek linksboven",
+  "Hjørne øverst til venstre"
+ ],
+ "Corner top right": [
+  "Hoek rechtsboven",
+  "Hjørne øverst til høyre"
+ ],
+ "Door line (wall {l})": [
+  "Deurlijn (wand {l})",
+  "Dørlinjen (vegg {l})"
+ ],
+ "Floor tiles": [
+  "Vloertegels",
+  "Gulvfliser"
+ ],
+ "Floor tiles start": [
+  "Vloertegels starten",
+  "Gulvflisene starter"
+ ],
+ "From the grid of each wall: {w} whole and {c} cut pieces": [
+  "Uit het tegelpatroon van elke wand: {w} hele tegels en {c} snijtegels",
+  "Fra flisrutenettet på hver vegg: {w} hele fliser og {c} kappede biter"
+ ],
+ "In the plan and in 3D the floor pattern does not follow this start yet.": [
+  "In de plattegrond en in 3D volgt het vloerpatroon deze start nog niet.",
+  "I planen og i 3D følger gulvmønsteret ikke denne starten ennå."
+ ],
+ "Left corner": [
+  "Linkerhoek",
+  "Venstre hjørne"
+ ],
+ "On this wall: {w} whole tiles and {c} cut pieces": [
+  "Op deze wand: {w} hele tegels en {c} snijtegels",
+  "På denne veggen: {w} hele fliser og {c} kappede biter"
+ ],
+ "Right corner": [
+  "Rechterhoek",
+  "Høyre hjørne"
+ ],
+ "Rows": [
+  "Rijen",
+  "Rader"
+ ],
+ "Shift": [
+  "Verschuiven",
+  "Forskyv"
+ ],
+ "Shift (mm)": [
+  "Verschuiven (mm)",
+  "Forskyv (mm)"
+ ],
+ "Shift left–right": [
+  "Verschuiven links–rechts",
+  "Forskyv venstre–høyre"
+ ],
+ "Shift up–down": [
+  "Verschuiven boven–onder",
+  "Forskyv opp–ned"
+ ],
+ "Tiles start across": [
+  "Tegels starten in de breedte",
+  "Flisene starter i bredden"
+ ],
+ "Tiles start: centre of the room": [
+  "Tegels starten vanuit het midden van de ruimte",
+  "Flisene starter midt i rommet"
+ ],
+ "Tiles start: centred, whole rows from the floor": [
+  "Tegels starten vanuit het midden, hele rijen vanaf de vloer",
+  "Flisene starter fra midten, hele rader fra gulvet"
+ ],
+ "Tiles start: chosen": [
+  "Tegels starten: gekozen",
+  "Flisene starter: valgt"
+ ],
+ "Where the floor tiles start": [
+  "Waar de vloertegels starten",
+  "Hvor gulvflisene starter"
+ ],
+ "Where the tiles start…": [
+  "Waar de tegels starten…",
+  "Hvor flisene starter…"
+ ],
+ "Where the wall tiles start": [
+  "Waar de wandtegels starten",
+  "Hvor veggflisene starter"
+ ],
+ "Whole row at the floor": [
+  "Hele rij op de vloer",
+  "Hel rad ved gulvet"
+ ],
+ "Whole row at the top (cut row at the floor)": [
+  "Hele rij bovenaan (snijrij op de vloer)",
+  "Hel rad øverst (kapprad ved gulvet)"
+ ],
+ "Whole row from": [
+  "Hele rij vanaf",
+  "Hel rad fra"
+ ],
+ "Whole row from a height I type": [
+  "Hele rij vanaf een hoogte die ik invul",
+  "Hel rad fra en høyde jeg skriver inn"
+ ],
+ "Whole row on top of: {what} ({h} mm)": [
+  "Hele rij boven op: {what} ({h} mm)",
+  "Hel rad oppå: {what} ({h} mm)"
+ ],
+ "above the {what}": [
+  "boven de {what}",
+  "over {what}"
+ ],
+ "at the floor": [
+  "op de vloer",
+  "ved gulvet"
+ ],
+ "bottom side": [
+  "onderkant",
+  "nedre side"
+ ],
+ "half a tile": [
+  "een halve tegel",
+  "en halv flis"
+ ],
+ "left corner": [
+  "linkerhoek",
+  "venstre hjørne"
+ ],
+ "left of the {what}": [
+  "links van de {what}",
+  "til venstre for {what}"
+ ],
+ "left side": [
+  "linkerkant",
+  "venstre side"
+ ],
+ "or drag the tiles sideways": [
+  "of sleep de tegels opzij",
+  "eller dra flisene sidelengs"
+ ],
+ "right corner": [
+  "rechterhoek",
+  "høyre hjørne"
+ ],
+ "right of the {what}": [
+  "rechts van de {what}",
+  "til høyre for {what}"
+ ],
+ "right side": [
+  "rechterkant",
+  "høyre side"
+ ],
+ "round the opening in the floor": [
+  "rond de sparing in de vloer",
+  "rundt åpningen i gulvet"
+ ],
+ "top row": [
+  "bovenste rij",
+  "øverste rad"
+ ],
+ "top side": [
+  "bovenkant",
+  "øvre side"
+ ],
+ "try {what}": [
+  "probeer {what}",
+  "prøv {what}"
+ ],
+ "under the {what}": [
+  "onder de {what}",
+  "under {what}"
+ ],
+ "{n} floor tiles: {w} whole and {c} cut pieces, with {p} % extra": [
+  "{n} vloertegels: {w} hele tegels en {c} snijtegels, met {p} % extra",
+  "{n} gulvfliser: {w} hele og {c} kappede biter, med {p} % ekstra"
+ ],
+ "{n} tiles: {w} whole and {c} cut pieces": [
+  "{n} tegels: {w} hele en {c} snijtegels",
+  "{n} fliser: {w} hele og {c} kappede biter"
+ ],
+ "{where} {c} mm is a sliver (under ⅓ tile)": [
+  "{where} {c} mm is een smal reepje (minder dan ⅓ tegel)",
+  "{where} {c} mm er en smal stripe (under ⅓ flis)"
+ ],
+ "{where}: {c} mm": [
+  "{where}: {c} mm",
+  "{where}: {c} mm"
+ ],
+ "{w} whole and {c} cut pieces": [
+  "{w} hele tegels en {c} snijtegels",
+  "{w} hele fliser og {c} kappede biter"
+ ],
+ "{w} whole and {c} cut pieces + {p} %": [
+  "{w} hele tegels en {c} snijtegels + {p} %",
+  "{w} hele fliser og {c} kappede biter + {p} %"
+ ],
+ "{w} whole and {c} cut pieces, with {p} % extra": [
+  "{w} hele tegels en {c} snijtegels, met {p} % extra",
+  "{w} hele fliser og {c} kappede biter, med {p} % ekstra"
  ]
 }
