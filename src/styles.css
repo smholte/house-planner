@@ -963,6 +963,11 @@ body[data-viewer] #btn-savepoint, body[data-viewer] #storey-tabs button[aria-lab
 .face-tag text { fill: var(--ink); font-size: 11px; font-weight: 700; text-anchor: middle; font-family: var(--font-label); }
 .face-tag.sel circle { fill: var(--accent); stroke: var(--accent); }
 .face-tag.sel text { fill: var(--on-accent); }
+.wp-plan-mark { cursor: pointer; }
+.wp-plan-mark circle:first-child { fill: var(--surface); stroke: var(--accent); stroke-width: 1.4; }
+.wp-plan-mark .wp-cam { fill: none; stroke: var(--accent); stroke-width: 1.2; stroke-linejoin: round; }
+.wp-plan-mark .wp-lens { fill: none; stroke: var(--accent); stroke-width: 1.1; }
+.wp-plan-mark .wp-n { fill: var(--ink); font-size: 9px; font-weight: 700; font-family: var(--font-label); }
 .face-tag.small text { font-size: 8.5px; }
 /* quantities */
 .check-row { display: flex; gap: 8px; align-items: center; font-size: 13px; }
@@ -1335,6 +1340,17 @@ button.sun-lab:hover, button.sun-lab:focus-visible { background: var(--surface-2
   #editor.bars-away .topbar { height: var(--pull-h); min-height: 0; padding: 0; overflow: hidden; gap: 0; }
   #editor.bars-away .topbar > :not(.bars-pull) { display: none !important; }
   #editor.bars-away .bars-pull { display: flex; }
+}
+/* side by side on a turned phone (task 0038): the bars fold to a strip with a handle; the legend sits small in a corner */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 1000px) {
+  #editor.bars-slim { grid-template-rows: var(--pull-h) 0 minmax(0, 1fr); }
+  #editor.bars-slim .viewbar { visibility: hidden; overflow: hidden; min-height: 0; height: 0; padding-block: 0; border: 0; }
+  #editor.bars-slim .topbar { height: var(--pull-h); min-height: 0; padding: 0; overflow: hidden; gap: 0; }
+  #editor.bars-slim .topbar > :not(.bars-pull) { display: none !important; }
+  #editor.bars-slim .bars-pull { display: flex; }
+  .stage.split .legend { top: auto !important; bottom: 4px !important; left: auto; right: 4px; gap: 6px; padding: 2px 6px; font-size: 10px; flex-wrap: nowrap; white-space: nowrap; }
+  .stage.split .legend i { width: 12px; margin-right: 3px; }
+  .stage.split .legend .lg-room { width: 7px; }
 }
 /* speed check (round 11) */
 .speed-body { display: grid; gap: 10px; }

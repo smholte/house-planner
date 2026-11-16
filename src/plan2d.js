@@ -527,6 +527,7 @@ class PlanView extends Emitter {
       if (b) this.dimLabel(g, this.measure.a, b, this.measure.offset || [0, 0], 0, true, true);
     }
     this.drawFaceLabels(g);
+    this.drawWallPhotoMarks(g);
     this.drawModeLabels(g);
   }
 
@@ -802,6 +803,8 @@ class PlanView extends Emitter {
     // a dimension number: tap to type a new size
     const dimEl = e.target && e.target.closest ? e.target.closest('[data-dimv]') : null;
     if (dimEl && this.spec.mode === 'build' && this.spec.editable && this.app.tool === 'select') { this.gesture.dim = dimEl.getAttribute('data-dimv'); return; }
+    const wpEl = e.target && e.target.closest ? e.target.closest('[data-wpmark]') : null;
+    if (wpEl && this.spec.mode === 'build') { this.gesture.wpmark = wpEl.getAttribute('data-wpmark'); return; }
     if (this.spec.mode && this.spec.mode !== 'build') { this.modeDown(e, sp, wp); return; }
     const en = this.editEntry;
     const tool = this.app.tool;
@@ -946,6 +949,7 @@ class PlanView extends Emitter {
     clearTimeout(this._lp);
     this.drag = null;
     if (!g.moved && g.dim) { this.editDim(g.dim, sp); return; }
+    if (!g.moved && g.wpmark) { this.openWallPhotoMark(g.wpmark); return; }
     if (!g.moved && g.multiTap !== undefined) { if (g.multiTap && g.multiTap.solo) this.app.select(g.multiTap.solo); else if (g.multiTap) this.app.multiToggle(g.multiTap); return; }
     if (!g.moved) { this._tapDownHit = g.downHit || null; this.onTap(wp, sp, e); this._tapDownHit = null; }
   }
