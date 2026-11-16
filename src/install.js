@@ -326,23 +326,41 @@ Object.assign(View3D.prototype, {
           // the outdoor heat pump (wider than 90 cm, task 0041) looks like a Mitsubishi Ecodan: the fan behind a black grille
           // on the left two thirds of the front, a white panel with the maker's plate on the right, louvres on the side
           if (pt.sub === 'heatpump' && w > 0.9) {
-            const blk = ptMat('hp-black', '#26282A', { rough: 0.6 }), fin = ptMat('hp-fin', '#101112', { rough: 0.5 }), plate = ptMat('hp-plate', '#5E6165', { rough: 0.4 });
+            // (every part goes into one mesh per colour: this unit is 6 draw calls, not 80)
+            // (one mesh, one material: the colour of each part is in its points)
+            const blk = '#26282A', fin = '#101112', plate = '#5E6165', ring = '#0B0B0C', blade = '#3E4246', hubM = '#6A6E73', whiteC = '#F4F3EF', greyC = '#9A9DA0';
+            const G = new Map(), put = (m, geo) => { if (!G.has(m)) G.set(m, []); G.get(m).push(geo); };
+            const bx = (m, w2, h2, d2, x, y, z, rot) => { const geo = new THREE.BoxGeometry(w2, h2, d2); if (rot) geo.applyMatrix4(rot); geo.translate(x, y, z); put(m, geo); };
+            const cyl = (m, r, h2, x, y, z) => { const geo = new THREE.CylinderGeometry(r, r, h2, 36); geo.rotateX(Math.PI / 2); geo.translate(x, y, z); put(m, geo); };
             const gw = w * 0.64, gx = -w / 2 + 0.03 + gw / 2, gh = hh - 0.1, fz = d / 2;
-            box(gw, gh, 0.012, blk, gx, hh / 2, fz + 0.002);
-            for (let i = 1; i < 18; i++) box(gw, 0.007, 0.018, fin, gx, 0.05 + gh * i / 18, fz + 0.006);
-            for (const x of [-gw / 2, 0, gw / 2]) box(0.008, gh, 0.018, fin, gx + x, hh / 2, fz + 0.006);
-            const r = Math.min(gw, gh) * 0.43, fan = new THREE.Group(); fan.position.set(gx, hh / 2, fz + 0.011); fan.userData.point = pt.id;
-            const fm = (geo, m) => { const o = new THREE.Mesh(geo, m); o.userData.point = pt.id; return o; };
-            const ring = fm(new THREE.CylinderGeometry(r, r, 0.004, 40), ptMat('hp-ring', '#0B0B0C', { rough: 0.7 })); ring.rotation.x = Math.PI / 2; fan.add(ring);
-            for (let k = 0; k < 3; k++) { const bl = new THREE.Group(); bl.rotation.z = k * 2.0944; const b = fm(new THREE.BoxGeometry(r * 0.62, r * 0.34, 0.004), ptMat('hp-blade', '#3E4246', { rough: 0.5 })); b.position.set(r * 0.52, 0, 0.003); b.rotation.x = 0.35; bl.add(b); fan.add(bl); }
-            const hub = fm(new THREE.CylinderGeometry(r * 0.2, r * 0.2, 0.012, 24), ptMat('hp-hub', '#6A6E73', { rough: 0.4 })); hub.rotation.x = Math.PI / 2; hub.position.z = 0.006; fan.add(hub);
-            grp.add(fan);
+            bx(blk, gw, gh, 0.012, gx, hh / 2, fz + 0.002);
+            for (let i = 1; i < 18; i++) bx(fin, gw, 0.007, 0.018, gx, 0.05 + gh * i / 18, fz + 0.006);
+            for (const x of [-gw / 2, 0, gw / 2]) bx(fin, 0.008, gh, 0.018, gx + x, hh / 2, fz + 0.006);
+            const r = Math.min(gw, gh) * 0.43, fy = hh / 2, fzz = fz + 0.011;
+            cyl(ring, r, 0.004, gx, fy, fzz);
+            for (let k = 0; k < 3; k++) { const a = k * 2.0944, m4 = new THREE.Matrix4().makeRotationZ(a).multiply(new THREE.Matrix4().makeTranslation(r * 0.52, 0, 0)).multiply(new THREE.Matrix4().makeRotationX(0.35)); bx(blade, r * 0.62, r * 0.34, 0.004, gx, fy, fzz + 0.003, m4); }
+            cyl(hubM, r * 0.2, 0.012, gx, fy, fzz + 0.006);
             const rx = -w / 2 + 0.03 + gw + (w - gw - 0.03) / 2;
-            box(Math.min(0.16, w * 0.13), 0.075, 0.006, plate, rx, hh * 0.84, fz + 0.003);
-            box(Math.min(0.1, w * 0.08), 0.012, 0.007, white, rx, hh * 0.84, fz + 0.004);
-            box(w - gw - 0.06, 0.004, 0.004, grey, rx, hh * 0.22, fz + 0.002);
-            for (let i = 0; i < 12; i++) box(0.004, 0.012, d * 0.8, blk, -w / 2 - 0.002, hh * 0.12 + hh * 0.76 * i / 11, 0);
-            for (let i = 0; i < 12; i++) box(0.004, 0.012, d * 0.8, blk, w / 2 + 0.002, hh * 0.12 + hh * 0.76 * i / 11, 0);
+            bx(plate, Math.min(0.16, w * 0.13), 0.075, 0.006, rx, hh * 0.84, fz + 0.003);
+            bx(whiteC, Math.min(0.1, w * 0.08), 0.012, 0.007, rx, hh * 0.84, fz + 0.004);
+            bx(greyC, w - gw - 0.06, 0.004, 0.004, rx, hh * 0.22, fz + 0.002);
+            for (let i = 0; i < 12; i++) for (const sx of [-1, 1]) bx(blk, 0.004, 0.012, d * 0.8, sx * (w / 2 + 0.002), hh * 0.12 + hh * 0.76 * i / 11, 0);
+            let nv = 0, ni = 0; for (const geos of G.values()) for (const g of geos) { nv += g.attributes.position.count; ni += g.index.count; }
+            const P = new Float32Array(nv * 3), N = new Float32Array(nv * 3), U = new Float32Array(nv * 2), C = new Float32Array(nv * 3), I = new Uint32Array(ni);
+            let vo = 0, io = 0;
+            for (const [hex, geos] of G) {
+              const c = new THREE.Color(hex);
+              for (const g of geos) {
+                const n = g.attributes.position.count;
+                P.set(g.attributes.position.array, vo * 3); N.set(g.attributes.normal.array, vo * 3); U.set(g.attributes.uv.array, vo * 2);
+                for (let i = 0; i < n; i++) { C[(vo + i) * 3] = c.r; C[(vo + i) * 3 + 1] = c.g; C[(vo + i) * 3 + 2] = c.b; }
+                for (let i = 0; i < g.index.count; i++) I[io + i] = g.index.array[i] + vo;
+                vo += n; io += g.index.count; g.dispose();
+              }
+            }
+            const mg = new THREE.BufferGeometry(); mg.setAttribute('position', new THREE.BufferAttribute(P, 3)); mg.setAttribute('normal', new THREE.BufferAttribute(N, 3)); mg.setAttribute('uv', new THREE.BufferAttribute(U, 2)); mg.setAttribute('color', new THREE.BufferAttribute(C, 3)); mg.setIndex(new THREE.BufferAttribute(I, 1));
+            const o = new THREE.Mesh(mg, mat('pt|hp-detail', () => new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.55, metalness: 0 })));
+            o.castShadow = false; o.userData.point = pt.id; grp.add(o);
           } else
           if (pt.sub === 'heatpump' || pt.sub === 'wtw' || pt.sub === 'inverter') box(Math.min(0.2, w * 0.4), Math.min(0.08, hh * 0.2), 0.006, dark, 0, hh * 0.78, d / 2 + 0.003);
           if (pt.sub === 'heater') for (let i = 1; i < 8; i++) box(w * 0.96, 0.012, 0.012, grey, 0, hh * i / 8, d / 2 + 0.006);
