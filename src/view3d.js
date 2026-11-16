@@ -188,7 +188,11 @@ function pvTexture() {
 // white frame the door then looks as in the drawing in the normal daylight (measured at the front door: shade a little
 // darker, full sun a little lighter, the warm grey kept). How strongly the wood's grain shows over it: ODOOR_CONTRAST.
 const ODOOR_GREY = '#7A7875', ODOOR_CONTRAST = 1.5;
-function shellMaterial(key, m) {
+function shellMaterial(key, m, project) {
+  // a flat roof the project says is gravelled (project.flatRoof = 'gravel', task 0041): the gravel picture, else grey
+  if (m.kind === 'flat' && project && project.flatRoof === 'gravel') {
+    return libMaterial('Ground062L', { tint: '#8F8D89', contrast: 1.1 }) || mat('shell|gravel-roof', () => new THREE.MeshStandardMaterial({ color: new THREE.Color().setRGB(0.55, 0.54, 0.52, THREE.SRGBColorSpace), roughness: 0.97 }));
+  }
   // the real pictures (texlib.js): the house's own bricks and roof tiles
   if (m.kind === 'brick') { const b = libBrick(m.color); if (b) return b; }
   // the outside doors' leaves: grey quality fake wood (Wood012), the grain upright; their frames stay white. The grey is
@@ -1367,7 +1371,7 @@ class View3D extends Emitter {
       if ((isWin || isDoor) && spec.windows === false) continue;
       if ((isOut || m.plinth) && spec.outside === false) continue;
       if (m.floor && spec.floors === false) continue;
-      const material = shellMaterial(part.key, m);
+      const material = shellMaterial(part.key, m, this.app && this.app.project);
       material.userData.cutClip = cutH != null;
       const mesh = new THREE.Mesh(shellGeometry(part), material);
       mesh.userData.keep = true;

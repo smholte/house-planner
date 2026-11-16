@@ -319,10 +319,31 @@ Object.assign(View3D.prototype, {
           box(0.03, 0.006, d, fr, -w / 2 + 0.015, 0, 0); box(0.03, 0.006, d, fr, w / 2 - 0.015, 0, 0);
           grp.position.set(pt.x, 0.008, pt.y);
         } else {
-          const body = pt.sub === 'inverter' ? ptMat('inv', '#D9DCDF') : pt.sub === 'vessel' ? ptMat('vessel', '#C8423A', { rough: 0.4 }) : white;
+          const body = /^#[0-9a-f]{6}$/i.test(pt.color || '') ? ptMat('u' + pt.color, pt.color, { rough: 0.8 }) : pt.sub === 'inverter' ? ptMat('inv', '#D9DCDF') : pt.sub === 'vessel' ? ptMat('vessel', '#C8423A', { rough: 0.4 }) : white;
           if (pt.sub === 'vessel') { const c = disc(w / 2, hh, body, hh / 2); c.castShadow = true; }
           else { const b = box(w, hh, d, body, 0, hh / 2, 0); b.castShadow = true; }
           // a dark panel on the front (display, label)
+          // the outdoor heat pump (wider than 90 cm, task 0041) looks like a Mitsubishi Ecodan: the fan behind a black grille
+          // on the left two thirds of the front, a white panel with the maker's plate on the right, louvres on the side
+          if (pt.sub === 'heatpump' && w > 0.9) {
+            const blk = ptMat('hp-black', '#26282A', { rough: 0.6 }), fin = ptMat('hp-fin', '#101112', { rough: 0.5 }), plate = ptMat('hp-plate', '#5E6165', { rough: 0.4 });
+            const gw = w * 0.64, gx = -w / 2 + 0.03 + gw / 2, gh = hh - 0.1, fz = d / 2;
+            box(gw, gh, 0.012, blk, gx, hh / 2, fz + 0.002);
+            for (let i = 1; i < 18; i++) box(gw, 0.007, 0.018, fin, gx, 0.05 + gh * i / 18, fz + 0.006);
+            for (const x of [-gw / 2, 0, gw / 2]) box(0.008, gh, 0.018, fin, gx + x, hh / 2, fz + 0.006);
+            const r = Math.min(gw, gh) * 0.43, fan = new THREE.Group(); fan.position.set(gx, hh / 2, fz + 0.011); fan.userData.point = pt.id;
+            const fm = (geo, m) => { const o = new THREE.Mesh(geo, m); o.userData.point = pt.id; return o; };
+            const ring = fm(new THREE.CylinderGeometry(r, r, 0.004, 40), ptMat('hp-ring', '#0B0B0C', { rough: 0.7 })); ring.rotation.x = Math.PI / 2; fan.add(ring);
+            for (let k = 0; k < 3; k++) { const bl = new THREE.Group(); bl.rotation.z = k * 2.0944; const b = fm(new THREE.BoxGeometry(r * 0.62, r * 0.34, 0.004), ptMat('hp-blade', '#3E4246', { rough: 0.5 })); b.position.set(r * 0.52, 0, 0.003); b.rotation.x = 0.35; bl.add(b); fan.add(bl); }
+            const hub = fm(new THREE.CylinderGeometry(r * 0.2, r * 0.2, 0.012, 24), ptMat('hp-hub', '#6A6E73', { rough: 0.4 })); hub.rotation.x = Math.PI / 2; hub.position.z = 0.006; fan.add(hub);
+            grp.add(fan);
+            const rx = -w / 2 + 0.03 + gw + (w - gw - 0.03) / 2;
+            box(Math.min(0.16, w * 0.13), 0.075, 0.006, plate, rx, hh * 0.84, fz + 0.003);
+            box(Math.min(0.1, w * 0.08), 0.012, 0.007, white, rx, hh * 0.84, fz + 0.004);
+            box(w - gw - 0.06, 0.004, 0.004, grey, rx, hh * 0.22, fz + 0.002);
+            for (let i = 0; i < 12; i++) box(0.004, 0.012, d * 0.8, blk, -w / 2 - 0.002, hh * 0.12 + hh * 0.76 * i / 11, 0);
+            for (let i = 0; i < 12; i++) box(0.004, 0.012, d * 0.8, blk, w / 2 + 0.002, hh * 0.12 + hh * 0.76 * i / 11, 0);
+          } else
           if (pt.sub === 'heatpump' || pt.sub === 'wtw' || pt.sub === 'inverter') box(Math.min(0.2, w * 0.4), Math.min(0.08, hh * 0.2), 0.006, dark, 0, hh * 0.78, d / 2 + 0.003);
           if (pt.sub === 'heater') for (let i = 1; i < 8; i++) box(w * 0.96, 0.012, 0.012, grey, 0, hh * i / 8, d / 2 + 0.006);
           grp.position.set(pt.x, H, pt.y);

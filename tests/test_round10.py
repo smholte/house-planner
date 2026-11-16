@@ -20,6 +20,16 @@ with sync_playwright() as p:
     pg.click('#dim-toggle button[data-dim="3d"]'); pg.wait_for_timeout(5000)
     n3 = pg.evaluate("() => { const ids = new Set(); window.__hp.app.panes[0].view.group.traverse(o => { if (o.userData.point) ids.add(o.userData.point); }); return ids.size; }")
     check(f'3D: all {N} points of the ground floor are drawn', n3 == N, n3)
+    # a unit with a colour of its own (a black rubber block, task 0041) and a gravelled flat roof (project.flatRoof)
+    uid_ = pg.evaluate("""(st) => { const a = window.__hp.app, u = a.shownVersion().plan.points.find(q => q.storey === st && q.kind === 'unit' && q.sub !== 'hatch'); a.mutate(pl => { pl.points.find(q => q.id === u.id).color = '#26282A'; }); return u.id; }""", gf)
+    pg.wait_for_timeout(2500)
+    ck = pg.evaluate("(id) => { const ks = []; window.__hp.app.panes[0].view.group.traverse(o => { if (o.userData.point === id && o.isMesh) ks.push(([].concat(o.material)[0].userData || {}).key); }); return ks; }", uid_)
+    check('3D: a unit with its own colour (#26282A) is drawn in it', 'pt|u#26282A' in ck, ck)
+    load_pictures(pg)
+    gr = pg.evaluate("""() => { const H = window.__hp, m0 = { kind: 'flat', color: [0.2, 0.2, 0.21] }, lum = x => x.color.r + x.color.g + x.color.b;
+      const plain = H.shellMaterial('flatroof|roof', m0, {}), grav = H.shellMaterial('flatroof|roof', m0, { flatRoof: 'gravel' }), other = H.shellMaterial('brick:0.5,0.3,0.2', { kind: 'flat', color: [0.2, 0.2, 0.21] }, { flatRoof: 'gravel' });
+      return { same: plain === grav, lib: grav.userData.lib || null, plainLum: lum(plain), gravLum: lum(grav), roofKind: H.shellMaterial('roof|roof', { kind: 'roof', color: [0.3, 0.3, 0.3] }, { flatRoof: 'gravel' }) === H.shellMaterial('roof|roof', { kind: 'roof', color: [0.3, 0.3, 0.3] }, {}) }; }""")
+    check('3D: a flat roof of a project with flatRoof = gravel gets the gravel (lighter than the dark roof), a project without it and sloping roofs stay', not gr['same'] and gr['gravLum'] > gr['plainLum'] * 1.5 and gr['roofKind'], gr)
     # ───────── the Electrics tool: the new kinds ─────────
     pg.click('#dim-toggle button[data-dim="2d"]'); pg.wait_for_timeout(1000)
     bx = room_box(pg, 'Woonkamer')
