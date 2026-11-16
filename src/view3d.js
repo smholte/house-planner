@@ -235,9 +235,57 @@ function shellGeometry(part) {
   SHELL_GEO.set(part, geo);
   return geo;
 }
+/* ───────── tiles in 3D where the wall view and the floor's layout have them (task 0039) ─────────
+   The tile pictures are one texture per kind of tile, shared by every wall and floor; where the grid starts is a shift
+   of UV set 0 of each tiled face (no new picture, no extra draw call). Light-map UVs (set 1) and the bake's surface
+   hash (positions only) are not touched. */
+const TILE_SHIFT = new WeakMap();
+/** the [du, dv] (metres) that puts the tile texture's joints where faceTileLayout() has them on face f, seen from
+ *  side sign of its wall (wallPrism's UVs: u = ±metres along the wall, v = height) – null without tiles */
+function tileShift(plan, f, st, sign) {
+  let c = TILE_SHIFT.get(f);
+  if (!c) { c = {}; TILE_SHIFT.set(f, c); }
+  if (sign in c) return c[sign];
+  let lay = null;
+  try { lay = faceTileLayout(plan, f, st); } catch (e) { console.error(e); }
+  if (!lay) return (c[sign] = null);
+  const T = lay.T, G = lay.G, j = G.j, fr = faceFrame(f);
+  // the side's u as a function of x in the wall view (from its left corner): u = slope · x + C
+  const slope = sign * fr.sgn, C = sign * (fr.sgn > 0 ? f.u0 : f.u1);
+  // the texture (tileTexture): tile k of a row at u = j/2 + k·M; with half bond the rows lie 2 to a repeat, the
+  // lower one shifted by M / 2 – so the grid's row 0 (not shifted) goes in the upper one
+  const rows = T.lay === 'half' ? 2 : 1;
+  const du = slope > 0 ? j / 2 - G.ox - C : j / 2 + G.ox + T.w - C;
+  const dv = j / 2 - G.oy + (rows === 2 ? G.MH : 0);
+  const mod = (a, m) => ((a % m) + m) % m;
+  return (c[sign] = [mod(du, G.M), mod(dv, G.MH * rows)]);
+}
+/** a tiled floor's UVs (a ShapeGeometry in the plan's (x, −y)): the shared pattern texture's joints where
+ *  floorTileLayout() has them – one grid period of the layout (tile + joint) on one of the picture's */
+function floorTileUVs(geo, plan, r) {
+  let lay = null;
+  try { lay = floorTileLayout(plan, r); } catch (e) { console.error(e); }
+  // (a photo repeated over the floor is not a grid of tiles: it keeps its own UVs)
+  if (!lay || (lay.F.photo && lay.F.photo.mode === 'pattern')) return geo;
+  const F = lay.F, G = lay.G, j = FLOOR_JOINT;
+  const pat = floorLayout(F), rot = -((pat.angle + F.dir) * Math.PI) / 180, c = Math.cos(rot), s = Math.sin(rot);
+  const pos = geo.attributes.position, uv = geo.attributes.uv;
+  if (!pos || !uv) return geo;
+  for (let i = 0; i < uv.count; i++) {
+    // the shape's (x, −y) back to the plan, into the layout's frame
+    const [lu, lv] = lay.toL([pos.getX(i), -pos.getY(i)]);
+    // in the picture (metres, its y down): joints at whole periods, row k of a bond shifted by k / n of a tile
+    const cx = (lu - G.ou + j / 2) * F.l / G.MU, cy = (lv - G.ov + j / 2) * F.w / G.MV;
+    // the texture's own turn (centre 0) and flip undone: (cx, −cy) = R(rot)·(u, v)
+    uv.setXY(i, c * cx + s * cy, s * cx - c * cy);
+  }
+  uv.needsUpdate = true;
+  return geo;
+}
+
 /** a wall piece: len along x (centred), from yb up to a top that may slope (ytA at −x, ytB at +x), thickness t along z.
     Material groups like a box: 0 +x end, 1 −x end, 2 top, 3 bottom, 4 +z side, 5 −z side */
-function wallPrism(len, yb, ytA, ytB, t, u0 = -len / 2, off = null) {
+function wallPrism(len, yb, ytA, ytB, t, u0 = -len / 2, off = null, shift = null) {
   const x0 = -len / 2, x1 = len / 2, z0 = -t / 2, z1 = t / 2;
   // each end can stop at another place on each side (mitred and butt joints where walls meet): off = { x0p, x0m,
   // x1p, x1m } moves the corners on the +z (p) and −z (m) side along the wall
@@ -246,6 +294,10 @@ function wallPrism(len, yb, ytA, ytB, t, u0 = -len / 2, off = null) {
   // the two sides: u in metres along the wall from its start (u0 at this piece's start), so a pattern runs on over
   // all pieces of a wall; on the right side (z0) it runs the other way, so it is not mirrored there
   const U = x => u0 + (x - x0);
+  // shift = [[du, dv] of the +z side, [du, dv] of the −z side] (or null): a tile grid moved to where its tiles start
+  // (task 0039, tileShift), added to UV set 0 only
+  const [sp, sm] = shift || [];
+  const S = (q, d) => (d ? q.map(([a, b]) => [a + d[0], b + d[1]]) : q);
   const P = [], UV = [];
   const quad = (a, b, c, d, uv) => { P.push(...a, ...b, ...c, ...a, ...c, ...d); UV.push(...uv[0], ...uv[1], ...uv[2], ...uv[0], ...uv[2], ...uv[3]); };
   const groups = [];
@@ -254,8 +306,8 @@ function wallPrism(len, yb, ytA, ytB, t, u0 = -len / 2, off = null) {
   face(() => quad([x0m, yb, z0], [x0p, yb, z1], [x0p, ytA, z1], [x0m, ytA, z0], [[0, yb], [t, yb], [t, ytA], [0, ytA]]));
   face(() => quad([x0p, ytA, z1], [x1p, ytB, z1], [x1m, ytB, z0], [x0m, ytA, z0], [[x0p, 0], [x1p, 0], [x1m, t], [x0m, t]]));
   face(() => quad([x0m, yb, z0], [x1m, yb, z0], [x1p, yb, z1], [x0p, yb, z1], [[x0m, 0], [x1m, 0], [x1p, t], [x0p, t]]));
-  face(() => quad([x0p, yb, z1], [x1p, yb, z1], [x1p, ytB, z1], [x0p, ytA, z1], [[U(x0p), yb], [U(x1p), yb], [U(x1p), ytB], [U(x0p), ytA]]));
-  face(() => quad([x1m, yb, z0], [x0m, yb, z0], [x0m, ytA, z0], [x1m, ytB, z0], [[-U(x1m), yb], [-U(x0m), yb], [-U(x0m), ytA], [-U(x1m), ytB]]));
+  face(() => quad([x0p, yb, z1], [x1p, yb, z1], [x1p, ytB, z1], [x0p, ytA, z1], S([[U(x0p), yb], [U(x1p), yb], [U(x1p), ytB], [U(x0p), ytA]], sp)));
+  face(() => quad([x1m, yb, z0], [x0m, yb, z0], [x0m, ytA, z0], [x1m, ytB, z0], S([[-U(x1m), yb], [-U(x0m), yb], [-U(x0m), ytA], [-U(x1m), ytB]], sm)));
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2));
@@ -1427,7 +1479,7 @@ class View3D extends Emitter {
     for (const r of plan.rooms) {
       if (r.storey !== sid || r.poly.length < 3 || !floorsOn) continue;
       // the stairwell stays open
-      const geo = new THREE.ShapeGeometry(floorShapes(r.poly, roomHoles(plan, r), ([x, y]) => new THREE.Vector2(x, -y)));
+      const geo = floorTileUVs(new THREE.ShapeGeometry(floorShapes(r.poly, roomHoles(plan, r), ([x, y]) => new THREE.Vector2(x, -y))), plan, r);
       const m = new THREE.Mesh(geo, floorMaterial(r.floor));
       m.rotation.x = -Math.PI / 2;
       m.position.y = 0.004;
@@ -1489,6 +1541,11 @@ class View3D extends Emitter {
         if (!f) return sideColor(sign);
         return finishMat(faceFinish(w, f.room), yb, f, sign, roomCeilH(f.room, st));
       };
+      // tiles: the grid where the wall view has it (its chosen start), as a shift of this side's UVs (task 0039)
+      const tiled = (sign, u, yb) => {
+        const f = faceAt(sign, u), T = f && faceFinish(w, f.room).tiles;
+        return T && (!(T.to > 0) || yb < T.to - 0.001) ? tileShift(plan, f, st, sign) : null;
+      };
       const endM = wallMat('#d9d6cf');
       const news = newByWall.get(w.id) || [];
       let tagDoor = null;
@@ -1526,7 +1583,8 @@ class View3D extends Emitter {
             if (ext0 && ua === a) { off.x0p = ext0 - E.a[0]; off.x0m = ext0 - E.a[1]; }
             if (ext1 && ub === b) { off.x1p = E.b[0] - ext1; off.x1m = E.b[1] - ext1; }
             const up = upBrick && upstands.has(w.id);
-            const geo = wallPrism(ub - ua, yb, ta, tb, w.t + (up ? 0.006 : 0), ua, off);
+            const sh = isNew || up ? null : [tiled(1, um, yb), tiled(-1, um, yb)];
+            const geo = wallPrism(ub - ua, yb, ta, tb, w.t + (up ? 0.006 : 0), ua, off, sh && (sh[0] || sh[1]) ? sh : null);
             const isCut = cutH != null && Math.max(ta, tb) >= cutH - 1e-6;
             const top = isCut ? matCut : (isNew ? matNew : endM);
             const mats = isNew ? [matNew, matNew, top, matNew, matNew, matNew] : up ? [upBrick, upBrick, isCut ? matCut : upBrick, upBrick, upBrick, upBrick] : [endM, endM, top, endM, sideMat(1, um, yb), sideMat(-1, um, yb)];

@@ -735,6 +735,18 @@
    },
    "set": "public"
   },
+  "test_tiles3d.py": {
+   "seconds": 86.0,
+   "ok": true,
+   "checks": 23,
+   "made_up": {
+    "seconds": 86.0,
+    "ok": true,
+    "checks": 23
+   },
+   "set": "public",
+   "note": "task 0039"
+  },
   "test_walk.py": {
    "seconds": 114.0,
    "ok": true,

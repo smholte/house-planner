@@ -278,7 +278,8 @@ Object.assign(View3D.prototype, {
           const pts = [at(s, v0), at(e, v0), at(e, v1), at(s, v1)];
           const shape = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x, -y)));
           // (gathered per floor material with the boxes: one mesh per floor)
-          addBox(new THREE.ShapeGeometry(shape).rotateX(-Math.PI / 2).translate(0, 0.002, 0), floorMaterial(r.floor), 'floorStrip');
+          // (its tiles on the room's grid, task 0039)
+          addBox(floorTileUVs(new THREE.ShapeGeometry(shape), plan, r).rotateX(-Math.PI / 2).translate(0, 0.002, 0), floorMaterial(r.floor), 'floorStrip');
         }
       } else if (A || B) {
         // to the outside: a threshold from the room's floor to just past the outside face (as wide as this
