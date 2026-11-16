@@ -87,8 +87,8 @@ def mean_at(pg, pt, r=5):
     from PIL import Image
     shot = pg.screenshot(clip={'x': pt[0] - r, 'y': pt[1] - r, 'width': 2 * r, 'height': 2 * r})
     im = Image.open(io.BytesIO(shot)).convert('RGB')
-    px = list(im.getdata())
-    return sum(sum(p) / 3 for p in px) / len(px)
+    b = im.tobytes()
+    return sum(b) / len(b)
 
 
 SCREEN = """([x, y, z]) => { const v = window.__hp.app.panes.find(p => p.kind === '3d').view, T = window.__hp.THREE;

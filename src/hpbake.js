@@ -429,7 +429,9 @@ function hpbHash(x, y, z) { return (Math.imul(x, 73856093) ^ Math.imul(y, 193496
  *  - furniture moved (same id, same size, as many vertices – its hash changes as it is written in place): keeps its own
  *    light; what lies within HPB_MARGIN_MOVED of its old and new place is out of date;
  *  - changed (hash), new (unknown id of a kind the bake has) or deleted: live light; what lies within HPB_MARGIN of its old
- *    and new place is out of date (furniture: HPB_MARGIN_MOVED) – measured from the triangles of each surface to the box
+ *    and new place is out of date (furniture: HPB_MARGIN_MOVED) – measured from the triangles of each surface to the box;
+ *    furniture only within its own storey, the house's parts within their storey and on the plot (the floor slab stands
+ *    between storeys: a tall cupboard's box reaches the walls upstairs), the plot and what is around it everywhere
  *  - kinds the export left out (no surface of that kind in the bake) and parts without a result: live, no message.
  *  M.state[i]: 0 no result, 1 baked, 2 moved (baked), 3 out of date. M.changes = [{ id, how }], M.near = how many more */
 function hpbStatus(M, now, doc) {
@@ -444,24 +446,24 @@ function hpbStatus(M, now, doc) {
     if (!b) {
       if (!kinds.has(S.kind)) return;
       st[i] = 3; changes.push({ id: S.id, how: 'new', i });
-      boxes.push([S.box, HPB_MOVABLE.has(S.kind) ? HPB_MARGIN_MOVED : HPB_MARGIN, i]);
+      boxes.push([S.box, HPB_MOVABLE.has(S.kind) ? HPB_MARGIN_MOVED : HPB_MARGIN, i, S.storey, HPB_MOVABLE.has(S.kind)]);
       return;
     }
     if (b.hash === S.hash) { st[i] = 1; return; }
     const r = (first.maps || {})[S.id];
     if (HPB_MOVABLE.has(S.kind) && sameSize(b.box, S.box) && (!r || r.count === undefined || r.count === S.nv)) {
       st[i] = 2; changes.push({ id: S.id, how: 'moved', i });
-      boxes.push([b.box, HPB_MARGIN_MOVED, i], [S.box, HPB_MARGIN_MOVED, i]);
+      boxes.push([b.box, HPB_MARGIN_MOVED, i, S.storey, true], [S.box, HPB_MARGIN_MOVED, i, S.storey, true]);
       return;
     }
     st[i] = 3; changes.push({ id: S.id, how: 'changed', i });
     const m = HPB_MOVABLE.has(S.kind) ? HPB_MARGIN_MOVED : HPB_MARGIN;
-    boxes.push([b.box, m, i], [S.box, m, i]);
+    boxes.push([b.box, m, i, S.storey, HPB_MOVABLE.has(S.kind)], [S.box, m, i, S.storey, HPB_MOVABLE.has(S.kind)]);
   });
   for (const [id, b] of Object.entries(bs)) {
     if (M.byId.has(id)) continue;
     changes.push({ id, how: 'deleted', i: -1 });
-    boxes.push([b.box, HPB_MOVABLE.has(kindOf(id)) ? HPB_MARGIN_MOVED : HPB_MARGIN, -1]);
+    boxes.push([b.box, HPB_MOVABLE.has(kindOf(id)) ? HPB_MARGIN_MOVED : HPB_MARGIN, -1, undefined, HPB_MOVABLE.has(kindOf(id))]);
   }
   // the neighbours: a surface with a triangle within the margin of a changed place
   let near = 0;
@@ -469,7 +471,10 @@ function hpbStatus(M, now, doc) {
   now.surfaces.forEach((S, i) => {
     if (st[i] !== 1 && st[i] !== 2) return;
     const own = M.surfaces[i];
-    const hits = boxes.filter(([B, m, k]) => k !== i && hpbBoxNear(own.box, B, m));
+    // (a storey's floor slab stands between storeys: furniture touches only its own storey; the house's parts their
+    // storey and the plot; the plot and what is around it – and a part whose storey is not known – everything)
+    const zone = (st0, mov) => st0 == null || own.storey === st0 || (!mov && own.storey == null);
+    const hits = boxes.filter(([B, m, k, st0, mov]) => k !== i && zone(st0, mov) && hpbBoxNear(own.box, B, m));
     if (!hits.length) return;
     const T = S.translation || [0, 0, 0];
     for (const [B, m] of hits) {
