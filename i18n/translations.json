@@ -11239,6 +11239,242 @@
   "{name} opgeslagen: {n} vlakken, {size}.",
   "{name} lagret: {n} flater, {size}."
  ],
+ "Kitchen parts list": [
+  "Keukenonderdelenlijst",
+  "Delliste for kjøkkenet"
+ ],
+ "Kitchen parts list…": [
+  "Keukenonderdelenlijst…",
+  "Delliste for kjøkkenet …"
+ ],
+ "Island": [
+  "Eiland",
+  "Øy"
+ ],
+ "Run": [
+  "Opstelling",
+  "Rekke"
+ ],
+ "Units": [
+  "Kasten",
+  "Skap"
+ ],
+ "Panels and fillers": [
+  "Zijpanelen en passtukken",
+  "Sidepaneler og fyllstykker"
+ ],
+ "Appliances": [
+  "Apparaten",
+  "Apparater"
+ ],
+ "Sink and tap": [
+  "Spoelbak en kraan",
+  "Vask og kran"
+ ],
+ "Bulkhead panel": [
+  "Boven-paneel tot het plafond",
+  "Panel opp til taket"
+ ],
+ "Ventilation grille": [
+  "Ventilatierooster",
+  "Ventilasjonsrist"
+ ],
+ "Fixed front panel": [
+  "Vast frontpaneel",
+  "Fast frontpanel"
+ ],
+ "Wall unit": [
+  "Bovenkast",
+  "Overskap"
+ ],
+ "Corner unit": [
+  "Hoekkast",
+  "Hjørneskap"
+ ],
+ "Unit on the worktop": [
+  "Kast op het werkblad",
+  "Skap på benken"
+ ],
+ "Fridge": [
+  "Koelkast",
+  "Kjøleskap"
+ ],
+ "Free-standing fridge": [
+  "Vrijstaande koelkast",
+  "Frittstående kjøleskap"
+ ],
+ "Niche": [
+  "Inbouwmaat",
+  "Nisjemål"
+ ],
+ "Hood": [
+  "Afzuigkap",
+  "Ventilator"
+ ],
+ "Over the hob": [
+  "Boven het kookvlak",
+  "Over komfyren"
+ ],
+ "Cut-out: sink": [
+  "Uitsparing: spoelbak",
+  "Utsparing: vask"
+ ],
+ "Cut-out: hob": [
+  "Uitsparing: kookplaat",
+  "Utsparing: kokeplate"
+ ],
+ "Cut-out: downdraft extractor": [
+  "Uitsparing: downdraft-afzuiging",
+  "Utsparing: nedtrekksventilator"
+ ],
+ "Tap hole": [
+  "Kraangat",
+  "Krankhull"
+ ],
+ "Cut-out": [
+  "Uitsparing",
+  "Utsparing"
+ ],
+ "Total of the units": [
+  "Totaal van de kasten",
+  "Sum av skapene"
+ ],
+ "Worktop piece": [
+  "Werkblad",
+  "Benkeplate"
+ ],
+ "Worktop area (m²)": [
+  "Werkblad oppervlak (m²)",
+  "Benkeplate areal (m²)"
+ ],
+ "Worktop end (down the ends)": [
+  "Werkblad-eind (langs de zijkant)",
+  "Benkeplate ende (ned langs enden)"
+ ],
+ "Drawer front": [
+  "Ladefront",
+  "Skuffefront"
+ ],
+ "Dishwasher front": [
+  "Vaatwasserfront",
+  "Oppvaskmaskinfront"
+ ],
+ "Wall unit door": [
+  "Deur bovenkast",
+  "Dør overskap"
+ ],
+ "Above the units": [
+  "Boven de kasten",
+  "Over skapene"
+ ],
+ "Tall": [
+  "Hoog",
+  "Høy"
+ ],
+ "{n} doors": [
+  "{n} deuren",
+  "{n} dører"
+ ],
+ "{n} drawers": [
+  "{n} laden",
+  "{n} skuffer"
+ ],
+ "From the floor": [
+  "Vanaf de vloer",
+  "Fra gulvet"
+ ],
+ "Height up to the underside of the worktop": [
+  "Hoogte tot de onderkant van het werkblad",
+  "Høyde opp til undersiden av benken"
+ ],
+ "From the left end": [
+  "Vanaf de linkerkant",
+  "Fra venstre ende"
+ ],
+ "from the edge": [
+  "vanaf de rand",
+  "fra kanten"
+ ],
+ "back side, seen from the front": [
+  "achterzijde, gezien vanaf de voorkant",
+  "bakside, sett forfra"
+ ],
+ "50 mm behind the bowl": [
+  "50 mm achter de bak",
+  "50 mm bak vasken"
+ ],
+ "Not in the app": [
+  "Niet in de app",
+  "Ikke i appen"
+ ],
+ "diameter": [
+  "diameter",
+  "diameter"
+ ],
+ "exact size": [
+  "exacte maat",
+  "nøyaktig mål"
+ ],
+ "Behind the hob": [
+  "Achter het kookvlak",
+  "Bak kokeplaten"
+ ],
+ "With a downdraft extractor behind it": [
+  "Met downdraft-afzuiging erachter",
+  "Med nedtrekksventilator bak"
+ ],
+ "Joints": [
+  "Naden",
+  "Skjøter"
+ ],
+ "Bowl": [
+  "Bak",
+  "Kum"
+ ],
+ "The numbers (run.unit) are the same in the top view and the list.": [
+  "De nummers (opstelling.kast) zijn gelijk in het bovenaanzicht en de lijst.",
+  "Numrene (rekke.skap) er de samme i oversikten fra oven og i listen."
+ ],
+ "There is no kitchen in this layout yet.": [
+  "Er is nog geen keuken in deze indeling.",
+  "Det er ikke noe kjøkken i denne innredningen ennå."
+ ],
+ "shelves, hinges of pairs of doors, drilling, joints of the worktop, tap hole size, colours by name": [
+  "planken, scharnieren van dubbele deuren, boringen, naden van het werkblad, maat van het kraangat, kleurnamen",
+  "hyller, hengsler på dobbeltdører, boring, skjøter i benkeplaten, størrelse på krankhull, fargenavn"
+ ],
+ "Sizes are as drawn in the app, without gaps between fronts.": [
+  "Maten zoals getekend in de app, zonder naden tussen de fronten.",
+  "Mål som tegnet i appen, uten fuger mellom frontene."
+ ],
+ "Part of the list": [
+  "Onderdeel van de lijst",
+  "Del av listen"
+ ],
+ "Part": [
+  "Onderdeel",
+  "Del"
+ ],
+ "Type": [
+  "Soort",
+  "Type"
+ ],
+ "Width mm": [
+  "Breedte mm",
+  "Bredde mm"
+ ],
+ "Depth mm": [
+  "Diepte mm",
+  "Dybde mm"
+ ],
+ "Height mm": [
+  "Hoogte mm",
+  "Høyde mm"
+ ],
+ "Number": [
+  "Aantal",
+  "Antall"
+ ],
  "10 mm to the left": [
   "10 mm naar links",
   "10 mm til venstre"

@@ -632,6 +632,7 @@ Object.assign(app, {
       if (sides.length > 1) sec.appendChild(this.segRow(t('Show'), sides, side, k => { this.kitSel = { id: f.id, side: k, i: 0 }; this.renderInspector(); }, false, 'kit-side'));
     }
     sec.appendChild(h('div', { class: 'kit-elev-wrap' }, runElevation(f, side, CH, ks.i, pick)));
+    sec.appendChild(h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'f-kit-parts', onclick: () => this.kitchenPartsSheet() }, icon('table'), t('Kitchen parts list'))));
     sec.appendChild(h('p', { class: 'note-muted' }, t('Tap a unit in the drawing (or its number below) to change it.')));
     // the units, left to right (a compact list)
     units.forEach((u, i) => {
@@ -921,5 +922,190 @@ Object.assign(app, {
     }
     this.furnMutate(l => { l.items.push(...stools); });
     this.toast(t('{n} bar stools placed.', { n }));
+  },
+});
+
+/* ───────── the parts list (task 0037): every part of the kitchen, to check the shop's offerte ─────────
+   kitchenParts() turns the runs and islands of a layout into rows (mm). It lists only what the app knows: what it does
+   not know (shelves, hinges of pairs, drilling, joints of the worktop, tap hole size) is not guessed. */
+const KP_SECS = ['Units', 'Fronts', 'Worktop', 'Plinth', 'Panels and fillers', 'Appliances', 'Sink and tap'];
+const KP_FRONT = { door: 'Door', drawer: 'Drawer front', dw: 'Dishwasher front', wall: 'Wall unit door' };
+const kmm = v => Math.round(v * 1000);
+function kitchenParts(list, ceilingOf) {
+  const rows = [], runs = [];
+  list.forEach((it, ri) => {
+    const rn = ri + 1, isl = isIsland(it), ctx = runCtx(it, ceilingOf(it)), cd = runCabDepth(it), bd = runBackDepth(it);
+    const X = it.w / 2, Y = it.d / 2, ov = isl ? 0 : runTopOv(it), te = isl ? (it.topEnd || 0) : 0, [tl, tr] = isl ? [0, 0] : (it.topTrim || [0, 0]);
+    const R = (sec, no, part, type, w, d, h, qty, note) => rows.push({ sec, run: rn, no, part, type: type || '', w: w == null ? null : kmm(w), d: d == null ? null : kmm(d), h: h == null ? null : kmm(h), qty: qty == null ? 1 : qty, note: note || '' });
+    const info = { no: rn, name: isl ? t('Island') : t('Run'), it, boxes: [], top: [-X - te, -Y, X + te, Y + ov] };
+    const sides = [{ lay: runLayout(it), depth: cd, pre: '', y0: -Y }];
+    if (bd > 0) sides.push({ lay: runLayout(it, 'back'), depth: bd, pre: 'B', y0: -Y + cd });
+    const fronts = new Map();
+    const sinkOf = [];
+    for (const S of sides) {
+      const sctx = { ...ctx, wall: ctx.wall && S.pre !== 'B' };
+      let seg = 0;
+      const flush = () => { if (seg > 0.001) R('Plinth', rn + '.' + S.pre + 'P', 'Plinth', S.pre ? 'Back side' : 'Front', seg, null, runPlinth(it), 1, it.plinthC || '#1d1f21'); seg = 0; };
+      let total = 0;
+      S.lay.forEach((L, j) => {
+        const u = L.u, k = u.k, w = L.x1 - L.x0, zone = colZone(S.lay, j), no = rn + '.' + S.pre + (j + 1);
+        info.boxes.push({ no: (S.pre ? 'B' : '') + (j + 1), x0: L.x0, x1: L.x1, y0: S.y0, y1: S.y0 + S.depth, gap: k === 'gap' });
+        if (k === 'gap') { flush(); return; }
+        total += w;
+        const faces = unitFaces(it, S.lay, j, sctx), cnt = ty => faces.filter(F => F.t === ty).length;
+        // the plinth runs under the cupboards in one piece, up to a gap, a niche, a panel or a filler
+        if (zone === 'fill' || k === 'niche' || zone === 'top') flush(); else seg += w;
+        for (const F of faces) {
+          if (KP_FRONT[F.t]) { const key = [F.t, kmm(F.x1 - F.x0), kmm(F.y1 - F.y0)].join('|'); const g = fronts.get(key) || { t: F.t, w: F.x1 - F.x0, h: F.y1 - F.y0, n: 0, nos: [] }; g.n++; g.nos.push(no); fronts.set(key, g); }
+          else if (F.t === 'bulk') R('Panels and fillers', no, 'Bulkhead panel', 'Above the units', F.x1 - F.x0, null, F.y1 - F.y0, 1, '');
+          else if (F.t === 'grille') R('Panels and fillers', no, 'Ventilation grille', 'Above the units', F.x1 - F.x0, null, F.y1 - F.y0, 1, '');
+          else if (F.t === 'panel' && k !== 'filler' && k !== 'panel') R('Panels and fillers', no, 'Fixed front panel', t(unitDef(u).name), F.x1 - F.x0, null, F.y1 - F.y0, 1, '');
+        }
+        if (k === 'filler' || k === 'panel') {
+          const F = faces.find(q => q.t === 'panel');
+          R('Panels and fillers', no, k === 'panel' ? 'Side panel (19 mm)' : 'Filler', zone === 'tall' ? 'Tall' : 'Under the worktop', w, S.depth, F ? F.y1 - F.y0 : null, 1, '');
+          return;
+        }
+        const doors = cnt('door'), drawers = cnt('drawer'), det = [];
+        if (doors) det.push(t('{n} doors', { n: doors }));
+        if (drawers) det.push(t('{n} drawers', { n: drawers }));
+        if (k === 'open') det.push(t('Open shelves'));
+        const hf = faces.find(q => q.t === 'door' && q.hinge);
+        if (doors === 1 && hf) det.push(t('Hinges') + ': ' + (hf.hinge === 'L' ? t('Left') : t('Right')).toLowerCase());
+        const type = k === 'corner' ? 'Corner unit' : zone === 'tall' ? 'Tall unit' : zone === 'top' ? 'Unit on the worktop' : 'Base unit';
+        const uh = zone === 'tall' ? ctx.tallH - ctx.p : zone === 'top' ? ctx.tallH - ctx.H : ctx.bt - ctx.p;
+        R('Units', no, t(unitDef(u).name), type, w, S.depth, uh, 1, det.join(', '));
+        for (const F of faces) if (F.t === 'wall') R('Units', no, 'Wall unit', 'Wall unit', F.x1 - F.x0, Math.min(it.wallD || 0.35, it.d), F.y1 - F.y0, 1, t('From the floor') + ' ' + kmm(ctx.wallZ) + ' mm');
+        // the appliances and their niches
+        if (k === 'dw') R('Appliances', no, 'Dishwasher', 'Niche', w, S.depth, ctx.bt, 1, t('Height up to the underside of the worktop'));
+        if (k === 'oven') { const F = faces.find(q => q.t === 'oven'); R('Appliances', no, 'Oven', 'Niche', w, S.depth, F ? F.y1 - F.y0 : null, 1, ''); }
+        if (k === 'ovens') for (const F of faces) if (K_APPS[F.t] && !['drawer', 'door'].includes(F.t)) R('Appliances', no, K_APPS[F.t].name, 'Niche', w, S.depth, F.y1 - F.y0, 1, '');
+        if (k === 'fridge') R('Appliances', no, 'Fridge (tall)', 'Niche', w, S.depth, ctx.tallH - ctx.p, 1, '');
+        if (k === 'niche') {
+          const F = faces.find(q => q.t === 'niche'), fw = Math.min(w - 0.02, u.fw || 0.9);
+          R('Appliances', no, 'Niche for a free-standing fridge', 'Niche', w, S.depth, F ? F.y1 - F.y0 : null, 1, '');
+          R('Appliances', no, 'Free-standing fridge', 'Fridge', fw, u.fd || 0.7, Math.min(u.fh || 1.8, F ? F.y1 - F.y0 : 9), 1, K_METALS[u.fc || 'steel'] ? (u.fc || 'steel') : '');
+        }
+        const hood = faces.find(q => q.t === 'hood');
+        if (hood) R('Appliances', no, 'Hood', 'Over the hob', hood.x1 - hood.x0, null, null, 1, '');
+        // worktop cut-outs: seen from the front, from the left end of the worktop
+        const left = -X - te + tl, cx = (L.x0 + L.x1) / 2, from = x => t('From the left end') + ' ' + kmm(x - left) + ' mm; ' + t('from the edge') + ' 60 mm' + (S.pre ? '; ' + t('back side, seen from the front') : '');
+        if (k === 'sink') {
+          const sw = Math.min(w - 0.1, u.sinkW || 0.55), sd = Math.min(S.depth - 0.16, u.sinkD || 0.43);
+          R('Worktop', no, 'Cut-out: sink', 'Cut-out', sw, sd, null, 1, from(cx - sw / 2));
+          R('Worktop', no, 'Tap hole', 'Cut-out', null, null, null, 1, t('From the left end') + ' ' + kmm(cx - left) + ' mm; ' + t('50 mm behind the bowl') + '; ' + t('Not in the app') + ': ' + t('diameter'));
+          sinkOf.push({ no, sw, sd, u });
+        }
+        if (k === 'hob') {
+          const hw = Math.min(w - 0.02, u.hobW || Math.min(0.78, w - 0.06)), hd = u.hobD || 0.51;
+          R('Worktop', no, 'Cut-out: hob', 'Cut-out', hw, hd, null, 1, from(cx - hw / 2));
+          R('Appliances', no, 'Hob', 'Cut-out', hw, hd, null, 1, u.dd ? t('With a downdraft extractor behind it') : '');
+          if (u.dd) R('Worktop', no, 'Cut-out: downdraft extractor', 'Cut-out', hw, 0.12, null, 1, t('Behind the hob') + '; ' + t('Not in the app') + ': ' + t('exact size'));
+        }
+      });
+      flush();
+      if (S.pre === '') R('Units', rn + '.Σ', 'Total of the units', 'Total', total, null, null, '', '');
+    }
+    // the fronts, counted per size
+    const fcol = it.color || '#E9E6E0', look = fcol + (it.grain ? ', ' + t('Wood grain') : '') + '; ' + t('Handles') + ': ' + t((K_HANDLES.find(q => q[0] === (it.handles || 'bar')) || K_HANDLES[1])[1]) + ((it.handles || 'bar') !== 'none' ? ', ' + (it.handleC || 'steel') : '');
+    [...fronts.values()].sort((a, b) => a.t < b.t ? -1 : a.t > b.t ? 1 : b.w * b.h - a.w * a.h).forEach(g => R('Fronts', g.nos.join(' '), KP_FRONT[g.t], '', g.w, null, g.h, g.n, look));
+    // the worktop
+    const len = it.w + 2 * te - tl - tr, dep = it.d + ov;
+    R('Worktop', String(rn), 'Worktop piece', t((K_TOPS.find(q => q[0] === (it.topMat || 'plain')) || K_TOPS[0])[1]), len, dep, runTopT(it), 1, (it.top || furnType(it).top || '#4A4744') + '; ' + t('Joints') + ': ' + t('Not in the app') + (ov ? '; ' + t('Worktop sticks out') + ' ' + kmm(ov) + ' mm' : ''));
+    R('Worktop', String(rn) + '.Σ', 'Worktop area (m²)', 'Total', null, null, null, +(len * dep).toFixed(2), '');
+    if (it.waterfall) R('Worktop', String(rn), 'Worktop end (down the ends)', t('Worktop down the ends'), it.d, runTopT(it), it.h, 2, '');
+    // sink and tap
+    for (const s of sinkOf) {
+      R('Sink and tap', s.no, 'Sink', '', s.sw, s.sd, null, 1, t('Bowl') + ', ' + t(it.sinkC === 'steel' ? 'Stainless steel' : it.sinkC && it.sinkC !== 'black' ? 'White' : 'Black'));
+      R('Sink and tap', s.no, 'Tap', '', null, null, null, 1, t(({ steel: 'Steel', black: 'Black', gold: 'Gold', brass: 'Brass' })[it.tapC || 'steel'] || 'Steel'));
+    }
+    runs.push(info);
+  });
+  rows.sort((a, b) => KP_SECS.indexOf(a.sec) - KP_SECS.indexOf(b.sec));
+  return { rows, runs };
+}
+
+Object.assign(app, {
+  /** the kitchen runs and islands of the active layout, with their parts */
+  kitchenPartsData() {
+    const lay = this.activeLayout(), p = this.project;
+    const list = lay ? lay.items.filter(x => furnType(x).kind === 'krun') : [];
+    const ceil = it => { const st = getStorey(p, it.storey); return st ? (st.wallHeight || DEFAULTS.wallHeight) : DEFAULTS.wallHeight; };
+    return { list, ...kitchenParts(list, ceil) };
+  },
+  kitchenPartsCell(v) { return v == null || v === '' ? '' : String(v); },
+  kitchenPartsRows() {
+    const D = this.kitchenPartsData(), v = this.shownVersion();
+    const head = [t('Kitchen parts list'), this.project.name, v.name, todayStamp()];
+    const cols = [t('Part of the list'), t('Run'), t('No.'), t('Part'), t('Type'), t('Width mm'), t('Depth mm'), t('Height mm'), t('Number'), t('Details')];
+    const rows = D.rows.map(r => [t(r.sec), r.run, r.no, t(r.part), t(r.type), r.w, r.d, r.h, r.qty, r.note]);
+    return { head, cols, rows, D };
+  },
+  kitchenPartsCsv() {
+    const comma = I18N.lang !== 'en';
+    const q = x => typeof x === 'number' ? (comma ? String(x).replace('.', ',') : String(x)) : '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
+    const { head, cols, rows } = this.kitchenPartsRows();
+    const lines = [head.map(q), [], cols.map(q), ...rows.map(r => r.map(q))];
+    lines.push([], [q(t('Not in the app') + ': ' + t('shelves, hinges of pairs of doors, drilling, joints of the worktop, tap hole size, colours by name'))]);
+    const text = lines.map(r => r.join(';')).join('\r\n');
+    this.downloadBlob(`${slugify(this.project.name)}_${slugify(t('Kitchen parts list'))}_${slugify(this.shownVersion().name)}_${todayStamp()}.csv`, new Blob(['﻿' + text], { type: 'text/csv;charset=utf-8' }));
+  },
+  /** the top view: units drawn with their numbers (the numbers of the list) */
+  kitchenTopSvg(D) {
+    const all = [];
+    const polys = D.runs.map(r => {
+      const it = r.it, P = q => furnToPlan(it, q).map(fx);
+      const poly = (x0, y0, x1, y1) => [P([x0, y0]), P([x1, y0]), P([x1, y1]), P([x0, y1])];
+      const top = poly(...r.top), boxes = r.boxes.map(b => ({ no: r.no + '.' + b.no, poly: poly(b.x0, b.y0, b.x1, b.y1), c: P([(b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2]), w: b.x1 - b.x0, gap: b.gap }));
+      for (const q of top) all.push(q);
+      return { top, boxes };
+    });
+    if (!all.length) return null;
+    const xs = all.map(q => q[0]), ys = all.map(q => q[1]), pad = 0.15;
+    const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad, w = Math.max(...xs) - x0 + pad, hh = Math.max(...ys) - y0 + pad;
+    const pts = pl => pl.map(q => q.join(',')).join(' ');
+    const fs = Math.min(0.16, Math.max(0.07, w / 40));
+    const g = polys.map(P => `<polygon points="${pts(P.top)}" fill="none" stroke="#888" stroke-width="0.012" stroke-dasharray="0.05 0.04"/>` + P.boxes.map(b => `<polygon points="${pts(b.poly)}" fill="${b.gap ? 'none' : '#f4f1ea'}" stroke="#1a2326" stroke-width="0.012"/>` + (b.gap ? '' : `<text x="${b.c[0]}" y="${b.c[1]}" font-size="${b.w < 0.3 ? fs * 0.7 : fs}" text-anchor="middle" dominant-baseline="central" fill="#1a2326">${b.no}</text>`)).join('')).join('');
+    return `<svg class="kp-top" viewBox="${fx(x0)} ${fx(y0)} ${fx(w)} ${fx(hh)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${t('Top view')}">${g}</svg>`;
+  },
+  kitchenPartsTable(D, esc) {
+    const cell = v => esc(this.kitchenPartsCell(v));
+    let out = '', last = null;
+    const th = [t('No.'), t('Part'), t('Type'), t('Width mm'), t('Depth mm'), t('Height mm'), t('Number'), t('Details')];
+    for (const r of D.rows) {
+      if (r.sec !== last) { if (last) out += '</tbody></table>'; last = r.sec; out += `<h2>${esc(t(r.sec))}</h2><table class="kp-table"><thead><tr>${th.map((x, i) => `<th class="${i >= 3 && i <= 6 ? 'r' : ''}">${esc(x)}</th>`).join('')}</tr></thead><tbody>`; }
+      out += `<tr${r.type === 'Total' ? ' class="tot"' : ''}><td class="num">${cell(r.no)}</td><td>${cell(t(r.part))}</td><td>${cell(t(r.type))}</td><td class="r num">${cell(r.w)}</td><td class="r num">${cell(r.d)}</td><td class="r num">${cell(r.h)}</td><td class="r num">${cell(r.qty)}</td><td class="d">${cell(r.note)}</td></tr>`;
+    }
+    return out + (last ? '</tbody></table>' : '');
+  },
+  kitchenPartsHtml() {
+    const D = this.kitchenPartsData(), esc = x => String(x == null ? '' : x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const p = this.project, v = this.shownVersion(), svg = this.kitchenTopSvg(D);
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(t('Kitchen parts list'))} · ${esc(p.name)}</title><style>
+      @page { size: A4; margin: 10mm; }
+      body { font: 11px/1.35 system-ui, sans-serif; color: #1a2326; margin: 0; } h1 { font-size: 18px; margin: 0 0 2px; } h2 { font-size: 13px; margin: 12px 0 4px; }
+      .sub { color: #5b6669; margin-bottom: 6px; } table { width: 100%; border-collapse: collapse; } th { text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: #5b6669; border-bottom: 1.5px solid #1a2326; padding: 3px 5px; }
+      td { vertical-align: top; border-bottom: 1px solid #d5dbdb; padding: 3px 5px; } .r { text-align: right; white-space: nowrap; } .d { color: #5b6669; } tr { page-break-inside: avoid; } tr.tot td { font-weight: 600; }
+      .kp-top { display: block; width: 100%; max-height: 80mm; margin: 6px 0; border: 1px solid #d5dbdb; } .foot { margin-top: 10px; color: #5b6669; font-size: 10px; }
+    </style></head><body><h1>${esc(t('Kitchen parts list'))} · ${esc(p.name)}</h1><div class="sub">${esc(v.name)} · ${esc(fmtDate(Date.now()))}</div>
+    ${svg || ''}${this.kitchenPartsTable(D, esc)}
+    <div class="foot">${esc(t('Not in the app') + ': ' + t('shelves, hinges of pairs of doors, drilling, joints of the worktop, tap hole size, colours by name') + '. ' + t('Sizes are as drawn in the app, without gaps between fronts.'))}</div></body></html>`;
+  },
+  async kitchenPartsSheet() {
+    const D = this.kitchenPartsData();
+    if (!D.list.length) { this.toast(t('There is no kitchen in this layout yet.')); return; }
+    const esc = x => String(x == null ? '' : x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const body = h('div', { class: 'kp-sheet', id: 'kp-sheet' });
+    body.appendChild(h('p', { class: 'note-muted' }, this.shownVersion().name + ' · ' + t('The numbers (run.unit) are the same in the top view and the list.')));
+    const svg = this.kitchenTopSvg(D);
+    if (svg) { const d = h('div', { class: 'kp-topwrap' }); d.innerHTML = svg; body.appendChild(d); }
+    const tb = h('div', { class: 'qty-scroll kp-tables' }); tb.innerHTML = this.kitchenPartsTable(D, esc).replace(/class="kp-table"/g, 'class="qty-table kp-table"'); body.appendChild(tb);
+    body.appendChild(h('p', { class: 'note-muted' }, t('Not in the app') + ': ' + t('shelves, hinges of pairs of doors, drilling, joints of the worktop, tap hole size, colours by name') + '.'));
+    const v = await UI.dialog({ title: t('Kitchen parts list'), body, wide: true, enterKey: false, actions: [
+      { label: t('Spreadsheet (.csv)'), value: 'csv', icon: 'download' },
+      { label: t('Print or save as PDF'), value: 'print', icon: 'print', kind: 'primary' },
+    ] });
+    if (v === 'csv') this.kitchenPartsCsv();
+    if (v === 'print') this.printHtml(this.kitchenPartsHtml(), t('Kitchen parts list'));
   },
 });

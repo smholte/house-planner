@@ -1666,3 +1666,10 @@ button.sun-lab:hover, button.sun-lab:focus-visible { background: var(--surface-2
 .wp-meta { font-size: 13px; color: var(--ink-3); }
 .wp-text { white-space: pre-wrap; }
 @media (max-width: 600px) { .wp-dialog .wp-big { max-height: 60vh; } }
+
+/* kitchen parts list (task 0037) */
+.kp-sheet { min-width: 0; max-width: 100%; }
+.kp-topwrap { max-width: 100%; overflow: hidden; margin: 6px 0 10px; border: 1px solid var(--line, #d5dbdb); border-radius: 8px; padding: 6px; }
+.kp-topwrap svg { display: block; width: 100%; height: auto; max-height: 240px; }
+.kp-tables h2 { font-size: 14px; margin: 14px 0 4px; }
+.kp-table td.d { color: var(--muted, #5b6669); min-width: 140px; }
