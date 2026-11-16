@@ -21,7 +21,9 @@ Object.assign(View3D.prototype, {
     const models = typeof MODELS !== 'undefined' ? [MODELS.geo.size, [...MODELS.user.values()].map(u => u.state).join(',')] : [];
     return JSON.stringify([pick, spec.entries.length, shellId, spec.origPlan ? sigHash(JSON.stringify(spec.origPlan)) : 0,
       cssVar('--paper'), cssVar('--ink'), document.documentElement.dataset.theme || '', quality3d(s), VIEW_KEYS.map(k => s[k]),
-      p.doorState || null, (p.models || []).length, models, !!this.fast, !!this.high, !!this.opts.mini, TEXLIB.gen]);
+      p.doorState || null, (p.models || []).length, models, !!this.fast, !!this.high, !!this.opts.mini, TEXLIB.gen,
+      // baked light: built again when it is switched on or off and when the bake was matched anew (hpbake.js)
+      this.app && this.app.hpbReuseKey && !this.opts.mini ? this.app.hpbReuseKey() : '']);
   },
   /** everything one storey's group is built from */
   entrySig(spec, en) {
@@ -61,7 +63,7 @@ Object.assign(View3D.prototype, {
   clearKeep(keep) {
     for (const r of [...this.group.children]) {
       if (keep.has(r)) continue;
-      r.traverse(o => { if (o.isInstancedMesh) o.dispose(); if (o.geometry && !(o.userData && o.userData.keep)) o.geometry.dispose(); });
+      r.traverse(o => { if (o.isInstancedMesh) o.dispose(); if (o.geometry && (!(o.userData && o.userData.keep) || o.userData.hpbOwn)) o.geometry.dispose(); });
     }
     this.group.clear();
     this.vegLod = null;

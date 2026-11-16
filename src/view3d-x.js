@@ -247,6 +247,8 @@ Object.assign(View3D.prototype, {
     }
     this._lightKey = null;
     this.hqApply(this.group);
+    // baked light: the pieces just built (a piece moved shows live light until the bake is matched again)
+    if (this._hpbBound) this.hpbApply(this.group.children.filter(g => g.userData.entry), true);
     this.applyClip();
   },
 

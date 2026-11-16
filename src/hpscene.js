@@ -41,6 +41,29 @@ const hpsName = s => String(s).replace(/[^A-Za-z0-9_.-]+/g, '-').replace(/^-+|-+
 const f32 = Math.fround;
 const r6 = x => Math.round(x * 1e6) / 1e6;
 
+/* ───────── the export's layout settings in its id (task 0032) ─────────
+   A bake names the scene it was made for only by its id. So that the app can lay out the same light maps again when the
+   bake comes back – on this device or another – the id carries what the layout depends on: the house's texel density,
+   the page size, the groups in it, the plot / street / neighbours / park densities and the groups made per vertex.
+   hp-<time>-<random>_t16_p2048_ihfic_bg8s5n4w5_vn  (letters: HPS_LETTERS) */
+const HPS_LETTERS = { house: 'h', furniture: 'f', installs: 'i', ceilItems: 'c', garden: 'g', street: 's', houses: 'n', park: 'w' };
+function hpsCode(q, groups) {
+  const L = g => HPS_LETTERS[g] || '';
+  const tpm = String(Math.round(q.tpm * 100) / 100);
+  const by = HPS_SITE.filter(g => groups.includes(g) && q.byGroup[g] != null).map(g => L(g) + String(Math.round(q.byGroup[g] * 100) / 100)).join('');
+  return `_t${tpm}_p${q.pageSize}_i${groups.map(L).join('')}` + (by ? `_b${by}` : '') + (q.vertexGroups && q.vertexGroups.size ? `_v${[...q.vertexGroups].map(L).join('')}` : '');
+}
+/** the settings back from an id (null: not an id made by this app since version 54) */
+function hpsDecode(id) {
+  const m = /^hp-[a-z0-9]+-[a-z0-9]+_t([0-9.]+)_p(1024|2048)_i([a-z]+)(?:_b((?:[a-z][0-9.]+)+))?(?:_v([a-z]+))?$/.exec(String(id || ''));
+  if (!m) return null;
+  const byL = Object.fromEntries(Object.entries(HPS_LETTERS).map(([g, l]) => [l, g]));
+  const groups = [...m[3]].map(l => byL[l]).filter(Boolean);
+  const byGroup = {};
+  for (const [, l, n] of (m[4] || '').matchAll(/([a-z])([0-9.]+)/g)) if (byL[l]) byGroup[byL[l]] = +n;
+  return { tpm: +m[1], pageSize: +m[2], groups, byGroup, vertexGroups: new Set([...(m[5] || '')].map(l => byL[l]).filter(Boolean)) };
+}
+
 /* ───────── zip (stored or deflated, FORMAT.md section 2) ───────── */
 const HPS_CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
 function hpsCrc32(b) { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = HPS_CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
@@ -172,6 +195,16 @@ function hpsPieces(mesh, matrix) {
   return out;
 }
 
+/** a key for a joined surface before it is laid out: what it is, its numbers and the layout settings that touch it */
+function hpsMemoKey(hp, prims, translation, q) {
+  let a = 0x811c9dc5 | 0, b = 0x01000193 | 0;
+  const f = new Float64Array(1), u = new Uint32Array(f.buffer);
+  const mix = x => { f[0] = x; a = Math.imul(a ^ u[0], 16777619); a = Math.imul(a ^ u[1], 16777619); b = Math.imul(b + u[0], 2246822519) ^ u[1]; };
+  for (const P of prims) { mix(P.pos.length); for (const x of P.pos) mix(x); mix(P.idx.length); for (const x of P.idx) mix(x); mix(-1); }
+  return [hp.id, hp.kind, hp.group, hp.bake, hp.storey, hp.source || '', hp.material || '', (a >>> 0).toString(36), (b >>> 0).toString(36), JSON.stringify(translation),
+    q.tpm, q.byGroup[hp.group] ?? '', q.pageSize, q.vertexGroups && q.vertexGroups.has(hp.group) ? 1 : 0, prims.map(P => hpsMatKey(P.mat)).join(',')].join('|');
+}
+
 /** is this a see-through material (glass, water)? */
 const hpsClear = m => !!m && ((m.transparent && m.opacity < 0.9) || (m.transmission || 0) > 0.1 || /glass/i.test((m.userData && m.userData.key) || m.name || ''));
 const hpsMatKey = m => String((m && m.userData && m.userData.key) || (m && m.name) || '');
@@ -265,6 +298,34 @@ Object.assign(app, {
     const host = dv._hpsHost;
     try { dv.destroy(); } catch (e) { /* gone */ }
     if (host) host.remove();
+  },
+
+  /** the surfaces of a version as an export with the settings P (hpsDecode) makes them – ids, hashes and geometry, no
+   *  file (task 0032: matching a bake). Surfaces laid out before with the same geometry come from a memo.
+   *  Returns { surfaces: [{ hp, hash, prims: [{ key, pos, nrm, uv1, idx }], translation }], roots: { storey id | 'garden':
+   *  the group's matrixWorld in the hidden view }, groups } */
+  hpsSurfacesNow(v, P) {
+    const p = this.project;
+    const groups = HPS_GROUPS.filter(g => P.groups.includes(g) && (p.site || !HPS_SITE.includes(g)));
+    if (!groups.includes('house')) groups.unshift('house');
+    const inc = { storeys: sortedStoreys(p).map(st => st.id), groups };
+    const dv = this.hpsView(v, inc);
+    if (!dv) return null;
+    try {
+      const items = this.hpsCollect(dv, v, inc);
+      const memo = { old: (this._hpsMemo && this._hpsMemo.now) || new Map(), now: new Map() };
+      const q = { tpm: P.tpm, byGroup: { ...P.byGroup }, pageSize: P.pageSize, lightSpots: dv.lightSpots || [], vertexGroups: new Set(P.vertexGroups), memo };
+      const surfaces = this.hpsSurfaces(items, v, q);
+      this._hpsMemo = memo;
+      const seen = new Set();
+      for (const S of surfaces) { let id = S.hp.id, n = 1; while (seen.has(id)) id = `${S.hp.id}.${n++}`; S.hp.id = id; seen.add(id); }
+      const roots = {};
+      for (const g of dv.group.children) {
+        if (g.userData.storeyId) roots[g.userData.storeyId] = g.matrixWorld.clone();
+        else if (g.userData.garden) roots.garden = g.matrixWorld.clone();
+      }
+      return { surfaces, roots, groups };
+    } finally { this.hpsDrop(dv); }
   },
 
   /** every mesh of the hidden view, named: [{ id, kind, storey, group, bake, source, mesh, matrix, light }] */
@@ -417,7 +478,16 @@ Object.assign(app, {
       const hp = { id: info.id, kind: info.kind, storey: info.storey, group: info.group, bake: info.bake };
       if (info.source) hp.source = hpsName(info.source);
       if (info.material) hp.material = hpsName(info.material);
-      out.push(...this.hpsMap({ hp, prims, translation, light }, q));
+      if (!q.memo) { out.push(...this.hpsMap({ hp, prims, translation, light }, q)); continue; }
+      // matching a bake (task 0032): a surface whose geometry did not change since the last time is not laid out again
+      const key = hpsMemoKey(hp, prims, translation, q);
+      let got = q.memo.old.get(key);
+      if (!got) {
+        got = this.hpsMap({ hp, prims, translation, light }, q).map(S => ({ ...S, mapOf: null, prims: S.prims.map(P => ({ ...P, key: hpsMatKey(P.mat), mat: null })) }));
+        for (const S of got) S.hash = hpSurfaceHash(S.prims.map(P => ({ pos: P.pos, uv1: P.uv1, idx: P.idx })), S.hp.bake === 'MAP' ? S.hp.uv1_px : null);
+      }
+      q.memo.now.set(key, got);
+      out.push(...got.map(S => ({ ...S, hp: { ...S.hp } })));
     }
     out.sort((a, b) => (a.hp.id < b.hp.id ? -1 : a.hp.id > b.hp.id ? 1 : 0));
     return out;
@@ -716,7 +786,7 @@ Object.assign(app, {
       const intLevel = (st, i) => (Number.isInteger(st.level) ? st.level : i - Math.max(0, all.findIndex(s => (s.elevation || 0) >= -0.5)));
       const doc = {
         format: 'house-scene', version: HPS_FORMAT, generator: { app: 'House Planner', version: String(APP_VERSION.n) },
-        id: 'hp-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8), created: new Date().toISOString(), title: hpsText(p.name, 120, 'House'),
+        id: 'hp-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8) + hpsCode(q, inc.groups), created: new Date().toISOString(), title: hpsText(p.name, 120, 'House'),
         house: { version_id: hpsName(v.id), version_name: hpsText(v.name || (v.kind === 'original' ? t('Original') : t('Version'))) },
         files: { house: 'house.glb' }, hash: HP_HASH, uv1: HP_UV1, scene_hash: hpSceneHash(pairs),
         place: R.place,
@@ -728,6 +798,13 @@ Object.assign(app, {
       const stats = { surfaces: surfaces.length, map: surfaces.filter(S => S.hp.bake === 'MAP').length, vertex: surfaces.filter(S => S.hp.bake === 'VERTEX').length,
         no: surfaces.filter(S => S.hp.bake === 'NO').length, lamps: lamps.length, texels: q.texels, pages: Math.round(q.pages * 100) / 100, tpm: q.tpm, byGroup: q.byGroup,
         glbBytes: glb.length, vertexGroups: [...q.vertexGroups], bytes: blob.size, triangles: surfaces.reduce((s, S) => s + S.prims.reduce((a, P) => a + P.idx.length / 3, 0), 0) };
+      // the house remembers the scenes it sent (their moments' sun): a bake that comes back finds its moments (task 0032)
+      if (!p.viewer) {
+        const rec = { id: doc.id, created: Date.now(), versionId: v.id, versionName: doc.house.version_name,
+          moments: doc.recipe.moments.map(m => ({ id: m.id, season: m.season, time: m.time, sun: { azimuth: m.sun.azimuth, elevation: m.sun.elevation } })) };
+        p.hpScenes = [...(p.hpScenes || []).filter(x => x.id !== rec.id), rec].slice(-12);
+        Saver.markDirty();
+      }
       return { blob, name: `${slugify(p.name)}_${todayStamp()}.hpscene`, doc, stats, ids: surfaces.map(S => [S.hp.id, S.hp.hash]) };
     } finally { this.hpsDrop(dv); }
   },

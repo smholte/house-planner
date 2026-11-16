@@ -1194,6 +1194,17 @@ button.bud-line:hover { background: var(--surface-2); }
 .north-arrow .na-n { font: 700 8px var(--font, system-ui); fill: var(--ink); text-anchor: middle; }
 .seg.g-mode { margin-right: 4px; }
 
+/* ───────── baked light from Fresing Render (hpbake.js) ───────── */
+.bake-bar { flex-wrap: wrap; gap: 6px 10px; align-items: center; max-width: min(760px, calc(100vw - 24px)); }
+.bake-bar .bake-ic svg { width: 18px; height: 18px; color: #d9a21b; }
+.bake-bar select { min-height: 36px; max-width: 46vw; }
+.bake-bar .bake-status { font-size: 13px; color: var(--ink-2); flex: 1 1 160px; min-width: 0; }
+.bake-moments { display: flex; flex-wrap: wrap; gap: 6px; }
+.bake-moments .chip { min-height: 36px; }
+.bake-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.bake-list { margin: 0; padding-left: 18px; display: grid; gap: 2px; max-height: 40vh; overflow: auto; }
+@media (max-width: 600px) { .bake-bar .bake-status { flex-basis: 100%; order: 9; } .bake-bar select { max-width: 60vw; } }
+
 /* ───────── sun ───────── */
 .sun-bar { flex-wrap: wrap; gap: 6px 12px; align-items: center; }
 .sun-bar .sun-ic svg { width: 18px; height: 18px; color: #d9a21b; }

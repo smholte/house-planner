@@ -651,6 +651,12 @@ Object.assign(app, {
       row(t('3D: ceilings (seen from inside)'), toggle('ceilings')),
       row(t('3D: heights of sockets and switches'), (() => { const b = toggle('ptHeights'); b.id = 'mi-pt-heights'; return b; })()),
       row(t('3D: light'), lightSeg),
+      row(t('3D: baked light (Fresing Render)'), (() => {
+        const rec = this.hpbRec(), on = this.hpbOn();
+        const m = on && rec.moments.find(x => x.id === s.bakeMoment);
+        return h('button', { class: 'chip', id: 'mi-bake', 'aria-pressed': String(on), onclick: () => { document.querySelectorAll('.menu').forEach(x => x.closeMenu && x.closeMenu()); this.bakeSheet(); } },
+          m ? (m.label || hpbMomentLabel(m.id)) : rec ? t('Live') : t('Import…'));
+      })()),
       row(t('3D: quality'), qSeg),
       row(t('3D: soft shadows in corners (Beautiful)'), (() => {
         const on = s.ao !== false;
@@ -805,7 +811,7 @@ Object.assign(app, {
     data.id = this.project.id;
     this.pushUndo();
     this.restoreState(JSON.stringify(migrateProject(data)));
-    await Assets.ensure(assetIdsOf(this.project));
+    await Assets.ensure(assetIdsOf(this.project, false));
     this.refreshViews(true);
     this.toast('Restored. The previous state is under Automatic backups.');
     return true;
@@ -1103,12 +1109,14 @@ Object.assign(app, {
   },
 
   /* ───────── export / import ───────── */
-  async buildExport(projects, includeSaves) {
+  /** the house file's text; withBakes: also the files of baked light (big – off unless asked for, task 0032) */
+  async buildExport(projects, includeSaves, withBakes = false) {
     const out = { format: 'house-planner', formatVersion: 1, appVersion: APP_VERSION.n, exported: Date.now(), projects: [], assets: {} };
     for (const p of projects) {
       const saves = includeSaves ? (await Snapshots.list(p.id)).filter(sn => sn.kind === 'manual') : [];
-      out.projects.push({ project: p, savePoints: saves });
-      for (const id of [...assetIdsOf(p), ...saves.flatMap(sn => assetIdsOf(sn.project))]) {
+      // (without baked light: its record stays, marked – a merge or another device then knows its files are not here)
+      out.projects.push({ project: withBakes ? p : hpbLeftOut(p), savePoints: saves });
+      for (const id of [...assetIdsOf(p, withBakes), ...saves.flatMap(sn => assetIdsOf(sn.project, withBakes))]) {
         if (out.assets[id]) continue;
         const a = await Assets.getRecord(id);
         if (a) out.assets[id] = a.kind === 'shell' ? { kind: 'shell', json: a.json } : { dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}) };
@@ -1128,14 +1136,33 @@ Object.assign(app, {
     const nameEl = h('dd', { style: { overflowWrap: 'anywhere' } }, '…');
     const base = `${slugify(p.name)}_${todayStamp()}`;
     let text = null, file = null;
-    const prep = async () => { text = await this.buildExport([p], inc.checked); file = await packHouse(text, base, zip.checked); sizeEl.textContent = fmtBytes(file.blob.size); nameEl.textContent = file.name; };
+    // baked light from Fresing Render (task 0032): big, so only when asked for
+    const bakes = new Map();
+    for (const x of p.versions) if (x.bake && x.bake.json) bakes.set(x.bake.id, x.bake);
+    const bakeSize = [...bakes.values()].reduce((s, b) => s + (b.size || 0), 0);
+    const withB = h('input', { type: 'checkbox', id: 'ex-bakes', checked: false });
+    // (only the newest file counts, and Save / Share wait for it: ticking "With baked light" takes a while)
+    let gen = 0, pending = null;
+    const prep0 = async () => {
+      const my = ++gen;
+      sizeEl.textContent = '…';
+      const tx = await this.buildExport([p], inc.checked, withB.checked), f = await packHouse(tx, base, zip.checked);
+      if (my !== gen) return;
+      text = tx; file = f; sizeEl.textContent = fmtBytes(file.blob.size); nameEl.textContent = file.name;
+      pending = null;
+    };
+    const prep = () => (pending = prep0());
     inc.addEventListener('change', prep);
+    withB.addEventListener('change', prep);
     zip.addEventListener('change', () => { Settings.set('exportZip', zip.checked); prep(); });
+    // baked light above HPB_EXPORT_MAX is too big for one house file (it is held as text in memory)
+    if (bakeSize > HPB_EXPORT_MAX) withB.disabled = true;
     const versions = p.versions.length;
     const body = h('div', { style: { display: 'grid', gap: '12px' } },
       h('p', null, `One file with the whole house: ${versions} version${versions > 1 ? 's' : ''}, all storeys, rooms, notes and drawings. Send it to someone; they tap Import in their app.`),
       h('label', { class: 'check', for: 'ex-saves' }, inc, h('span', null, 'Include my save points', h('br'), h('span', { class: 'note-muted' }, 'Autosaves are never included.'))),
       h('label', { class: 'check', for: 'ex-zip' }, zip, h('span', null, t('Smaller file (compressed)'), h('br'), h('span', { class: 'note-muted' }, t('About three times smaller. Opens in House Planner like any house file.')))),
+      bakes.size ? h('label', { class: 'check', for: 'ex-bakes' }, withB, h('span', null, t('With baked light ({s})', { s: fmtBytes(bakeSize) }), h('br'), h('span', { class: 'note-muted' }, bakeSize > HPB_EXPORT_MAX ? t('Too big for one house file: keep the .hpbake file and import it on the other device.') : t('The light Fresing Render baked, for your phone or another device. Without it the file is much smaller.')))) : null,
       h('div', { class: 'kv' }, h('dt', null, 'File'), nameEl, h('dt', null, 'Size'), h('dd', null, sizeEl)),
       h('div', { class: 'export-alt' }, h('div', null, h('b', null, t('For family or suppliers')), h('span', { class: 'note-muted' }, t('A copy to look at and add notes to, as a page that opens in any browser.'))),
         h('button', { class: 'btn sm', id: 'btn-export-viewer', onclick: () => { const d = body.closest('.dialog'); if (d && d.closeWith) d.closeWith(null); this.viewerExportDialog(p); } }, icon('eye'), t('Export for viewing…'))),
@@ -1151,6 +1178,7 @@ Object.assign(app, {
       canShareFiles ? { label: 'Share…', value: 'share', kind: 'primary', icon: 'share' } : null,
     ].filter(Boolean) });
     if (!choice) return;
+    while (pending) { try { await pending; } catch (e) { break; } }
     this.backupStamp([p.id]);
     if (choice === 'share') {
       if (file.blob.type === 'application/gzip') { try { const f = new File([file.blob], file.name, { type: 'application/gzip' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: file.name }); return; } } catch (e) { if (e && e.name === 'AbortError') return; } }
@@ -1235,11 +1263,16 @@ Object.assign(app, {
   },
 
   async importFlow() {
-    const files = await pickFiles(HOUSE_ACCEPT + ',.ifc');
+    const files = await pickFiles(HOUSE_ACCEPT + ',.ifc,.hpbake');
     if (!files || !files.length) return;
     const ifcs = files.filter(f => /\.ifc$/i.test(f.name));
     if (ifcs.length) return this.importIfc(ifcs);
     const file = files[0];
+    // baked light from Fresing Render: for the version that is open (task 0032)
+    if (/\.hpbake$/i.test(file.name)) {
+      if (!this.project) { this.toast(t('Open the house first: baked light belongs to one of its versions.')); return; }
+      return this.hpbakeImport(file);
+    }
     const data = await this.readHouseFileChecked(file);
     if (!data) return;
     if (data && data.format === 'house-planner-notes') return this.importNotesFile(data);
@@ -1275,13 +1308,13 @@ Object.assign(app, {
         }
       }
       if (mode === 'merge') {
-        for (const [id, a] of Object.entries(data.assets || {})) if (!(await DB.get('assets', id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
+        for (const [id, a] of Object.entries(data.assets || {})) if (!(await Assets.getRecord(id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
         let mine = existing;
         if (this.project && this.project.id === existing.id) { await Saver.flushNow(); mine = clone(this.project); }
         if (await this.mergeDialog(mine, incoming, file.name)) { lastId = incoming.id; count++; this._merged = true; }
         continue;
       }
-      for (const [id, a] of Object.entries(data.assets || {})) if (!(await DB.get('assets', id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
+      for (const [id, a] of Object.entries(data.assets || {})) if (!(await Assets.getRecord(id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
       if (mode === 'replace') {
         let mine = existing;
         if (this.project && this.project.id === existing.id) { await this.closeProject(); mine = await DB.get('projects', existing.id) || existing; }

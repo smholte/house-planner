@@ -61,6 +61,7 @@ Object.assign(app, {
     act('Save a copy of this house now', 'download', this.project && !this.project.viewer && (() => this.quickBackup(this.project)), 'backup reservekopie kopie copy opslaan save bestand file proton');
     act('Export for viewing (family, suppliers)…', 'eye', has('viewerExportDialog') && (() => this.viewerExportDialog()), 'viewer bekijken familie');
     act('For Fresing Render…', 'sun', has('hpsceneDialog') && (() => this.hpsceneDialog()), 'fresing render bake baked light licht lys snow sneeuw snø hpscene scene');
+    act('Baked light…', 'sun', has('bakeSheet') && this.project && !this.project.viewer && (() => this.bakeSheet()), 'baked light import bake hpbake fresing gebakken licht lys bakt moment ochtend middag avond nacht morgen kveld natt');
     act('Merge a copy of this house…', 'split', has('mergeFileFlow') && (() => this.mergeFileFlow()), 'samenvoegen merge');
     act('Storeys…', 'layers', has('storeysSheet') && (() => this.storeysSheet()), 'verdiepingen');
     act('Settings', 'settings', has('settingsSheet') && (() => { this.settingsSheet(); }), 'instellingen taal language theme donker dark');

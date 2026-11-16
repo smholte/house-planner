@@ -42,7 +42,8 @@ function batchStatic(root, moving, cell = 0) {
   root.traverse(o => {
     if (!batchable(o, moving)) return;
     const g = o.geometry, M = new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld);
-    const names = ['position', 'normal', ...['uv', 'uv1', 'color'].filter(n => g.attributes[n])];
+    // ('hpb': which surface of a bake each vertex shows – hpbake.js)
+    const names = ['position', 'normal', ...['uv', 'uv1', 'color', 'hpb'].filter(n => g.attributes[n])];
     const sig = names.join(',') + '|' + names.map(n => g.attributes[n].itemSize).join(',');
     const parts = Array.isArray(o.material)
       ? (g.groups.length ? g.groups.map(gr => [o.material[gr.materialIndex], gr.start, gr.count]) : [[o.material[0], 0, Infinity]])

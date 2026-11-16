@@ -110,6 +110,43 @@ const DB = {
   },
 };
 
+/** the files of baked light (task 0032) live in a database of their own: an older copy of the app (version 53 and
+ *  before, which does not know version.bake) cleans up the 'assets' store and would delete them – it never opens this
+ *  one. Records as in 'assets' ({ id, kind: 'bake', dataUrl, w, h, created }). */
+const BakeDB = {
+  db: null, mem: new Map(),
+  async open() {
+    if (this.db || DB.memory) return this.db;
+    if (!this._opening) this._opening = new Promise(resolve => {
+      try {
+        const req = indexedDB.open('house-planner-bake', 1);
+        req.onupgradeneeded = () => { if (!req.result.objectStoreNames.contains('files')) req.result.createObjectStore('files', { keyPath: 'id' }); };
+        req.onsuccess = () => { this.db = req.result; this.db.onversionchange = () => { try { this.db.close(); } catch (e) { /* ignore */ } this.db = null; this._opening = null; }; resolve(this.db); };
+        req.onerror = () => resolve(null);
+        req.onblocked = () => resolve(null);
+      } catch (e) { resolve(null); }
+    });
+    return this._opening;
+  },
+  async _req(mode, fn) {
+    const db = await this.open();
+    if (!db) return fn(null);
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('files', mode), st = tx.objectStore('files');
+      let result;
+      const r = fn(st);
+      if (r && 'onsuccess' in r) r.onsuccess = () => { result = r.result; };
+      tx.oncomplete = () => resolve(result);
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error || new Error('Transaction aborted'));
+    });
+  },
+  async get(id) { return (await this.open()) ? this._req('readonly', st => st.get(id)) : this.mem.get(id); },
+  async put(rec) { if (await this.open()) return this._req('readwrite', st => st.put(rec)); this.mem.set(rec.id, rec); },
+  async del(id) { if (await this.open()) return this._req('readwrite', st => st.delete(id)); this.mem.delete(id); },
+  async keys() { return (await this.open()) ? this._req('readonly', st => st.getAllKeys()) : [...this.mem.keys()]; },
+};
+
 /** another copy of the app (tab, installed app) holds the writer lock of house `id` – not this one */
 async function writerElsewhere(id) {
   if (Saver._lock && Saver._lock.id === id && Saver._lock.held) return false;
@@ -165,8 +202,15 @@ const Assets = {
     return c.decoded;
   },
   get(id) { return this.cache.get(id) || null; },
-  async getRecord(id) { return DB.get('assets', id); },
-  async putRecord(rec) { this.fresh.add(rec.id); await DB.put('assets', rec); this.cache.set(rec.id, rec.kind === 'shell' ? { kind: 'shell', json: rec.json } : { url: rec.dataUrl, w: rec.w, h: rec.h }); },
+  /** a file's record (the files of baked light are in BakeDB) */
+  async getRecord(id) { return (await DB.get('assets', id)) || (/^bk_/.test(String(id)) ? (await BakeDB.get(id)) || null : undefined); },
+  async putRecord(rec) {
+    this.fresh.add(rec.id);
+    // (baked light: its own database, read when a moment is shown, never kept in memory here – hpbake.js)
+    if (rec.kind === 'bake') { await BakeDB.put(rec); return; }
+    await DB.put('assets', rec);
+    this.cache.set(rec.id, rec.kind === 'shell' ? { kind: 'shell', json: rec.json } : { url: rec.dataUrl, w: rec.w, h: rec.h });
+  },
   /** delete assets nobody references any more (projects, snapshots, trash) – only ones older than ASSET_GRACE_MS:
       another copy of the app (a second tab, the installed app) may have just added a photo its house refers to but
       has not written yet (task 0027) */
@@ -183,6 +227,8 @@ const Assets = {
         if (t.payload && t.payload.project) scan(t.payload.project);
         if (t.payload && t.payload.snapshots) for (const sn of t.payload.snapshots) scan(sn.project);
         if (t.payload && t.payload.snapshot) scan(t.payload.snapshot.project);
+        // a version in the trash keeps its baked light (restored with it)
+        if (t.payload && t.payload.version) scan({ versions: [t.payload.version] });
       }
       // (a file only Undo / Redo of the open house still uses – a photo deleted a moment ago – stays: task 0022)
       const steps = typeof app !== 'undefined' && app ? [...(app.undoStack || []), ...(app.redoStack || [])].map(e => e && e.s).filter(x => typeof x === 'string') : [];
@@ -194,12 +240,23 @@ const Assets = {
         if (rec && rec.created && rec.created > old) continue;
         await DB.del('assets', id); this.cache.delete(id);
       }
+      // the files of baked light, by the same rules
+      for (const id of await BakeDB.keys()) {
+        if (used.has(id) || steps.some(x => x.includes('"' + id + '"'))) continue;
+        const rec = await BakeDB.get(id);
+        if (rec && rec.created && rec.created > old) continue;
+        await BakeDB.del(id);
+      }
     } catch (e) { console.warn('asset GC failed', e); }
   },
 };
 
-function assetIdsOf(project) {
+/** the files (assets) a house uses; withBakes false: not the files of baked light (big; read only when shown, exported
+ *  only when asked for – task 0032) */
+function assetIdsOf(project, withBakes = true) {
   const ids = Object.values(project.underlays || {}).map(u => u && u.assetId).filter(Boolean);
+  // baked light from Fresing Render, kept with a version (versions that share one list the same files)
+  if (withBakes) for (const v of project.versions || []) if (v && v.bake && v.bake.files) for (const id of Object.values(v.bake.files)) if (id) ids.push(id);
   if (project.shell && project.shell.assetId) ids.push(project.shell.assetId);
   // photos in notes
   for (const n of project.notes || []) for (const id of n.photos || []) if (id) ids.push(id);
