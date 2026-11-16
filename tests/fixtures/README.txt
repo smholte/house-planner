@@ -1,1 +1,2 @@
 stove.glb: kitchenStove from the Kenney Furniture Kit (CC0, www.kenney.nl). table.obj/.mtl and bath.ifc: made for the tests.
+sample-house.fresing.hpbake: Fresing Render's real Cycles bake (0.2.89) of the house scene format's made-up sample house (no private data) – a copy of smholte/CAD-render-animation tests/data/house/sample-house.fresing.hpbake at commit b4e2117 (task 0114 there); task 0032's test input.

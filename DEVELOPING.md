@@ -222,6 +222,35 @@ The modules of the owner's own house (its plot, neighbourhood, documents …) ar
                      version gives the same ids and hashes. Own glTF writer (HpsGlb: pictures as PNG / JPEG, flipped as
                      three.js reads them) and zip writer (JSON deflated, the .glb stored). The format's checker is copied
                      in tests/house-scene-format/ (pinned tag); test_hpscene.py; the owner's house: house/tests/test_hpscene_own.py.
+                     The scene id carries the layout settings (hpsCode / hpsDecode: _t<density>_p<page>_i<groups>_b<site densities>
+                     _v<per-vertex groups>) and the house remembers each scene's moments and sun (project.hpScenes, last 12).
+                     hpsSurfacesNow(v, P): the surfaces as an export with settings P makes them – ids, hashes, geometry, no file
+                     (task 0032's matching), laid-out surfaces kept in a memo by their geometry (hpsMemoKey).
+    src/hpbake.js    Import bake… (task 0032): a .hpbake from Fresing Render. hpbUnzip (FORMAT.md 2: refuses encrypted, non-UTF-8,
+                     "..", twice, damaged) and hpbCheck (bake.json: major version, light, uv1, surfaces, pages = 8-bit RGB PNG
+                     without colour chunks, vertex files, rectangles on their page and not overlapping, ranges in their file,
+                     snow .glb) – errors refuse with a message, warnings are told. Kept with the version: version.bake = {id, file,
+                     size, imported, created, generator, scene, light, moments [{id, label, season, night, sun}], files {name →
+                     asset id}, json, problems}; the files are assets of kind 'bake' (never in Assets' memory cache, not loaded
+                     when a house opens – assetIdsOf(p, false) –, exported only "with baked light", kept by a version in the
+                     trash, listed for the clean-up; a copied version shares the record). Matching (hpbMatchBuild): the version
+                     laid out again by hpsSurfacesNow with the scene id's settings, id + hash per surface: M.state 1 baked, 2
+                     furniture moved (same size and vertices: keeps its light), 3 out of date (changed / new / deleted and every
+                     surface with a triangle within HPB_MARGIN 0.5 m – furniture HPB_MARGIN_MOVED 0.3 m – of their old and new
+                     box); look-up tables: light-map triangles in 1 m cells (plane + barycentric), light-per-vertex vertices by
+                     millimetre (+ normal, material). hpbTransfer: every mesh of a 3D build (View3D.hpbApply, before batch.js
+                     merges – it carries the attribute) gets the attribute 'hpb' (u, v, surface, how: 0 light map, −1−j vertex j,
+                     1 live; corners that disagree get vertices of their own), so cut walls, Explode, storeys and Show buttons
+                     keep their light. hpbShader/hpbPatch: materials read the moment from uniforms HPB_U set per view before it
+                     draws (hpbBind): a table per surface (rectangle and page, or first vertex), up to 4 pages (raw: NoColorSpace,
+                     no flip, no mipmaps; 1024 px or KTX2 on a Phone level), the light per vertex; baked surfaces take
+                     irradiance = L / reference × the view's sky light (factor) or L × 2^exposure (night, "As Fresing"), the
+                     sun live (Soft), gone (All, night) or at sun_light (Soft, As Fresing). A moment switch only swaps those
+                     textures (hpbLoadMoment, one moment at a time); the open-storey results when no storey above is drawn;
+                     snow layers (their own snow material) on the surfaces drawn. UI: the bar over 3D (bakeBar: moment, what
+                     changed + Which?, As Fresing, ⋯), View → 3D: baked light (bakeSheet: moments, file, Import, Remove),
+                     Import a house file takes .hpbake too, Export "With baked light". hpbPreview draws the format's own
+                     sample house with a bake (tests). tests/test_hpbake.py (+ tests/hpbake_maker.py: a bake for an app export).
     src/ar.js        AR (View → "AR: the plan in the real room"): arSupport() (secure context, navigator.xr,
                      immersive-ar), arNotHere() explains what is needed; arSetup() picks storey, room and corners A/B
                      (arCorners: the longest side; arCornerSvg); arGo() asks for the session first (inside the tap:

@@ -203,6 +203,8 @@ function duplicateVersion(p, srcId, name) {
     id: uid('v_'), name: name || (src.name + ' (copy)'), kind: 'plan', locked: false, status: 'active',
     created: Date.now(), updated: Date.now(), note: '', basedOn: src.id, plan: clone(src.plan),
   };
+  // baked light from Fresing Render: the copy shares it (the same files; parts changed later show live light)
+  if (src.bake) v.bake = clone(src.bake);
   const idx = p.versions.indexOf(src);
   p.versions.splice(idx + 1, 0, v);
   return v;

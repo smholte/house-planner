@@ -32,6 +32,10 @@ function mergeChanges(mine, theirs) {
     const vName = mv.kind === 'original' ? t('Original') : mv.name;
     const V2 = m => m.versions.find(v => v.id === tv.id);
     for (const k of ['name', 'note', 'locked', 'status']) if ((tv[k] ?? null) !== (mv[k] ?? null)) add(vName, t('Version: {k}', { k: t(k === 'note' ? 'its note' : k === 'locked' ? 'locked or not' : k) }) + ' → ' + String(tv[k] ?? '–').slice(0, 40), 'changed', newer, m => { const v = V2(m); if (v) v[k] = clone(tv[k]); });
+    // baked light (task 0032): taken or left as a whole
+    // (a file exported without baked light has the record but not the files: not ticked, and said so)
+    if (tv.bake && (!mv.bake || tv.bake.id !== mv.bake.id)) add(vName, t('Baked light: {f}', { f: tv.bake.file || '' }) + (tv.bake.filesLeftOut ? ' (' + t('its files are not in this file') + ')' : ''), mv.bake ? 'changed' : 'new', !tv.bake.filesLeftOut && (!mv.bake || (tv.bake.imported || 0) > (mv.bake.imported || 0)), m => { const v = V2(m); if (v) v.bake = clone(tv.bake); });
+    else if (mv.bake && !tv.bake) add(vName, t('Baked light: {f}', { f: mv.bake.file || '' }), 'only-mine', false, m => { const v = V2(m); if (v) delete v.bake; });
     const plabel = {
       walls: w => t('Wall {l}', { l: fmtM(V.dist(w.a, w.b)) }) + ' · ' + stName(theirs, w.storey),
       openings: o => t({ door: 'Door', window: 'Window', opening: 'Opening' }[o.kind] || 'Opening') + ' ' + fmtMM(o.w) + (o.leaf ? ' (' + t('façade layer') + ')' : ''),
@@ -108,6 +112,7 @@ function mergeChanges(mine, theirs) {
     if (u && (!y || !same(u, y))) add(t('Drawings under the plans'), t('Drawing under {s}', { s: stName(theirs, sid) || sid }), y ? 'changed' : 'new', !y || pNewer, m => { m.underlays = m.underlays || {}; m.underlays[sid] = clone(u); });
   }
   lists(t('People'), mine.people, theirs.people, x => x.name || t('Person'), m => (m.people = m.people || []), pNewer);
+  lists(t('House scenes sent to Fresing Render'), mine.hpScenes, theirs.hpScenes, x => fmtDate(x.created) + ' · ' + (x.versionName || ''), m => (m.hpScenes = m.hpScenes || []), pNewer);
   for (const [k, cuts] of Object.entries(theirs.slices || {})) {
     const y = (mine.slices || {})[k];
     if (cuts && cuts.length && !same(cuts, y)) add(t('Section cuts'), t('Section cuts: {k}', { k: k.split('|')[0] === 'storey' ? stName(theirs, k.split('|')[1]) || k : t('whole house') }), y ? 'changed' : 'new', !y || pNewer, m => { m.slices = m.slices || {}; m.slices[k] = clone(cuts); });
@@ -164,7 +169,7 @@ Object.assign(app, {
     if (this.fileNewerToast(data)) return;
     const entry = data.projects.find(x => x.project && this.project && x.project.id === this.project.id);
     if (!entry) { this.toast(t('This file is not a copy of this house. Use “Import a house file” instead.')); return; }
-    for (const [id, a] of Object.entries(data.assets || {})) if (!(await DB.get('assets', id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
+    for (const [id, a] of Object.entries(data.assets || {})) if (!(await Assets.getRecord(id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
     await Saver.flushNow();
     const mine = clone(this.project);
     if (this.houseProblem(entry)) { this.toast(t('This copy of the house could not be used: it is damaged. Nothing was changed.')); return; }

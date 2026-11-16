@@ -93,6 +93,9 @@ Object.assign(app, {
     // what things cost stays at home, and so do the documents (quotes, drawings with your name)
     delete c.budget;
     delete c.docs;
+    // baked light is far too big for a page to look at (task 0032), and the scenes sent to Fresing Render stay at home
+    for (const v of c.versions) delete v.bake;
+    delete c.hpScenes;
     const exported = Date.now();
     c.viewer = { sourceId: p.id, from: o.from || '', exported, title: p.name };
     const out = { format: 'house-planner', formatVersion: 1, exported, viewer: c.viewer, projects: [{ project: c, savePoints: [] }], assets: {} };
@@ -156,7 +159,7 @@ Object.assign(app, {
     incoming.viewer = { ...data.viewer };
     const existing = await DB.get('projects', vid);
     if (this.project && this.project.id === vid) await this.closeProject(true);
-    for (const [id, a] of Object.entries(data.assets || {})) if (!(await DB.get('assets', id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
+    for (const [id, a] of Object.entries(data.assets || {})) if (!(await Assets.getRecord(id))) await Assets.putRecord(a.kind === 'shell' ? { id, kind: 'shell', json: a.json, created: Date.now() } : { id, dataUrl: a.dataUrl, w: a.w, h: a.h, ...(a.kind ? { kind: a.kind } : {}), created: Date.now() });
     let fresh = true;
     if (existing && existing.viewer && existing.viewer.exported === incoming.viewer.exported) fresh = false;
     else if (existing) {
@@ -225,7 +228,7 @@ Object.assign(app, {
       for (const n of changed) { const i = pp.notes.findIndex(x => x.id === n.id); if (i >= 0) { const x = clone(n); delete x.mine; x.by = x.by || data.from; pp.notes[i] = x; } }
     };
     if (!this.project || this.project.id !== p0.id) await this.openProject(p0.id);
-    await Assets.ensure(assetIdsOf(this.project).concat(Object.keys(data.assets || {})));
+    await Assets.ensure(assetIdsOf(this.project, false).concat(Object.keys(data.assets || {})));
     this.mutate(apply, { project: true });
     if (this.mode !== 'view') this.setMode('view');
     this.toast(t('{k} notes from {n} added.', { k: added.length + changed.length, n: data.from || t('someone') }), { action: { label: t('Undo'), fn: () => this.undo() } });

@@ -8440,7 +8440,7 @@
   "Denne ruten har ingen stopp ennå: gå til et sted og trykk på “Legg til et stopp her”."
  ],
  "This session only; the house is saved as it is after each change. Save points (top bar) keep a state for later.": [
-  "Alleen deze sessie; het huis wordt na elke wijziging opgeslagen zoals het is. Bewaarpunten (bovenbalk) bewaren een toestand voor later.",
+  "Alleen deze sessie; het huis wordt na elke wijziging opgeslagen zoals het is. Herstelpunten (bovenbalk) bewaren een toestand voor later.",
   "Bare denne økten; huset lagres slik det er etter hver endring. Lagringspunkter (topplinjen) tar vare på en tilstand til senere."
  ],
  "This version": [
@@ -11238,5 +11238,453 @@
  "{name} saved: {n} surfaces, {size}.": [
   "{name} opgeslagen: {n} vlakken, {size}.",
   "{name} lagret: {n} flater, {size}."
+ ],
+ "A copy for viewing cannot take baked light.": [
+  "Een kopie om te bekijken kan geen gebakken licht krijgen.",
+  "En kopi for visning kan ikke få bakt lys."
+ ],
+ "A file of light per vertex is missing: {f}": [
+  "Een bestand met licht per hoekpunt ontbreekt: {f}",
+  "En fil med lys per hjørnepunkt mangler: {f}"
+ ],
+ "A light-map page is missing: {f}": [
+  "Een lichtkaartpagina ontbreekt: {f}",
+  "En lyskartside mangler: {f}"
+ ],
+ "A moment has no name or one used twice.": [
+  "Een moment heeft geen naam of een naam die twee keer voorkomt.",
+  "Et øyeblikk har ikke noe navn, eller et navn som er brukt to ganger."
+ ],
+ "A name in the file is not UTF-8.": [
+  "Een naam in het bestand is geen UTF-8.",
+  "Et navn i filen er ikke UTF-8."
+ ],
+ "A photo is missing: {f}": [
+  "Een foto ontbreekt: {f}",
+  "Et bilde mangler: {f}"
+ ],
+ "All baked": [
+  "Alles gebakken",
+  "Alt bakt"
+ ],
+ "Another house": [
+  "Een ander huis",
+  "Et annet hus"
+ ],
+ "As Fresing": [
+  "Als Fresing",
+  "Som Fresing"
+ ],
+ "Baked": [
+  "Gebakken",
+  "Bakt"
+ ],
+ "Baked light": [
+  "Gebakken licht",
+  "Bakt lys"
+ ],
+ "Baked light comes from Fresing Render on your PC: export this version with Export → For Fresing Render…, bake it there, then import the .hpbake file here.": [
+  "Gebakken licht komt uit Fresing Render op je pc: exporteer deze versie met Exporteren → Voor Fresing Render…, bak het daar en importeer het .hpbake-bestand hier.",
+  "Bakt lys kommer fra Fresing Render på PC-en din: eksporter denne versjonen med Eksporter → For Fresing Render…, bak den der, og importer .hpbake-filen her."
+ ],
+ "Baked light of {n} moments for “{v}”: {a} of {b} parts match.": [
+  "Gebakken licht van {n} momenten voor “{v}”: {a} van {b} delen passen.",
+  "Bakt lys for {n} øyeblikk for «{v}»: {a} av {b} deler passer."
+ ],
+ "Baked light removed.": [
+  "Gebakken licht verwijderd.",
+  "Bakt lys fjernet."
+ ],
+ "Baked light…": [
+  "Gebakken licht…",
+  "Bakt lys…"
+ ],
+ "Baked moment": [
+  "Gebakken moment",
+  "Bakt øyeblikk"
+ ],
+ "Before importing a bake ({d})": [
+  "Voor het importeren van een bake ({d})",
+  "Før import av en baking ({d})"
+ ],
+ "Before removing baked light ({d})": [
+  "Voor het verwijderen van gebakken licht ({d})",
+  "Før bakt lys ble fjernet ({d})"
+ ],
+ "Brightness as Fresing Render shows this moment": [
+  "Helderheid zoals Fresing Render dit moment toont",
+  "Lysstyrke slik Fresing Render viser dette øyeblikket"
+ ],
+ "Ceiling of {r}": [
+  "Plafond van {r}",
+  "Tak i {r}"
+ ],
+ "Changed since the bake": [
+  "Veranderd sinds de bake",
+  "Endret siden bakingen"
+ ],
+ "Door or window": [
+  "Deur of raam",
+  "Dør eller vindu"
+ ],
+ "Every part matches the bake.": [
+  "Elk deel past bij de bake.",
+  "Hver del passer med bakingen."
+ ],
+ "Floor edge": [
+  "Vloerrand",
+  "Dekkekant"
+ ],
+ "Floor of {r}": [
+  "Vloer van {r}",
+  "Gulv i {r}"
+ ],
+ "Fresing Render: {p}": [
+  "Fresing Render: {p}",
+  "Fresing Render: {p}"
+ ],
+ "From Fresing Render": [
+  "Van Fresing Render",
+  "Fra Fresing Render"
+ ],
+ "From “{v}” only: {n} other versions keep it.": [
+  "Alleen van “{v}”: {n} andere versies houden het.",
+  "Bare fra «{v}»: {n} andre versjoner beholder det."
+ ],
+ "Ground": [
+  "Maaiveld",
+  "Terreng"
+ ],
+ "Import bake…": [
+  "Bake importeren…",
+  "Importer baking…"
+ ],
+ "Imported": [
+  "Geïmporteerd",
+  "Importert"
+ ],
+ "Keeping the bake with the house…": [
+  "De bake wordt bij het huis bewaard…",
+  "Bakingen lagres med huset…"
+ ],
+ "Lamp": [
+  "Lamp",
+  "Lampe"
+ ],
+ "Leaves": [
+  "Blad",
+  "Løv"
+ ],
+ "Live (snow and photos only)": [
+  "Live (alleen sneeuw en foto's)",
+  "Live (bare snø og bilder)"
+ ],
+ "Live light": [
+  "Live licht",
+  "Levende lys"
+ ],
+ "Made by": [
+  "Gemaakt door",
+  "Laget av"
+ ],
+ "Matching it to the house…": [
+  "Wordt op het huis gelegd…",
+  "Tilpasses huset…"
+ ],
+ "Matching the bake to the house…": [
+  "De bake wordt op het huis gelegd…",
+  "Bakingen tilpasses huset…"
+ ],
+ "Moment {m}: its light encoding is not one this app reads.": [
+  "Moment {m}: deze app kan de lichtcodering niet lezen.",
+  "Øyeblikk {m}: denne appen kan ikke lese lyskodingen."
+ ],
+ "Moment {m}: its sun light is not three numbers.": [
+  "Moment {m}: het zonlicht is geen drie getallen.",
+  "Øyeblikk {m}: sollyset er ikke tre tall."
+ ],
+ "Moment {m}: the light map of {s} does not lie on its page.": [
+  "Moment {m}: de lichtkaart van {s} ligt niet op zijn pagina.",
+  "Øyeblikk {m}: lyskartet til {s} ligger ikke på siden sin."
+ ],
+ "Moment {m}: the light of {s} is in a file that is missing.": [
+  "Moment {m}: het licht van {s} staat in een bestand dat ontbreekt.",
+  "Øyeblikk {m}: lyset til {s} ligger i en fil som mangler."
+ ],
+ "Moment {m}: the light of {s} lies outside its file.": [
+  "Moment {m}: het licht van {s} ligt buiten zijn bestand.",
+  "Øyeblikk {m}: lyset til {s} ligger utenfor filen."
+ ],
+ "Moment {m}: {s} has no light.": [
+  "Moment {m}: {s} heeft geen licht.",
+  "Øyeblikk {m}: {s} har ikke noe lys."
+ ],
+ "Moment {m}: {s} is on a page that is missing.": [
+  "Moment {m}: {s} staat op een pagina die ontbreekt.",
+  "Øyeblikk {m}: {s} ligger på en side som mangler."
+ ],
+ "Open the house and version it was exported from, then import it there.": [
+  "Open het huis en de versie waaruit hij geëxporteerd is en importeer hem daar.",
+  "Åpne huset og versjonen den ble eksportert fra, og importer den der."
+ ],
+ "Other part": [
+  "Ander deel",
+  "Annen del"
+ ],
+ "Page {p} has a size that is not allowed.": [
+  "Pagina {p} heeft een maat die niet mag.",
+  "Side {p} har en størrelse som ikke er tillatt."
+ ],
+ "Page {p} is not a light-map page: {w}.": [
+  "Pagina {p} is geen lichtkaartpagina: {w}.",
+  "Side {p} er ikke en lyskartside: {w}."
+ ],
+ "Page {p}: the light maps of {a} and {b} overlap.": [
+  "Pagina {p}: de lichtkaarten van {a} en {b} overlappen.",
+  "Side {p}: lyskartene til {a} og {b} overlapper."
+ ],
+ "Reading the bake…": [
+  "De bake wordt gelezen…",
+  "Bakingen leses…"
+ ],
+ "Remove the baked light?": [
+  "Gebakken licht verwijderen?",
+  "Fjerne bakt lys?"
+ ],
+ "Replace the baked light?": [
+  "Gebakken licht vervangen?",
+  "Erstatte bakt lys?"
+ ],
+ "Soft (the sun stays live)": [
+  "Zacht (de zon blijft live)",
+  "Mykt (sola er levende)"
+ ],
+ "Surface {id} is incomplete.": [
+  "Oppervlak {id} is onvolledig.",
+  "Flate {id} er ufullstendig."
+ ],
+ "The bake could not be read: {e}": [
+  "De bake kon niet gelezen worden: {e}",
+  "Bakingen kunne ikke leses: {e}"
+ ],
+ "The bake does not say which house scene it was made for.": [
+  "De bake zegt niet voor welke huisscène hij gemaakt is.",
+  "Bakingen sier ikke hvilken husscene den ble laget for."
+ ],
+ "The bake has no format version.": [
+  "De bake heeft geen formaatversie.",
+  "Bakingen har ingen formatversjon."
+ ],
+ "The bake has no list of surfaces.": [
+  "De bake heeft geen lijst van oppervlakken.",
+  "Bakingen har ingen liste over flater."
+ ],
+ "The bake has no moments.": [
+  "De bake heeft geen momenten.",
+  "Bakingen har ingen øyeblikk."
+ ],
+ "The bake’s files are not on this device: import the house with baked light, or import the bake again.": [
+  "De bestanden van de bake staan niet op dit apparaat: importeer het huis met gebakken licht of importeer de bake opnieuw.",
+  "Filene til bakingen er ikke på denne enheten: importer huset med bakt lys, eller importer bakingen på nytt."
+ ],
+ "The file holds a name that is not allowed: {n}": [
+  "Het bestand bevat een naam die niet mag: {n}",
+  "Filen har et navn som ikke er tillatt: {n}"
+ ],
+ "The file holds “{n}” twice.": [
+  "Het bestand bevat “{n}” twee keer.",
+  "Filen har «{n}» to ganger."
+ ],
+ "The file is damaged (not a complete zip).": [
+  "Het bestand is beschadigd (geen volledige zip).",
+  "Filen er skadet (ikke en hel zip)."
+ ],
+ "The file is encrypted.": [
+  "Het bestand is versleuteld.",
+  "Filen er kryptert."
+ ],
+ "The file is packed in a way this app cannot read.": [
+  "Het bestand is ingepakt op een manier die deze app niet kan lezen.",
+  "Filen er pakket på en måte denne appen ikke kan lese."
+ ],
+ "The file is too big to read here (over 4 GB).": [
+  "Het bestand is te groot om hier te lezen (meer dan 4 GB).",
+  "Filen er for stor til å leses her (over 4 GB)."
+ ],
+ "The phone copy of page {p} is missing.": [
+  "De telefoonkopie van pagina {p} ontbreekt.",
+  "Telefonkopien av side {p} mangler."
+ ],
+ "The snow of {s} is missing or not a .glb file.": [
+  "De sneeuw van {s} ontbreekt of is geen .glb-bestand.",
+  "Snøen for {s} mangler eller er ikke en .glb-fil."
+ ],
+ "These parts show live light: export the house again for Fresing Render and bake it again to see their baked light.": [
+  "Deze delen tonen live licht: exporteer het huis opnieuw voor Fresing Render en bak het opnieuw om hun gebakken licht te zien.",
+  "Disse delene viser levende lys: eksporter huset på nytt for Fresing Render og bak det igjen for å se det bakte lyset deres."
+ ],
+ "This bake cannot be used": [
+  "Deze bake kan niet gebruikt worden",
+  "Denne bakingen kan ikke brukes"
+ ],
+ "This bake comes from an older export: parts whose layout differs show live light.": [
+  "Deze bake komt van een oudere export: delen met een andere indeling tonen live licht.",
+  "Denne bakingen kommer fra en eldre eksport: deler med en annen inndeling viser levende lys."
+ ],
+ "This bake is of an old format ({v}) this House Planner cannot read. Bake it again.": [
+  "Deze bake heeft een oud formaat ({v}) dat deze House Planner niet kan lezen. Bak hem opnieuw.",
+  "Denne bakingen har et gammelt format ({v}) som denne House Planner ikke kan lese. Bak den på nytt."
+ ],
+ "This bake was made by a newer Fresing Render (format {v}). Update House Planner to read it.": [
+  "Deze bake is gemaakt door een nieuwere Fresing Render (formaat {v}). Werk House Planner bij om hem te lezen.",
+  "Denne bakingen ble laget av en nyere Fresing Render (format {v}). Oppdater House Planner for å lese den."
+ ],
+ "This bake was made by a newer Fresing Render (format {v}): some extras are not shown.": [
+  "Deze bake is gemaakt door een nieuwere Fresing Render (formaat {v}): sommige extra's worden niet getoond.",
+  "Denne bakingen ble laget av en nyere Fresing Render (format {v}): noe ekstra vises ikke."
+ ],
+ "This bake was made for another house: none of its {n} parts is in “{v}”.": [
+  "Deze bake is gemaakt voor een ander huis: geen van zijn {n} delen zit in “{v}”.",
+  "Denne bakingen ble laget for et annet hus: ingen av de {n} delene finnes i «{v}»."
+ ],
+ "This browser cannot unpack the file.": [
+  "Deze browser kan het bestand niet uitpakken.",
+  "Denne nettleseren kan ikke pakke ut filen."
+ ],
+ "This is not a bake from Fresing Render (format “{f}”).": [
+  "Dit is geen bake van Fresing Render (formaat “{f}”).",
+  "Dette er ikke en baking fra Fresing Render (format «{f}»)."
+ ],
+ "This is not a bake from Fresing Render: it has no bake.json.": [
+  "Dit is geen bake van Fresing Render: er zit geen bake.json in.",
+  "Dette er ikke en baking fra Fresing Render: den har ingen bake.json."
+ ],
+ "Unknown light “{l}”.": [
+  "Onbekend licht “{l}”.",
+  "Ukjent lys «{l}»."
+ ],
+ "Unknown light-map layout “{l}”.": [
+  "Onbekende lichtkaartindeling “{l}”.",
+  "Ukjent lyskartinndeling «{l}»."
+ ],
+ "Which?": [
+  "Welke?",
+  "Hvilke?"
+ ],
+ "bake.json cannot be read: {e}": [
+  "bake.json kan niet gelezen worden: {e}",
+  "bake.json kan ikke leses: {e}"
+ ],
+ "bake.json has a control character in {w}.": [
+  "bake.json heeft een stuurteken in {w}.",
+  "bake.json har et kontrolltegn i {w}."
+ ],
+ "edge": [
+  "kant",
+  "kant"
+ ],
+ "gone": [
+  "weg",
+  "borte"
+ ],
+ "moved": [
+  "verplaatst",
+  "flyttet"
+ ],
+ "new": [
+  "nieuw",
+  "ny"
+ ],
+ "{f} is not whole (3 bytes a vertex).": [
+  "{f} is niet heel (3 bytes per hoekpunt).",
+  "{f} er ikke hel (3 byte per hjørnepunkt)."
+ ],
+ "{f}: the light of {a} and {b} overlap.": [
+  "{f}: het licht van {a} en {b} overlapt.",
+  "{f}: lyset til {a} og {b} overlapper."
+ ],
+ "{n} parts changed since the bake – bake again": [
+  "{n} delen veranderd sinds de bake – opnieuw bakken",
+  "{n} deler endret siden bakingen – bak på nytt"
+ ],
+ "{n} parts changed since the bake – bake again to see their light.": [
+  "{n} delen veranderd sinds de bake – bak opnieuw om hun licht te zien.",
+  "{n} deler endret siden bakingen – bak på nytt for å se lyset deres."
+ ],
+ "{n} parts near them show live light": [
+  "{n} delen ernaast tonen live licht",
+  "{n} deler ved siden av viser levende lys"
+ ],
+ "{n} parts near them show live light too: their shadows may have changed.": [
+  "{n} delen ernaast tonen ook live licht: hun schaduwen kunnen veranderd zijn.",
+  "{n} deler ved siden av viser også levende lys: skyggene deres kan ha endret seg."
+ ],
+ "{n} pieces moved (their own light kept)": [
+  "{n} stukken verplaatst (eigen licht behouden)",
+  "{n} møbler flyttet (eget lys beholdt)"
+ ],
+ "{n} versions share it": [
+  "{n} versies delen het",
+  "{n} versjoner deler det"
+ ],
+ "“{v}” has baked light from {f}. The new bake takes its place; the old one stays in Save points for 30 days.": [
+  "“{v}” heeft gebakken licht uit {f}. De nieuwe bake komt in de plaats; de oude blijft 30 dagen in Herstelpunten.",
+  "«{v}» har bakt lys fra {f}. Den nye bakingen tar plassen; den gamle blir i Lagringspunkter i 30 dager."
+ ],
+ "“{v}” shows live light again. The bake stays in Save points for 30 days.": [
+  "“{v}” toont weer live licht. De bake blijft 30 dagen in Herstelpunten.",
+  "«{v}» viser levende lys igjen. Bakingen blir i Lagringspunkter i 30 dager."
+ ],
+ "… and {n} more.": [
+  "… en nog {n}.",
+  "… og {n} til."
+ ],
+ "Baked light: {f}": [
+  "Gebakken licht: {f}",
+  "Bakt lys: {f}"
+ ],
+ "House scenes sent to Fresing Render": [
+  "Huisscènes naar Fresing Render gestuurd",
+  "Husscener sendt til Fresing Render"
+ ],
+ "3D: baked light (Fresing Render)": [
+  "3D: gebakken licht (Fresing Render)",
+  "3D: bakt lys (Fresing Render)"
+ ],
+ "Import…": [
+  "Importeren…",
+  "Importer…"
+ ],
+ "Open the house first: baked light belongs to one of its versions.": [
+  "Open eerst het huis: gebakken licht hoort bij een van zijn versies.",
+  "Åpne huset først: bakt lys hører til en av versjonene."
+ ],
+ "The light Fresing Render baked, for your phone or another device. Without it the file is much smaller.": [
+  "Het licht dat Fresing Render bakte, voor je telefoon of een ander apparaat. Zonder is het bestand veel kleiner.",
+  "Lyset Fresing Render bakte, for telefonen eller en annen enhet. Uten blir filen mye mindre."
+ ],
+ "With baked light ({s})": [
+  "Met gebakken licht ({s})",
+  "Med bakt lys ({s})"
+ ],
+ "its files are not in this file": [
+  "de bestanden zitten niet in dit bestand",
+  "filene er ikke i denne filen"
+ ],
+ "There is not enough room on this device for this bake ({s}). Free some space, or bake fewer moments.": [
+  "Er is niet genoeg ruimte op dit apparaat voor deze bake ({s}). Maak ruimte vrij of bak minder momenten.",
+  "Det er ikke nok plass på denne enheten til denne bakingen ({s}). Frigjør plass, eller bak færre øyeblikk."
+ ],
+ "Not enough room": [
+  "Niet genoeg ruimte",
+  "Ikke nok plass"
+ ],
+ "Too big for one house file: keep the .hpbake file and import it on the other device.": [
+  "Te groot voor één huisbestand: bewaar het .hpbake-bestand en importeer het op het andere apparaat.",
+  "For stor for én husfil: ta vare på .hpbake-filen og importer den på den andre enheten."
+ ],
+ "Backups and exports leave baked light out unless you tick “With baked light” in Export: keep the .hpbake file too.": [
+  "Back-ups en exports laten gebakken licht weg, tenzij je “Met gebakken licht” aanvinkt bij Exporteren: bewaar ook het .hpbake-bestand.",
+  "Sikkerhetskopier og eksporter tar ikke med bakt lys med mindre du krysser av for «Med bakt lys» under Eksporter: ta også vare på .hpbake-filen."
  ]
 }

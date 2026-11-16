@@ -1052,7 +1052,8 @@ class View3D extends Emitter {
 
   clear() {
     // (an InstancedMesh's own list of places goes too; its shape is shared – trees.js)
-    this.group.traverse(o => { if (o.isInstancedMesh) o.dispose(); if (o.geometry && !(o.userData && o.userData.keep)) o.geometry.dispose(); });
+    // (a kept shape given baked light got a copy of its own: that copy goes – hpbake.js)
+    this.group.traverse(o => { if (o.isInstancedMesh) o.dispose(); if (o.geometry && (!(o.userData && o.userData.keep) || o.userData.hpbOwn)) o.geometry.dispose(); });
     this.vegLod = null;
     this.group.clear();
     if (this.ao) this.ao.box = null;
@@ -1195,6 +1196,8 @@ class View3D extends Emitter {
     }
     // (a kept storey has its High materials already)
     for (const r of fresh) this.hqApply(r);
+    // baked light (hpbake.js): which surface of the bake each new mesh shows – before the meshes are merged
+    this.hpbApply(fresh);
     this.applyClip();
     // fewer draw calls: what never moves, one mesh per material (batch.js)
     this.batchAll();
@@ -1204,6 +1207,8 @@ class View3D extends Emitter {
     if (this.walker) { this.walker.collect(); this.walker.updateCamera(); }
     // the real sun for a date and time
     if (spec.sun) this.applySun(spec.sun);
+    // (a baked moment: its sun, or the night)
+    if (this._hpb) this.hpbLights(this._hpb.md);
     this.needs = true;
     // Evening: the lamps glow (glow.js)
     this.buildGlow();
