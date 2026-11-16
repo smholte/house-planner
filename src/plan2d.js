@@ -949,7 +949,7 @@ class PlanView extends Emitter {
     clearTimeout(this._lp);
     this.drag = null;
     if (!g.moved && g.dim) { this.editDim(g.dim, sp); return; }
-    if (!g.moved && g.wpmark) { this.openWallPhotoMark(g.wpmark); return; }
+    if (!g.moved && g.wpmark) { const k = g.wpmark; setTimeout(() => this.openWallPhotoMark(k), 300); return; }   // (later: the click that follows a touch would land on the new dialog's backdrop and close it)
     if (!g.moved && g.multiTap !== undefined) { if (g.multiTap && g.multiTap.solo) this.app.select(g.multiTap.solo); else if (g.multiTap) this.app.multiToggle(g.multiTap); return; }
     if (!g.moved) { this._tapDownHit = g.downHit || null; this.onTap(wp, sp, e); this._tapDownHit = null; }
   }
