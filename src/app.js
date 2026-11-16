@@ -393,7 +393,8 @@ const app = new (class App extends Emitter {
     this.undoStack = []; this.redoStack = [];
     // files a house's own data brings along (documents) onto this device, then everything it uses into memory
     if (typeof docsEnsureFiles === 'function') await docsEnsureFiles(p);
-    await Assets.ensure(assetIdsOf(p));
+    // (not the files of baked light: they are read when a moment is shown – hpbake.js)
+    await Assets.ensure(assetIdsOf(p, false));
     this.shell = p.shell ? Assets.shell(p.shell.assetId) : null;
     try { localStorage.setItem('house-planner.last', id); } catch (e) { /* ignore */ }
     if (this.settings.lastProject !== id) Settings.set('lastProject', id);
@@ -1119,7 +1120,7 @@ const app = new (class App extends Emitter {
         const hs = this.houseSig(pane, v);
         const build = () => (pane.view._houseSig = hs, pane.view.build({
           entries, cut: !!this.settings.cut && !this.walking, ground: this.settings.ground !== false,
-          mode: this.mode, light: this.settings.light === 'evening' ? 'evening' : 'day', ceilings: this.settings.ceilings !== false, walk: !!this.walking, plinth: this.settings.plinth !== false, windows: this.settings.windows !== false, outside: this.settings.outside !== false, roof: this.settings.roof !== false, floors: this.settings.floors !== false, shell: this.shell, origPlan: (getOriginal(p) || {}).plan || null, scope: this.view.scope, ...this.garden3d(entries, v), ...this.sunSpec(),
+          mode: this.mode, light: this.settings.light === 'evening' ? 'evening' : 'day', ceilings: this.settings.ceilings !== false, walk: !!this.walking, plinth: this.settings.plinth !== false, windows: this.settings.windows !== false, outside: this.settings.outside !== false, roof: this.settings.roof !== false, floors: this.settings.floors !== false, shell: this.shell, origPlan: (getOriginal(p) || {}).plan || null, scope: this.view.scope, ...this.garden3d(entries, v), ...this.sunSpec(), ...this.bakeSpec(),
           sliceKey: [this.project.id, this.view.scope, this.view.scope === 'storey' ? this.view.storeyId : ''].join('|'),
           homeView: (this.project.homeViews || {})[this.homeKey()] || null, homeLabel: this.homeLabel(),
           labels: this.settings.labels && !this.walking && (this.view.scope !== 'house' || (this.settings.explode || 0) > 0.25),
@@ -1174,7 +1175,10 @@ const app = new (class App extends Emitter {
     // the real sun: day and time
     // (also while walking: under the walking bar)
     if (this.settings.light !== 'sun') this._sunFold = false;   // (the sun bar is open each time the light is set to Sun)
-    if (this.view.dim === '3d' && this.settings.light === 'sun') top.appendChild(this.sunBar());
+    // baked light from Fresing Render (hpbake.js): its bar instead of the sun's
+    const baked = this.view.dim === '3d' && this.hpbRec() && this.settings.bakeMoment && this.hpbOn();
+    if (baked) top.appendChild(this.bakeBar());
+    else if (this.view.dim === '3d' && this.settings.light === 'sun') top.appendChild(this.sunBar());
     // legend for changes
     if (this.display === 'diff' && this.currentDiff) {
       const lg = h('div', { class: 'legend' },

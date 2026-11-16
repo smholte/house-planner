@@ -59,7 +59,7 @@ with sync_playwright() as p:
     # an old house: no wallPhotos field at all
     check('an old house has no wall photos field: the wall views open without it', pg.evaluate("() => window.__hp.app.project.wallPhotos === undefined"))
     open_views(pg, 'Keuken')
-    n_cards = pg.locator('.wv-card').count()
+    n_cards = pg.locator('.wv-card:not(.wv-floor)').count()   # the walls (a tiled floor has a card of its own, 0036)
     check('wall views: a photo strip under every wall', pg.locator('.wv-card .wp-strip').count() == n_cards and n_cards >= 3, n_cards)
     check('… “No photo of the bare wall yet” and an Add photo button (PC: a file picker)', pg.locator('.wv-card').first.locator('.wp-add').count() == 1 and 'No photo' in pg.locator('.wv-card .wp-title').first.inner_text())
     # add two photos to wall A: one with an EXIF date, one big without
@@ -113,7 +113,8 @@ with sync_playwright() as p:
     path = os.path.join(SHOTS, 'wallphotos.pdf'); dl.value.save_as(path)
     data = open(path, 'rb').read()
     pages = len(re.findall(rb'/Type\s*/Page[^s]', data))
-    check('PDF: a page per wall and one more with wall A’s photos (date and text under each)', pages == n_cards + 1 and data.count(b'/Subtype /Image') >= n_cards + 2, (pages, n_cards))
+    n_floor = 1 if pg.locator('.wv-card.wv-floor').count() else 0   # a tiled floor: a page of its own (0036)
+    check('PDF: a page per wall and one more with wall A’s photos (date and text under each)', pages == n_cards + 1 + n_floor and data.count(b'/Subtype /Image') >= n_cards + 2, (pages, n_cards))
     close_dialog(pg)
     # room details: the mark, the count, the strip in the open wall
     pg.evaluate(SELROOM, 'Keuken'); pg.wait_for_timeout(700)

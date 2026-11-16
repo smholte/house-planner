@@ -11,7 +11,7 @@ FX = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures') + os.s
 SELROOM = "(n) => { const a = window.__hp.app; const r = a.shownVersion().plan.rooms.find(r => r.name === n && r.storey === a.view.storeyId); a.select({ type: 'room', id: r.id, storey: r.storey }); }"
 LAST = "() => { const a = window.__hp.app, n = a.project.notes[a.project.notes.length - 1]; return n && JSON.parse(JSON.stringify(n)); }"
 OPEN_NOTES = "() => window.__hp.app.project.notes.filter(n => n.status !== 'done').length"
-CARDS = "() => [...document.querySelectorAll('.wv-card')].map(c => ({ l: c.dataset.letter, pts: c.querySelectorAll('.wv-pt').length, tiles: c.querySelectorAll('.wv-tile').length, cut: c.querySelectorAll('.wv-tile.cut').length, kit: c.querySelectorAll('.wv-kitchen').length, ops: c.querySelectorAll('.wv-op').length, rows: [...c.querySelectorAll('.wv-table tbody tr')].map(tr => [...tr.cells].map(td => td.textContent)), note: (c.querySelector('.wv-tilenote-line') || {}).textContent || '' }))"
+CARDS = "() => [...document.querySelectorAll('.wv-card:not(.wv-floor)')].map(c => ({ l: c.dataset.letter, pts: c.querySelectorAll('.wv-pt').length, tiles: c.querySelectorAll('.wv-tile').length, cut: c.querySelectorAll('.wv-tile.cut').length, kit: c.querySelectorAll('.wv-kitchen').length, ops: c.querySelectorAll('.wv-op').length, rows: [...c.querySelectorAll('.wv-table tbody tr')].map(tr => [...tr.cells].map(td => td.textContent)), note: (c.querySelector('.wv-tilenote-line') || {}).textContent || '' }))"
 
 def wall_views(pg, room):
     pg.evaluate(SELROOM, room); pg.wait_for_timeout(700)
@@ -65,7 +65,7 @@ with sync_playwright() as p:
     path = os.path.join(SHOTS, 'r12-wallviews.pdf'); dl.value.save_as(path)
     data = open(path, 'rb').read()
     pages = len(re.findall(rb'/Type\s*/Page[^s]', data))
-    check('PDF for the tiler, electrician and kitchen supplier: one A4 page per wall', data[:5] == b'%PDF-' and pages == 4, (pages, len(data)))
+    check('PDF for the tiler, electrician and kitchen supplier: one A4 page per wall, and one for the tiled floor (task 0036)', data[:5] == b'%PDF-' and pages == 5, (pages, len(data)))
     check('… with the drawing as a picture and the name of the file after the room', len(data) > 100000 and 'toilet' in dl.value.suggested_filename.lower(), dl.value.suggested_filename)
     close_dialog(pg)
     # ───────── N6: the building diary ─────────

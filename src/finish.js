@@ -135,11 +135,13 @@ function faceOpenings(plan, f) {
 function faceHeight(f, st) { return Math.min(roomCeilH(f.room, st), wallHeight(f.wall, st)); }
 
 /* ───────── tiles ───────── */
-/** tiles needed for an area of wall: whole tiles for the area (with the joints), plus the waste */
-function tileCount(area, T) {
+/** tiles needed for an area of wall: the pieces of the real grid (or, without one, whole tiles for the area with the
+ *  joints), plus the waste */
+function tileCount(area, T, pieces) {
   if (!T || !(area > 0.0001)) return { area: 0, tiles: 0, m2: 0 };
   const j = T.joint || 0, mod = (T.w + j) * (T.h + j);
-  const tiles = Math.ceil(area / mod * (1 + (T.waste || 0) / 100) - 1e-9);
+  // from the grid (task 0036): every whole tile and every cut piece is a tile, plus the extra for breakage
+  const tiles = Math.ceil((pieces != null ? pieces : area / mod) * (1 + (T.waste || 0) / 100) - 1e-9);
   return { area, tiles, m2: tiles * T.w * T.h };
 }
 const tileSize = T => `${fmtMM(T.w)} × ${fmtMM(T.h)} mm`;
@@ -156,7 +158,8 @@ function finishSummary(fin) {
   return (T ? tilesSummary(T) + ' · ' : '') + base;
 }
 
-/** per room: its walls with their finishes and areas, and the tiles per kind of tile */
+/** per room: its walls with their finishes and areas, and the tiles per kind of tile (counted from the real grid of
+ *  each wall: whole tiles and cut pieces, task 0036) */
 function roomFinishStats(plan, r, st) {
   const faces = roomFaces(plan, r, true);
   const tiles = new Map();
@@ -167,14 +170,324 @@ function roomFinishStats(plan, r, st) {
     const T = fin.tiles;
     const tArea = T ? faceArea(plan, f, st, 0, T.to > 0 ? T.to : Infinity) : 0;
     wall += area; tiled += tArea;
+    // the grid as the wall view draws it (the face between the wall's ends, not round its outside corners)
+    let lay = null;
     if (T && tArea > 0) {
+      try { lay = faceTileLayout(plan, { ...f, u0: Math.max(f.u0, 0), u1: Math.min(f.u1, wallLen(f.wall)) }, st); } catch (e) { console.error(e); }
       const k = tileKey(T);
-      if (!tiles.has(k)) tiles.set(k, { T, area: 0 });
-      tiles.get(k).area += tArea;
+      if (!tiles.has(k)) tiles.set(k, { T, area: 0, whole: 0, cut: 0, grid: true });
+      const x = tiles.get(k);
+      x.area += tArea;
+      if (lay) { x.whole += lay.count.whole; x.cut += lay.count.cut; } else x.grid = false;
     }
-    return { f, fin, area, tArea, cover: Math.max(0, area - tArea), len: f.u1 - f.u0, ops: faceOpenings(plan, f) };
+    return { f, fin, area, tArea, cover: Math.max(0, area - tArea), len: f.u1 - f.u0, ops: faceOpenings(plan, f), lay };
   });
-  return { faces: rows, wall, tiled, cover: Math.max(0, wall - tiled), tiles: [...tiles.values()].map(x => ({ ...x, ...tileCount(x.area, x.T) })) };
+  return { faces: rows, wall, tiled, cover: Math.max(0, wall - tiled), tiles: [...tiles.values()].map(x => ({ ...x, ...tileCount(x.area, x.T, x.grid ? x.whole + x.cut : null) })) };
+}
+
+/* ───────── where the tiles start, the cut pieces and slivers (task 0036) ─────────
+   A wall's tiles lie in a straight grid: tile k of a row spans ox + k·M … + T.w (M = tile + joint), row r spans
+   oy + r·MH … + T.h; half bond shifts every other row by M / 2. Where the grid starts, per wall face, is kept on the
+   wall: wall.tileStart[roomId] = { x: 'centre' | 'left' | 'right' | 'at', at (m from the left corner), joint (a joint
+   on that line instead of a tile centred on it), ref ('window' | 'door' | 'bath' … – only a name), dx (nudge, m),
+   y: 'floor' | 'at' | 'top', yh (m), yref }. No start = centred, whole rows from the floor: the layout of before.
+   A floor's start: r.floor.start = { at: 'centre' | 'nw' | 'ne' | 'sw' | 'se' | 'door', p, n (the door's line and
+   the way into the room), dx, dy (nudges in the plan, m) }. A cut piece under a third of a tile is a sliver. */
+const SLIVER = 1 / 3, CUT_EPS = 0.0015, FLOOR_JOINT = 0.003;
+const FLOOR_GRID = new Set(['grid', 'half', 'third']);
+
+/** the piece cut at a line of a grid (tiles o + k·M … + w): after = the piece lies after the line → its size, 0 = whole */
+function gridCut(x, o, M, w, after) {
+  let p = ((x - o) % M + M) % M;
+  if (p > M - CUT_EPS) p = 0;
+  if (p < CUT_EPS || p > w - CUT_EPS) return 0;
+  return after ? w - p : p;
+}
+/** the smallest piece at a line over several row shifts (0 = whole in every row) */
+function gridCutMin(x, o, offs, M, w, after) {
+  let c = 0;
+  for (const s0 of offs) { const v = gridCut(x, o + s0, M, w, after); if (v > 0 && (!c || v < c)) c = v; }
+  return c;
+}
+/** polygon P clipped to the rectangle x0..x1 × y0..y1 (Sutherland–Hodgman) */
+function clipToRect(P, x0, y0, x1, y1) {
+  const side = (Q, inside, cross) => {
+    const out = [];
+    for (let i = 0; i < Q.length; i++) {
+      const a = Q[(i + Q.length - 1) % Q.length], b = Q[i], ia = inside(a), ib = inside(b);
+      if (ib) { if (!ia) out.push(cross(a, b)); out.push(b); } else if (ia) out.push(cross(a, b));
+    }
+    return out;
+  };
+  const atX = (a, b, x) => [x, a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0])];
+  const atY = (a, b, y) => [a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]), y];
+  let Q = P;
+  Q = side(Q, p => p[0] >= x0, (a, b) => atX(a, b, x0)); if (!Q.length) return Q;
+  Q = side(Q, p => p[0] <= x1, (a, b) => atX(a, b, x1)); if (!Q.length) return Q;
+  Q = side(Q, p => p[1] >= y0, (a, b) => atY(a, b, y0)); if (!Q.length) return Q;
+  return side(Q, p => p[1] <= y1, (a, b) => atY(a, b, y1));
+}
+/** count the tiles of a grid over a shape (polygon less holes, one frame): whole tiles and cut pieces.
+ *  G = { ou, ov, MU, MV, tu, tv, offs (shift of row r along u: offs[r mod offs.length]) } */
+function gridCount(poly, holes, G) {
+  const bb = bboxOfPoints(poly), full = G.tu * G.tv;
+  let whole = 0, cut = 0;
+  const pieces = [];
+  const r0 = Math.floor((bb.minY - G.ov) / G.MV) - 1, r1 = Math.ceil((bb.maxY - G.ov) / G.MV) + 1;
+  if (r1 - r0 > 4000) return { whole: 0, cut: 0, pieces };
+  for (let r = r0; r <= r1; r++) {
+    const y0 = G.ov + r * G.MV, y1 = y0 + G.tv;
+    if (y1 <= bb.minY || y0 >= bb.maxY) continue;
+    const sh = G.offs[((r % G.offs.length) + G.offs.length) % G.offs.length];
+    const k0 = Math.floor((bb.minX - G.ou - sh) / G.MU) - 1, k1 = Math.ceil((bb.maxX - G.ou - sh) / G.MU) + 1;
+    if (k1 - k0 > 4000) continue;
+    for (let k = k0; k <= k1; k++) {
+      const x0 = G.ou + sh + k * G.MU, x1 = x0 + G.tu;
+      if (x1 <= bb.minX || x0 >= bb.maxX) continue;
+      const Q = clipToRect(poly, x0, y0, x1, y1);
+      if (Q.length < 3) continue;
+      let a = Math.abs(polygonArea(Q));
+      for (const hl of holes) { const H = clipToRect(hl, x0, y0, x1, y1); if (H.length >= 3) a -= Math.abs(polygonArea(H)); }
+      if (a < 1e-6) continue;
+      const qb = bboxOfPoints(Q);
+      if (qb.maxX - qb.minX < CUT_EPS || qb.maxY - qb.minY < CUT_EPS) continue;
+      const isCut = a < full * 0.998;
+      if (isCut) cut++; else whole++;
+      pieces.push({ x0: Math.max(x0, qb.minX), x1: Math.min(x1, qb.maxX), y0: Math.max(y0, qb.minY), y1: Math.min(y1, qb.maxY), cut: isCut });
+    }
+  }
+  return { whole, cut, pieces };
+}
+
+/** the start kept for one wall face (or null: centred, rows from the floor) */
+function faceTileStart(w, r) {
+  const S = w && w.tileStart && r ? w.tileStart[r.id] : null;
+  return S && typeof S === 'object' ? S : null;
+}
+/** where the grid of a wall's tiles lies: x from the left corner, y up from the floor */
+function tileOrigin(T, L, top, S) {
+  const j = T.joint || 0, M = T.w + j, MH = T.h + j;
+  S = S || {};
+  let ox;
+  if (S.x === 'left') ox = 0;
+  else if (S.x === 'right') ox = L - T.w;
+  else if (S.x === 'at' && isFinite(S.at)) ox = S.joint ? S.at + j / 2 : S.at - T.w / 2;
+  else ox = tileFall(T, L, top).side;
+  ox += +S.dx || 0;
+  let oy = 0;
+  if (S.y === 'at' && S.yh > 0) oy = S.yh;
+  else if (S.y === 'top') oy = top - T.h;
+  return { ox, oy, M, MH, j, offs: T.lay === 'half' ? [0, M / 2] : [0] };
+}
+/** the cuts of a wall's tiles: at both corners, the floor, the top row and round doors and windows
+ *  → [{ k, op, c (m), size (the tile's side it cuts), sliver }] */
+function wallTileCuts(T, G, L, top, flatTop, ops) {
+  const out = [];
+  const add = (k, c, size, op) => { if (c > 0) out.push({ k, c, size, op: op || null, sliver: c < size * SLIVER - 1e-6 }); };
+  const xc = (x, after) => gridCutMin(x, G.ox, G.offs, G.M, T.w, after);
+  const yc = (y, after) => gridCut(y, G.oy, G.MH, T.h, after);
+  add('left', xc(0, true), T.w);
+  add('right', xc(L, false), T.w);
+  add('floor', yc(0, true), T.h);
+  if (flatTop) add('top', yc(top, false), T.h);
+  for (const o of ops || []) {
+    if (o.y0 >= top - CUT_EPS || o.y1 <= CUT_EPS) continue;
+    if (o.x0 > CUT_EPS) add(o.kind + '-l', xc(o.x0, false), T.w, o);
+    if (o.x1 < L - CUT_EPS) add(o.kind + '-r', xc(o.x1, true), T.w, o);
+    if (o.y0 > CUT_EPS) add(o.kind + '-b', yc(o.y0, false), T.h, o);
+    if (o.y1 < top - CUT_EPS) add(o.kind + '-t', yc(o.y1, true), T.h, o);
+  }
+  return out;
+}
+
+/** a wall face's tiles laid out: the grid from its start, the pieces (whole / cut), the cuts and their slivers.
+ *  f: a face (u0..u1 along the wall), S: a start to try instead of the kept one */
+function faceTileLayout(plan, f, st, S, fin) {
+  fin = fin || faceFinish(f.wall, f.room);
+  const T = fin.tiles;
+  if (!T) return null;
+  const fr = faceFrame(f), w = f.wall, H = wallHeight(w, st), ch = roomCeilH(f.room, st), L = fr.L;
+  const N = Math.max(2, Math.ceil(L / 0.1)), topL = [];
+  for (let i = 0; i <= N; i++) { const u = f.u0 + L * i / N; topL.push([fr.ex(u), Math.min(wallTopAt(w, u, H), ch)]); }
+  topL.sort((a, b) => a[0] - b[0]);
+  const maxH = Math.max(...topL.map(q => q[1])), minH = Math.min(...topL.map(q => q[1]));
+  const top = T.to > 0 ? Math.min(T.to, maxH) : maxH;
+  const ops = faceOpenings(plan, f).map(op => {
+    const a = fr.ex(Math.max(op.pos - op.w / 2, f.u0)), b = fr.ex(Math.min(op.pos + op.w / 2, f.u1));
+    const y0 = op.kind === 'window' ? (op.sill || 0) : 0;
+    return { kind: op.kind, x0: Math.min(a, b), x1: Math.max(a, b), y0, y1: y0 + op.h, id: op.id };
+  }).sort((a, b) => a.x0 - b.x0);
+  const start = S === undefined ? faceTileStart(w, f.room) : S;
+  const G = tileOrigin(T, L, top, start);
+  const flatTop = minH >= top - 0.001;
+  const cuts = wallTileCuts(T, G, L, top, flatTop, ops);
+  const shape = [[0, 0], ...topL.map(([x, y]) => [x, Math.min(y, top)]), [L, 0]];
+  const holes = ops.map(o => [[o.x0, o.y0], [o.x1, o.y0], [o.x1, o.y1], [o.x0, o.y1]]);
+  const count = gridCount(shape, holes, { ou: G.ox, ov: G.oy, MU: G.M, MV: G.MH, tu: T.w, tv: T.h, offs: G.offs });
+  return { T, L, top, maxH, flatTop, ops, start: start || null, G, cuts, slivers: cuts.filter(c => c.sliver), count };
+}
+
+/** the choices of where a wall's tiles start: [{ key, label, S }] – across and up, from the wall's own things */
+function tileStartChoices(lay, fixtures) {
+  const T = lay.T, j = T.joint || 0;
+  const xs = [{ key: 'centre', label: t('Centre of the wall'), S: { x: 'centre' } }, { key: 'left', label: t('Left corner'), S: { x: 'left' } }, { key: 'right', label: t('Right corner'), S: { x: 'right' } }];
+  const n = { window: 0, door: 0, opening: 0 };
+  for (const o of lay.ops) {
+    n[o.kind] = (n[o.kind] || 0) + 1;
+    const nm = (o.kind === 'window' ? t('window') : o.kind === 'door' ? t('door') : t('opening')) + (lay.ops.filter(q => q.kind === o.kind).length > 1 ? ' ' + n[o.kind] : '');
+    xs.push({ key: 'op' + xs.length, label: t('Centre on: {what}', { what: nm }), S: { x: 'at', at: +((o.x0 + o.x1) / 2).toFixed(4), ref: o.kind } });
+  }
+  for (const F of fixtures || []) xs.push({ key: 'fx' + xs.length, label: t('Centre on: {what}', { what: F.name }), S: { x: 'at', at: +F.xc.toFixed(4), ref: F.kind } });
+  const ys = [{ key: 'floor', label: t('Whole row at the floor'), S: { y: 'floor' } }];
+  for (const F of fixtures || []) if (F.top > 0.05 && F.top < lay.top - 0.05) ys.push({ key: 'fy' + ys.length, label: t('Whole row on top of: {what} ({h} mm)', { what: F.name, h: fmtMM(F.top) }), S: { y: 'at', yh: +F.top.toFixed(4), yref: F.kind } });
+  ys.push({ key: 'top', label: t('Whole row at the top (cut row at the floor)'), S: { y: 'top' } });
+  return { xs, ys, j };
+}
+/** the start with the widest smallest cut: each choice across (and the joint or a tile on its line, and half a tile
+ *  further), then each choice for the rows (and half a tile higher) */
+function bestTileStart(plan, f, st, fixtures) {
+  const lay = faceTileLayout(plan, f, st, null);
+  if (!lay) return null;
+  const { xs, ys } = tileStartChoices(lay, fixtures);
+  const T = lay.T, M = lay.G.M, MH = lay.G.MH;
+  const score = (S, dim) => { const L2 = faceTileLayout(plan, f, st, S); return L2.cuts.filter(c => (dim === 'x') === /^(left|right)$|-[lr]$/.test(c.k)).reduce((m, c) => Math.min(m, c.c / c.size), 1); };
+  // the usual start (centred, rows from the floor) stays unless another makes the smallest cut a tenth of a tile wider
+  const KEEP = 0.1, half = ' + ' + t('half a tile');
+  let bx = null, bxs = -1;
+  for (const X of xs) for (const jt of X.S.x === 'at' ? [false, true] : [false]) for (const dx of [0, M / 2]) {
+    const S = { ...X.S, ...(jt ? { joint: true } : {}), ...(dx ? { dx: +dx.toFixed(4) } : {}), y: 'floor' };
+    const v = score(S, 'x');
+    if (v > bxs + (bx && bx.first ? KEEP : 1e-6)) { bxs = v; bx = { S, label: X.label + (dx ? half : ''), first: !bx }; }
+  }
+  let by = null, bys = -1;
+  for (const Y of ys) for (const dy of [0, MH / 2]) {
+    let S = { ...Y.S };
+    if (dy) { if (S.y === 'floor') S = { y: 'at', yh: +dy.toFixed(4) }; else if (S.y === 'at') S = { ...S, yh: +(S.yh + dy).toFixed(4) }; else continue; }
+    const v = score({ x: 'left', ...S }, 'y');
+    if (v > bys + (by && by.first ? KEEP : 1e-6)) { bys = v; by = { S, label: Y.label + (dy ? half : ''), first: !by }; }
+  }
+  const S = { ...bx.S, ...by.S };
+  if (S.y === 'floor') delete S.y;
+  if (S.x === 'centre') delete S.x;
+  return { S, labelX: bx.label, labelY: by.label, score: Math.min(bxs, bys) };
+}
+/** a start worth keeping: nothing for the default (centred, rows from the floor) */
+function cleanTileStart(S) {
+  if (!S) return null;
+  const o = {};
+  if (S.x && S.x !== 'centre') { o.x = S.x; if (S.x === 'at') { o.at = +(+S.at).toFixed(4); if (S.joint) o.joint = true; if (S.ref) o.ref = S.ref; } }
+  if (+S.dx) o.dx = +(+S.dx).toFixed(4);
+  if (S.y === 'top' || (S.y === 'at' && S.yh > 0)) { o.y = S.y; if (S.y === 'at') { o.yh = +(+S.yh).toFixed(4); if (S.yref) o.yref = S.yref; } }
+  return Object.keys(o).length ? o : null;
+}
+
+/** what a cut is called, for the tiler */
+function cutPlace(c) {
+  const [k, e] = c.k.split('-');
+  if (!e) return t({ left: 'left corner', right: 'right corner', floor: 'at the floor', top: 'top row' }[k]);
+  const what = k === 'window' ? t('window') : k === 'door' ? t('door') : t('opening');
+  return t({ l: 'left of the {what}', r: 'right of the {what}', b: 'under the {what}', t: 'above the {what}' }[e], { what });
+}
+/** the narrowest cut at each place (corners, floor, top, round each opening), in words */
+function cutsSummary(cuts) {
+  const by = new Map();
+  for (const c of cuts) { const k = cutPlace(c); if (!by.has(k) || c.c < by.get(k).c) by.set(k, c); }
+  return [...by.entries()].map(([k, c]) => ({ place: k, c: c.c, sliver: c.sliver, text: t('{where}: {c} mm', { where: k, c: fmtMM(c.c) }) }));
+}
+
+/* ───────── floor tiles: start, cuts, count ───────── */
+/** a room's tiled floor laid out (straight, half bond or a third offset): the grid in the floor's own frame (u along
+ *  the run, v across), the cut pieces, the cuts at each side of the room in the plan, and the count. null: no tiles
+ *  or a herringbone floor */
+function floorTileLayout(plan, r, S) {
+  const F = floorSpec(r.floor);
+  if (F.kind !== 'tile' || !FLOOR_GRID.has(F.pattern) || !r.poly || r.poly.length < 3) return null;
+  const turn = F.dir === 90, j = FLOOR_JOINT;
+  const toL = p => (turn ? [p[1], p[0]] : [p[0], p[1]]);
+  const poly = r.poly.map(toL), holes = (roomHoles(plan, r) || []).map(hl => hl.map(toL));
+  const bb = bboxOfPoints(poly);
+  const tu = F.l, tv = F.w, MU = tu + j, MV = tv + j;
+  const offs = F.pattern === 'half' ? [0, MU / 2] : F.pattern === 'third' ? [0, MU / 3, 2 * MU / 3] : [0];
+  S = S === undefined ? (r.floor.start || null) : S;
+  const centre = (a, b, t0) => a + tileFall({ w: t0, h: 1, joint: j }, b - a, 1).side;
+  let ou, ov;
+  const at = S && S.at;
+  if (at === 'nw' || at === 'ne' || at === 'sw' || at === 'se') {
+    const px = at[1] === 'w' ? 'min' : 'max', py = at[0] === 'n' ? 'min' : 'max';
+    const pu = turn ? py : px, pv = turn ? px : py;
+    ou = pu === 'min' ? bb.minX : bb.maxX - tu;
+    ov = pv === 'min' ? bb.minY : bb.maxY - tv;
+  } else if (at === 'door' && S.p && S.n) {
+    const p = toL(S.p), n = toL(S.n);
+    if (Math.abs(n[0]) >= Math.abs(n[1])) { ou = n[0] > 0 ? p[0] : p[0] - tu; ov = p[1] - tv / 2; }
+    else { ov = n[1] > 0 ? p[1] : p[1] - tv; ou = p[0] - tu / 2; }
+  } else { ou = centre(bb.minX, bb.maxX, tu); ov = centre(bb.minY, bb.maxY, tv); }
+  const d = toL([+(S && S.dx) || 0, +(S && S.dy) || 0]);
+  ou += d[0]; ov += d[1];
+  const G = { ou, ov, MU, MV, tu, tv, offs };
+  // the cuts along each straight side of the room (and round holes in the floor), named by the side in the plan
+  const cuts = [];
+  const sgn = Math.sign(polygonArea(r.poly)) || 1;
+  const sideOf = (P, hole) => {
+    for (let i = 0; i < P.length; i++) {
+      const a = P[i], b = P[(i + 1) % P.length], e = V.sub(b, a), el = V.len(e);
+      if (el < 0.05) continue;
+      // into the floor: into the room, or out of a hole in it
+      const inward = V.mul(V.perp(V.mul(e, 1 / el)), hole ? -(Math.sign(polygonArea(P)) || 1) : sgn);
+      let k = null;
+      if (Math.abs(e[0]) < 0.01 * el) k = inward[0] > 0 ? 'left' : 'right';
+      else if (Math.abs(e[1]) < 0.01 * el) k = inward[1] > 0 ? 'top' : 'bottom';
+      if (!k) continue;
+      const vertical = k === 'left' || k === 'right', after = k === 'left' || k === 'top';
+      const line = vertical ? a[0] : a[1];
+      // in the floor's frame: a line across u (cut along the run, every row's shift) or across v
+      const alongU = vertical !== turn;
+      const c = alongU ? gridCutMin(line, ou, offs, MU, tu, after) : gridCut(line, ov, MV, tv, after);
+      if (c > 0) cuts.push({ k: hole ? 'hole' : k, c, size: alongU ? tu : tv, sliver: c < (alongU ? tu : tv) * SLIVER - 1e-6 });
+    }
+  };
+  sideOf(r.poly, false);
+  for (const hl of roomHoles(plan, r) || []) sideOf(hl, true);
+  const count = gridCount(poly, holes, G);
+  return { F, turn, G, cuts, slivers: cuts.filter(c => c.sliver), count, start: S || null, toL };
+}
+/** the doors of a room: where they meet its floor (the wall's face) and the way into the room */
+function roomDoorLines(plan, r) {
+  const out = [];
+  for (const f of roomFaces(plan, r)) for (const op of faceOpenings(plan, f)) {
+    if (op.kind !== 'door' && op.kind !== 'opening') continue;
+    const w = f.wall, d = wallDir(w), n = V.perp(d);
+    const p = V.add(V.add(w.a, V.mul(d, op.pos)), V.mul(n, f.side * w.t / 2));
+    out.push({ p: [+p[0].toFixed(4), +p[1].toFixed(4)], n: V.mul(n, f.side).map(v => +v.toFixed(4)), letter: f.letter, kind: op.kind });
+  }
+  return out;
+}
+/** where a floor's tiles can start */
+function floorStartChoices(plan, r) {
+  const list = [['centre', t('Centre of the room')], ['nw', t('Corner top left')], ['ne', t('Corner top right')], ['sw', t('Corner bottom left')], ['se', t('Corner bottom right')]].map(([k, l]) => ({ key: k, label: l, S: { at: k } }));
+  roomDoorLines(plan, r).forEach((D, i, all) => list.push({ key: 'door' + i, label: t('Door line (wall {l})', { l: D.letter }) + (all.length > 1 && all.filter(x => x.letter === D.letter).length > 1 ? ' ' + (i + 1) : ''), S: { at: 'door', p: D.p, n: D.n } }));
+  return list;
+}
+function bestFloorStart(plan, r) {
+  const L0 = floorTileLayout(plan, r, null);
+  if (!L0) return null;
+  const turn = L0.turn, hu = L0.G.MU / 2, hv = L0.G.MV / 2;
+  let best = null, bs = -1;
+  for (const C of floorStartChoices(plan, r)) for (const su of [0, hu]) for (const sv of [0, hv]) {
+    const [dx, dy] = turn ? [sv, su] : [su, sv];
+    const S = { ...C.S, ...(dx ? { dx: +dx.toFixed(4) } : {}), ...(dy ? { dy: +dy.toFixed(4) } : {}) };
+    const lay = floorTileLayout(plan, r, S);
+    const v = lay.cuts.reduce((m, c) => Math.min(m, c.c / c.size), 1);
+    if (v > bs + (best && best.first ? 0.1 : 1e-6)) { bs = v; best = { S, label: C.label + (su || sv ? ' + ' + t('half a tile') : ''), score: v, first: !best }; }
+  }
+  if (best && best.S.at === 'centre' && !best.S.dx && !best.S.dy) best.S = null;
+  return best;
+}
+const FLOOR_SIDES = { left: 'left side', right: 'right side', top: 'top side', bottom: 'bottom side', hole: 'round the opening in the floor' };
+function floorCutsSummary(cuts) {
+  const by = new Map();
+  for (const c of cuts) if (!by.has(c.k) || c.c < by.get(c.k).c) by.set(c.k, c);
+  return ['left', 'right', 'top', 'bottom', 'hole'].filter(k => by.has(k)).map(k => { const c = by.get(k); return { place: t(FLOOR_SIDES[k]), c: c.c, sliver: c.sliver, text: t('{where}: {c} mm', { where: t(FLOOR_SIDES[k]), c: fmtMM(c.c) }) }; });
 }
 
 /* ───────── 3D: tiles, wallpaper ───────── */
@@ -545,21 +858,35 @@ Object.assign(app, {
     const stats = roomFinishStats(plan, r, st);
     sec.appendChild(this.finishTotals(stats));
     el.appendChild(sec);
-    // each wall
+    // each wall; a camera mark on walls with photos of the bare wall (0033), a warning mark on walls with slivers
     const list = h('div', { class: 'face-list' });
+    const viewFaces = roomFaces(plan, r);
+    const viewOf = f => viewFaces.find(g => g.wall.id === f.wall.id && g.side === f.side && Math.min(g.u1, f.u1) - Math.max(g.u0, f.u0) > 0.01) || f;
+    let withPhotos = 0;
     for (const row of stats.faces) {
       const f = row.f, open = sel && sel.face === f.wall.id;
+      const vf = viewOf(f), nPh = wallPhotosOf(this.project, vf).length;
+      if (nPh) withPhotos++;
+      const sliv = row.lay && row.lay.slivers.length;
       const sw = row.fin.tiles && !(row.fin.tiles.to > 0) ? row.fin.tiles.color : row.fin.base === 'paper' && row.fin.paper && projectImage(row.fin.paper.img) ? projectImage(row.fin.paper.img).avg : row.fin.color;
       const what = [];
       if (row.ops.length) what.push(row.ops.map(o => o.kind === 'window' ? t('window') : o.kind === 'door' ? t('door') : t('opening')).join(', '));
       list.appendChild(h('button', { class: 'face-row' + (open ? ' on' : '') + (row.fin.own ? ' own' : ''), 'data-face': f.wall.id, 'aria-expanded': String(!!open), onclick: () => this.select({ ...sel, face: open ? undefined : f.wall.id }) },
         h('span', { class: 'face-letter' }, f.letter),
+        nPh ? h('span', { class: 'wp-mark', title: t('{n} photos of the bare wall', { n: nPh }), 'aria-label': t('{n} photos of the bare wall', { n: nPh }) }, icon('camera'), h('span', { class: 'num' }, String(nPh))) : null,
         h('span', { class: 'face-main' }, h('span', { class: 'face-l1' }, h('span', { class: 'num' }, fmtM(row.len)), ' · ', h('span', { class: 'num' }, fmtArea(row.area)), what.length ? ' · ' + what.join(', ') : ''),
           h('span', { class: 'face-l2' }, row.fin.own ? t('Own finish') + ': ' + finishSummary(row.fin) : t('As the room'))),
+        sliv ? h('span', { class: 'ts-mark', title: t('A sliver of tile on this wall'), 'aria-label': t('A sliver of tile on this wall') }, icon('alert')) : null,
         h('span', { class: 'mini-sw big', style: { background: sw } })));
-      if (open) list.appendChild(this.faceEditor(r, row, ro, st, plan));
+      if (open) {
+        const ed = this.faceEditor(r, row, ro, st, plan);
+        // the open wall: its photos under its editor
+        ed.appendChild(this.wallPhotoStrip(vf, () => this.renderInspector()));
+        list.appendChild(ed);
+      }
     }
     if (!stats.faces.length) list.appendChild(h('p', { class: 'note-muted' }, t('No walls found along this room. Its corners should lie on the faces of the walls.')));
+    if (stats.faces.length) list.appendChild(h('p', { class: 'note-muted wp-count-line', id: 'wp-count' }, icon('camera'), ' ', t('{k} of {n} walls have photos of the bare wall', { k: withPhotos, n: stats.faces.length })));
     if (stats.faces.length) list.appendChild(h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'f-wall-views', onclick: () => this.wallViewsSheet(r) }, icon('wall'), t('Wall views (tiles, sockets, kitchen)'))));
     el.appendChild(h('div', { class: 'insp-sec' }, h('div', { class: 'eyebrow' }, t('Each wall'), h('span', { class: 'eyebrow-note' }, t('letters on the plan'))), list));
   },
@@ -572,7 +899,8 @@ Object.assign(app, {
       stats.tiled > 0 ? h('dt', null, t('Paint or paper')) : null, stats.tiled > 0 ? h('dd', null, fmtArea(stats.cover)) : null));
     for (const x of stats.tiles) box.appendChild(h('div', { class: 'tile-count' }, icon('grid'),
       h('span', null, h('strong', null, t('{n} tiles', { n: x.tiles })), ' · ' + tileLabel(x.T), h('br'),
-        h('small', null, t('{a} of wall, with {w} % extra: {m} of tiles', { a: fmtArea(x.area), w: x.T.waste ?? 0, m: fmtArea(x.m2) })))));
+        h('small', null, t('{a} of wall, with {w} % extra: {m} of tiles', { a: fmtArea(x.area), w: x.T.waste ?? 0, m: fmtArea(x.m2) })),
+        x.grid ? h('small', { class: 'tile-pieces' }, h('br'), t('From the grid of each wall: {w} whole and {c} cut pieces', { w: x.whole, c: x.cut })) : null)));
     box.appendChild(h('p', { class: 'note-muted' }, t('Without doors, windows and openings, up to the ceiling.')));
     return box;
   },
@@ -599,8 +927,15 @@ Object.assign(app, {
     }, ro, 'face-mode'));
     if (row.fin.own) this.finishControls(box, row.fin, setFace, ro, 'ff');
     if (row.fin.tiles && row.tArea > 0) {
-      const c = tileCount(row.tArea, row.fin.tiles);
-      box.appendChild(h('div', { class: 'tile-count' }, icon('grid'), h('span', null, h('strong', null, t('{n} tiles', { n: c.tiles })), ' ' + t('on this wall'), h('br'), h('small', null, t('{a} of wall, with {w} % extra: {m} of tiles', { a: fmtArea(row.tArea), w: row.fin.tiles.waste ?? 0, m: fmtArea(c.m2) })))));
+      const L0 = row.lay, c = tileCount(row.tArea, row.fin.tiles, L0 ? L0.count.whole + L0.count.cut : null);
+      box.appendChild(h('div', { class: 'tile-count' }, icon('grid'), h('span', null, h('strong', null, t('{n} tiles', { n: c.tiles })), ' ' + t('on this wall'), h('br'),
+        h('small', null, L0 ? t('{w} whole and {c} cut pieces, with {p} % extra', { w: L0.count.whole, c: L0.count.cut, p: row.fin.tiles.waste ?? 0 }) : t('{a} of wall, with {w} % extra: {m} of tiles', { a: fmtArea(row.tArea), w: row.fin.tiles.waste ?? 0, m: fmtArea(c.m2) })))));
+      if (L0) {
+        const list = cutsSummary(L0.cuts);
+        box.appendChild(h('p', { class: 'note-muted ts-cuts' }, (L0.start ? t('Tiles start: chosen') : t('Tiles start: centred, whole rows from the floor')) + (list.length ? ' · ' + list.map(x => x.text).join(' · ') : '')));
+        for (const x of list.filter(q => q.sliver)) box.appendChild(h('p', { class: 'wv-warn' }, icon('alert'), ' ', t('{where} {c} mm is a sliver (under ⅓ tile)', { where: x.place.charAt(0).toUpperCase() + x.place.slice(1), c: fmtMM(x.c) })));
+        box.appendChild(h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'ff-tile-start', onclick: () => this.wallViewsSheet(r, { focus: f.letter }) }, icon('grid'), t('Where the tiles start…'))));
+      }
     }
     box.appendChild(h('p', { class: 'note-muted' }, t('Tip: in 3D (Build), tap a wall inside a room to open it here.')));
     return box;
@@ -639,8 +974,11 @@ Object.assign(app, {
     for (const f of faces) {
       const fin = faceFinish(w, f.room);
       const letter = (roomFaces(v.plan, f.room).find(x => x.wall.id === w.id && Math.abs(x.u0 - f.u0) < 0.01) || {}).letter || '';
+      const vf = roomFaces(v.plan, f.room).find(x => x.wall.id === w.id && Math.abs(x.u0 - f.u0) < 0.01) || f;
+      const nPh = wallPhotosOf(this.project, vf).length;
       box.appendChild(h('button', { class: 'face-row', 'data-room': f.room.id, onclick: () => this.select({ type: 'room', id: f.room.id, storey: w.storey, face: w.id }) },
         h('span', { class: 'face-letter' }, letter),
+        nPh ? h('span', { class: 'wp-mark', 'aria-label': t('{n} photos of the bare wall', { n: nPh }) }, icon('camera'), h('span', { class: 'num' }, String(nPh))) : null,
         h('span', { class: 'face-main' }, h('span', { class: 'face-l1' }, t('Side of {r}', { r: f.room.name })), h('span', { class: 'face-l2' }, (fin.own ? t('Own finish') + ': ' : t('As the room') + ': ') + finishSummary(fin))),
         h('span', { class: 'mini-sw big', style: { background: fin.tiles && !(fin.tiles.to > 0) ? fin.tiles.color : fin.color } })));
     }
@@ -798,6 +1136,9 @@ function finishChanges(ra, rb, A, B) {
   if ((ra.wallBase === 'paper' || rb.wallBase === 'paper') && JSON.stringify(ra.wallPaper || null) !== JSON.stringify(rb.wallPaper || null)) ch.push({ field: 'Wallpaper', from: paperLabel(ra.wallPaper), to: paperLabel(rb.wallPaper) });
   if (JSON.stringify(ra.tiles || null) !== JSON.stringify(rb.tiles || null)) ch.push({ field: 'Wall tiles', from: tilesSummary(ra.tiles), to: tilesSummary(rb.tiles) });
   const own = (P, r) => P.walls.filter(w => w.fin && w.fin[r.id]).map(w => w.id + ':' + JSON.stringify(w.fin[r.id])).sort();
+  const starts = (P, r) => P.walls.filter(w => w.tileStart && w.tileStart[r.id]).map(w => w.id + ':' + JSON.stringify(w.tileStart[r.id])).sort().join('|');
+  if (starts(A, ra) !== starts(B, rb)) ch.push({ field: 'Where the wall tiles start', from: '', to: t('changed') });
+  if (JSON.stringify((ra.floor && ra.floor.start) || null) !== JSON.stringify((rb.floor && rb.floor.start) || null)) ch.push({ field: 'Where the floor tiles start', from: '', to: t('changed') });
   const oa = own(A, ra), ob = own(B, rb);
   if (oa.join('|') !== ob.join('|')) ch.push({ field: 'Walls with their own finish', from: String(oa.length), to: String(ob.length) + (oa.length === ob.length ? ' (' + t('changed') + ')' : '') });
   if ((ra.ceilingColor || CEIL_DEFAULT).toLowerCase() !== (rb.ceilingColor || CEIL_DEFAULT).toLowerCase()) ch.push({ field: 'Ceiling colour', from: ra.ceilingColor || CEIL_DEFAULT, to: rb.ceilingColor || CEIL_DEFAULT, swatch: true });

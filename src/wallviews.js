@@ -1,7 +1,8 @@
 /* ───────────── wallviews.js — wall views per room (wandaanzichten) ─────────────
    Every wall of a room drawn flat, as you see it standing in the room: its length and height (up to the ceiling,
    under a sloped roof), doors and windows with their sizes and positions, the tiles laid out with the joints and
-   where the cut tiles fall (the layout centred on the wall, whole rows from the floor), the sockets, switches,
+   where the cut tiles fall (from the start chosen per wall – centred, whole rows from the floor unless chosen –
+   with the narrowest cut at each place and slivers marked, task 0036), the sockets, switches,
    water points and other things on it at their height and distance from the left corner, the kitchen units
    standing against it (the kitchen builder's front view), and the dimensions. Room details → Walls → "Wall views";
    one tap makes a PDF with a page per wall for the tiler, the electrician and the kitchen supplier. */
@@ -32,7 +33,7 @@ function tileFall(T, L, top) {
 }
 
 /** everything on one wall of a room → plain data in the view's own coordinates (x from the left corner, y up) */
-function wallViewData(app0, plan, f, st, items) {
+function wallViewData(app0, plan, f, st, items, S) {
   const fr = faceFrame(f), w = f.wall, H = wallHeight(w, st), ch = roomCeilH(f.room, st);
   const L = fr.L, N = Math.max(2, Math.ceil(L / 0.1));
   const top = [];
@@ -49,7 +50,7 @@ function wallViewData(app0, plan, f, st, items) {
   let tiles = null;
   if (fin.tiles) {
     const T = fin.tiles, tt = T.to > 0 ? Math.min(T.to, maxH) : maxH;
-    tiles = { T, top: tt, fall: tileFall(T, L, tt) };
+    tiles = { T, top: tt, fall: tileFall(T, L, tt), lay: faceTileLayout(plan, f, st, S, fin) };
   }
   // things on this side of the wall (sockets, switches …) and units standing against it
   const pts = [];
@@ -91,7 +92,30 @@ function wallViewData(app0, plan, f, st, items) {
     const xc = fr.ex(fr.uOf([it.x, it.y])), xr = fr.ex(fr.uOf(furnToPlan(it, [it.w / 2, 0])));
     runs.push({ it, xc, flip: xr < xc, x0: xc - it.w / 2, x1: xc + it.w / 2 });
   }
-  return { f, L, maxH, ch, top, ops, tiles, pts, runs, fin, letter: f.letter };
+  return { f, L, maxH, ch, top, ops, tiles, pts, runs, fin, letter: f.letter, fixtures: wallFixtures(f, items, st) };
+}
+
+/** the bath, shower and washbasins standing against a wall face: where they are along it and how high the bath is */
+function wallFixtures(f, items, st) {
+  const fr = faceFrame(f), w = f.wall, out = [];
+  for (const it of items || []) {
+    if (it.storey !== f.room.storey) continue;
+    const kind = furnType(it).kind;
+    if (kind !== 'bath' && kind !== 'shower' && kind !== 'vanity') continue;
+    const cs = furnCorners(it);
+    let near = false;
+    for (let i = 0; i < 4; i++) {
+      const p = cs[i], q = cs[(i + 1) % 4], e = V.sub(q, p), el = V.len(e);
+      if (el < 0.05 || Math.abs(V.cross(e, fr.d)) / el > 0.05) continue;
+      const o1 = V.dot(V.sub(p, w.a), fr.n) - fr.faceOff, o2 = V.dot(V.sub(q, w.a), fr.n) - fr.faceOff;
+      if (Math.abs(o1) < 0.12 && Math.abs(o2) < 0.12) near = true;
+    }
+    const u = fr.uOf([it.x, it.y]);
+    if (!near || u < f.u0 || u > f.u1) continue;
+    const top = kind === 'bath' ? furnZ(it, roomCeilH(f.room, st)) + (it.h || 0) : 0;
+    out.push({ it, kind, name: furnName(it), xc: fr.ex(u), top });
+  }
+  return out.sort((a, b) => a.xc - b.xc);
 }
 
 /** the view as an SVG in metres (y up = negative) */
@@ -107,21 +131,14 @@ function wallViewSvg(D, opts = {}) {
   svg.appendChild(s('path', { d: wallPath, class: 'wv-wall' }));
   // the tiles (behind the openings)
   if (D.tiles) {
-    const { T, top, fall } = D.tiles, clipId = 'wvc-' + D.letter + '-' + Math.round(Math.random() * 1e6);
+    const { T, top } = D.tiles, clipId = 'wvc-' + D.letter + '-' + Math.round(Math.random() * 1e6);
     const cp = s('clipPath', { id: clipId }); cp.appendChild(s('path', { d: wallPath })); svg.appendChild(cp);
     const g = s('g', { 'clip-path': `url(#${clipId})` });
     g.appendChild(s('rect', { x: 0, y: Y(top), width: X(L), height: X(top), class: 'wv-grout', fill: T.grout || '#C9C4BA' }));
-    const { M, MH, side } = fall;
-    const rows = Math.ceil(top / MH);
-    for (let r = 0; r < rows; r++) {
-      const y0 = r * MH, y1 = Math.min(top, y0 + T.h);
-      const off = T.lay === 'half' && r % 2 ? M / 2 : 0;
-      for (let x = side + off - M * Math.ceil((side + off) / M); x < L; x += M) {
-        const a = Math.max(0, x), b = Math.min(L, x + T.w);
-        if (b - a < 0.001) continue;
-        const cut = b - a < T.w - 0.001 || y1 - y0 < T.h - 0.001;
-        g.appendChild(s('rect', { x: X(a), y: Y(y1), width: X(b - a), height: X(y1 - y0), class: 'wv-tile' + (cut ? ' cut' : ''), fill: T.color || '#E9E6DF' }));
-      }
+    // the pieces of the grid from the wall's start: cut pieces lighter, slivers (under a third of a tile) marked
+    for (const P of D.tiles.lay.count.pieces) {
+      const sl = P.cut && ((P.x1 - P.x0) < T.w * SLIVER - 1e-6 || (P.y1 - P.y0) < T.h * SLIVER - 1e-6);
+      g.appendChild(s('rect', { x: X(P.x0), y: Y(P.y1), width: X(P.x1 - P.x0), height: X(P.y1 - P.y0), class: 'wv-tile' + (P.cut ? ' cut' : '') + (sl ? ' sliver' : ''), fill: T.color || '#E9E6DF' }));
     }
     svg.appendChild(g);
     svg.appendChild(s('line', { x1: 0, y1: Y(top), x2: X(L), y2: Y(top), class: 'wv-tiletop' }));
@@ -173,18 +190,61 @@ function wallViewSvg(D, opts = {}) {
     svg.appendChild(s('line', { x1: X(xr), y1: 0, x2: X(xr), y2: Y(top), class: 'wv-dim' }));
     for (const y of [0, top]) svg.appendChild(s('line', { x1: X(xr - 0.025), y1: Y(y - 0.025), x2: X(xr + 0.025), y2: Y(y + 0.025), class: 'wv-dim' }));
     txt(xr + 0.05, top / 2, fmtMM(top), 'wv-dimt wv-vert wv-tilenote', 'middle', fs * 0.85).setAttribute('transform', `rotate(-90 ${X(xr + 0.05)} ${Y(top / 2)})`);
+    // the cut at each corner, just above the tiles
+    const cuts = D.tiles.lay.cuts, yl = Math.min(top + 0.05, maxH + 0.12);
+    for (const k of ['left', 'right']) {
+      const c = cuts.find(x => x.k === k);
+      if (c) txt(k === 'left' ? 0.02 : L - 0.02, yl, fmtMM(c.c), 'wv-cutt' + (c.sliver ? ' warn' : ''), k === 'left' ? 'start' : 'end', fs * 0.8);
+    }
   }
   txt(-pad + 0.04, maxH + 0.3, t('Wall {l}', { l: D.letter }) + '  ·  ' + fmtMM(L) + ' mm', 'wv-title', 'start', fs * 1.25);
   return svg;
 }
 
-/** for the tiler: how high, where cut */
+/** for the tiler: how high, where cut (the narrowest cut at each place) */
 function wallViewTileNote(D) {
   if (!D.tiles) return '';
-  const F = D.tiles.fall, notes = [t('tiles to {h} mm', { h: fmtMM(D.tiles.top) })];
-  if (F.cut > 0.002) notes.push(t('cut at both ends: {c} mm', { c: fmtMM(F.cut) }));
-  if (F.topCut) notes.push(t('top row: {c} mm', { c: fmtMM(F.topCut) }));
+  const lay = D.tiles.lay, notes = [t('tiles to {h} mm', { h: fmtMM(D.tiles.top) })];
+  const cl = lay.cuts.filter(c => c.k === 'left').reduce((m, c) => Math.min(m, c.c), Infinity), cr = lay.cuts.filter(c => c.k === 'right').reduce((m, c) => Math.min(m, c.c), Infinity);
+  let list = cutsSummary(lay.cuts);
+  if (isFinite(cl) && Math.abs(cl - cr) < 0.0005) { notes.push(t('cut at both ends: {c} mm', { c: fmtMM(cl) })); list = list.filter(x => x.place !== t('left corner') && x.place !== t('right corner')); }
+  notes.push(...list.map(x => x.text));
   return tileLabel(D.tiles.T) + ' · ' + notes.join(' · ');
+}
+/** the slivers of a wall, and what to try instead → { lines, best } */
+function wallViewWarnings(D, plan, st) {
+  if (!D.tiles || !D.tiles.lay.slivers.length) return { lines: [], best: null };
+  const best = bestTileStart(plan, D.f, st, D.fixtures);
+  const cur = D.tiles.lay.cuts.reduce((m, c) => Math.min(m, c.c / c.size), 1);
+  const by = new Map();
+  for (const c of D.tiles.lay.slivers) { const k = cutPlace(c); if (!by.has(k) || c.c < by.get(k).c) by.set(k, c); }
+  const tryIt = best && best.score > cur + 0.01 ? ' – ' + t('try {what}', { what: [best.S && best.S.x && best.S.x !== 'centre' || (best.S && best.S.dx) ? best.labelX : null, best.S && best.S.y ? best.labelY : null].filter(Boolean).join(', ') || t('Centre of the wall') }) : '';
+  const lines = [...by.entries()].map(([k, c]) => t('{where} {c} mm is a sliver (under ⅓ tile)', { where: k.charAt(0).toUpperCase() + k.slice(1), c: fmtMM(c.c) }) + tryIt);
+  return { lines, best };
+}
+
+/** a room's tiled floor seen from above (as in the plan): the tiles from its start, cut pieces lighter, slivers marked */
+function floorViewSvg(r, lay, plan, opts = {}) {
+  const bb = bboxOfPoints(r.poly), pad = 0.3, fs = opts.fs || 0.075;
+  const W = bb.maxX - bb.minX, H = bb.maxY - bb.minY;
+  const svg = s('svg', { class: 'wv wv-floorsvg', viewBox: [bb.minX - pad, bb.minY - pad - 0.12, W + 2 * pad, H + 2 * pad + 0.12].map(v => +v.toFixed(3)).join(' '), role: 'img', 'aria-label': t('Floor tiles') });
+  const path = 'M' + r.poly.map(q => q[0].toFixed(4) + ' ' + q[1].toFixed(4)).join('L') + 'Z';
+  const clipId = 'wvf-' + Math.round(Math.random() * 1e6);
+  const cp = s('clipPath', { id: clipId }); cp.appendChild(s('path', { d: path })); svg.appendChild(cp);
+  svg.appendChild(s('path', { d: path, class: 'wv-wall' }));
+  const g = s('g', { 'clip-path': `url(#${clipId})` });
+  g.appendChild(s('path', { d: path, class: 'wv-grout', fill: lay.F.grout }));
+  const { tu, tv } = lay.G;
+  for (const P of lay.count.pieces) {
+    const sl = P.cut && ((P.x1 - P.x0) < tu * SLIVER - 1e-6 || (P.y1 - P.y0) < tv * SLIVER - 1e-6);
+    const [x, y, w, hh] = lay.turn ? [P.y0, P.x0, P.y1 - P.y0, P.x1 - P.x0] : [P.x0, P.y0, P.x1 - P.x0, P.y1 - P.y0];
+    g.appendChild(s('rect', { x: +x.toFixed(4), y: +y.toFixed(4), width: +w.toFixed(4), height: +hh.toFixed(4), class: 'wv-tile' + (P.cut ? ' cut' : '') + (sl ? ' sliver' : ''), fill: lay.F.color }));
+  }
+  svg.appendChild(g);
+  for (const hl of roomHoles(plan, r) || []) svg.appendChild(s('path', { d: 'M' + hl.map(q => q[0].toFixed(4) + ' ' + q[1].toFixed(4)).join('L') + 'Z', class: 'wv-hole' }));
+  svg.appendChild(s('path', { d: path, class: 'wv-floor-edge' }));
+  svg.appendChild(s('text', { x: +(bb.minX - pad + 0.04).toFixed(3), y: +(bb.minY - 0.16).toFixed(3), class: 'wv-t wv-title', 'text-anchor': 'start', 'font-size': fs * 1.25 }, t('Floor') + '  ·  ' + fmtMM(W) + ' × ' + fmtMM(H) + ' mm'));
+  return svg;
 }
 
 /** the list of things on the wall, for the electrician: what, how high, how far from the left corner */
@@ -193,30 +253,176 @@ function wallViewRows(D) {
 }
 
 Object.assign(app, {
-  /** the data of every wall of a room, in the shown version */
-  roomWallViews(r) {
+  /** the data of every wall of a room, in the shown version (S: a start to try on the wall with that letter) */
+  roomWallViews(r, letter, S) {
     const v = this.shownVersion(), plan = v.plan, st = getStorey(this.project, r.storey);
     const lay = this.activeLayout ? this.activeLayout() : null;
-    return roomFaces(plan, r).map(f => wallViewData(this, plan, f, st, lay ? lay.items : []));
+    const rr = plan.rooms.find(x => x.id === r.id) || r;
+    return roomFaces(plan, rr).filter(f => !letter || f.letter === letter).map(f => wallViewData(this, plan, f, st, lay ? lay.items : [], letter && S !== undefined ? S : undefined));
   },
-  /** Room details → Walls → "Wall views" */
-  wallViewsSheet(r) {
+  /** Room details → Walls → "Wall views"; opts.focus: a wall's letter or 'floor' to scroll to */
+  wallViewsSheet(r, opts = {}) {
     const views = this.roomWallViews(r);
+    const ro = !this.canEdit() || !!this.project.viewer;
     const body = h('div', { class: 'wv-body', id: 'wv-body' });
     if (!views.length) body.appendChild(h('p', { class: 'note-muted' }, t('No walls found along this room. Its corners should lie on the faces of the walls.')));
-    for (const D of views) {
-      const card = h('div', { class: 'wv-card', 'data-letter': D.letter });
-      card.appendChild(wallViewSvg(D));
-      if (D.tiles) card.appendChild(h('p', { class: 'wv-tilenote-line note-muted' }, wallViewTileNote(D)));
-      const rows = wallViewRows(D);
+    for (const D0 of views) {
+      const card = h('div', { class: 'wv-card', 'data-letter': D0.letter });
+      const draw = h('div', { class: 'wv-draw' }), info = h('div', { class: 'wv-tileinfo' });
+      card.append(draw, info);
+      this.wallViewCard(r, D0, draw, info, ro);
+      const rows = wallViewRows(D0);
       if (rows.length) card.appendChild(h('table', { class: 'wv-table' },
         h('thead', null, h('tr', null, h('th', null, t('On this wall')), h('th', null, t('Height')), h('th', null, t('From the left corner')))),
         h('tbody', null, ...rows.map(x => h('tr', null, h('td', null, x.what), h('td', { class: 'num' }, x.h), h('td', { class: 'num' }, x.x))))));
-      card.appendChild(this.wallPhotoStrip(D.f));
+      card.appendChild(this.wallPhotoStrip(D0.f));
       body.appendChild(card);
     }
-    UI.dialog({ title: t('Wall views · {r}', { r: r.name }), body, wide: true,
+    const fcard = this.floorTileCard(r, ro);
+    if (fcard) body.appendChild(fcard);
+    // (Enter in a field of the tiles' start only stores it – it does not press the PDF button)
+    const p = UI.dialog({ title: t('Wall views · {r}', { r: r.name }), body, wide: true, enterKey: false,
       actions: [{ label: t('Close'), value: null }, { label: t('PDF for the tiler, electrician and kitchen supplier'), icon: 'download', kind: 'primary', validate: async () => { await this.wallViewsPdf(r); return false; } }] });
+    // the dialog puts the focus in its first field (and scrolls there): not here – open at the top, or at the wall asked for
+    setTimeout(() => {
+      if (document.activeElement && body.contains(document.activeElement)) document.activeElement.blur();
+      const c = body.querySelector(opts.focus ? `.wv-card[data-letter="${opts.focus}"]` : '.wv-card');
+      if (c) c.scrollIntoView({ block: 'start' });
+    }, 80);
+    return p;
+  },
+  /** one wall's drawing and its tiles: the cuts, slivers, and where the tiles start (task 0036); repaints itself */
+  wallViewCard(r, D, draw, info, ro) {
+    const plan = this.shownVersion().plan, st = getStorey(this.project, r.storey), letter = D.letter;
+    draw.textContent = ''; info.textContent = '';
+    draw.appendChild(wallViewSvg(D));
+    if (!D.tiles) return;
+    const lay = D.tiles.lay, S = lay.start || {};
+    info.appendChild(h('p', { class: 'wv-tilenote-line note-muted' }, wallViewTileNote(D)));
+    info.appendChild(h('p', { class: 'wv-count note-muted' }, icon('grid'), ' ', t('On this wall: {w} whole tiles and {c} cut pieces', { w: lay.count.whole, c: lay.count.cut })));
+    const W = wallViewWarnings(D, plan, st);
+    for (const line of W.lines) info.appendChild(h('p', { class: 'wv-warn' }, icon('alert'), ' ', line));
+    // the start: across, a nudge, the rows; Best start
+    const save = S2 => {
+      const c = cleanTileStart(S2), fid = D.f.wall.id, rid = r.id;
+      this.mutate(pl => {
+        const ww = pl.walls.find(x => x.id === fid);
+        if (!ww) return;
+        if (c) ww.tileStart = { ...(ww.tileStart || {}), [rid]: c };
+        else if (ww.tileStart) { delete ww.tileStart[rid]; if (!Object.keys(ww.tileStart).length) delete ww.tileStart; }
+      }, { keepInspector: true });
+      const D2 = this.roomWallViews(r, letter)[0];
+      if (D2) this.wallViewCard(r, D2, draw, info, ro);
+      return D2;
+    };
+    const ch = tileStartChoices(lay, D.fixtures);
+    const xKey = !S.x || S.x === 'centre' ? 'centre' : S.x === 'left' || S.x === 'right' ? S.x : (ch.xs.find(c => c.S.x === 'at' && Math.abs(c.S.at - S.at) < 0.0015) || { key: 'kept' }).key;
+    const xs = ch.xs.map(c => h('option', { value: c.key, selected: c.key === xKey }, c.label));
+    if (xKey === 'kept') xs.push(h('option', { value: 'kept', selected: true }, t('Centre on a line at {x} mm', { x: fmtMM(S.at) })));
+    const selX = h('select', { class: 'select ts-x', id: 'ts-x-' + letter, disabled: ro }, ...xs);
+    selX.addEventListener('change', () => {
+      const c = ch.xs.find(x => x.key === selX.value);
+      if (!c) return;
+      let X = { ...c.S };
+      // on a window, door or fixture: a tile or a joint on its centre line, whichever cuts less
+      if (X.x === 'at') {
+        const a = faceTileLayout(plan, D.f, st, { ...S, ...X, joint: false, dx: 0 }), b = faceTileLayout(plan, D.f, st, { ...S, ...X, joint: true, dx: 0 });
+        const sc = L2 => L2.cuts.filter(q => /^(left|right)$|-[lr]$/.test(q.k)).reduce((m, q) => Math.min(m, q.c / q.size), 1);
+        if (sc(b) > sc(a) + 1e-6) X.joint = true;
+      }
+      save({ ...S, x: X.x, at: X.at, joint: X.joint, ref: X.ref, dx: 0 });
+    });
+    const dx = h('input', { class: 'input num ts-dx', id: 'ts-dx-' + letter, type: 'text', value: String(Math.round((+S.dx || 0) * 1000)), disabled: ro, autocomplete: 'off', 'aria-label': t('Shift (mm)') });
+    const setDx = v => { if (isFinite(v)) save({ ...S, dx: clamp(v, -5000, 5000) / 1000 }); };
+    dx.addEventListener('change', () => setDx(parseFloat(dx.value.replace(',', '.'))));
+    dx.addEventListener('keydown', e => { if (e.key === 'Enter') dx.blur(); });
+    const step = d => h('button', { class: 'btn sm ts-step', type: 'button', disabled: ro, 'data-d': String(d), 'aria-label': d < 0 ? t('10 mm to the left') : t('10 mm to the right'), onclick: () => setDx(Math.round((+S.dx || 0) * 1000) + d) }, d < 0 ? '◀' : '▶');
+    const yKey = S.y === 'top' ? 'top' : S.y === 'at' ? ((ch.ys.find(c => c.S.y === 'at' && Math.abs(c.S.yh - S.yh) < 0.0015) || { key: 'height' }).key) : 'floor';
+    const selY = h('select', { class: 'select ts-y', id: 'ts-y-' + letter, disabled: ro }, ...ch.ys.map(c => h('option', { value: c.key, selected: c.key === yKey }, c.label)), h('option', { value: 'height', selected: yKey === 'height' }, t('Whole row from a height I type')));
+    selY.addEventListener('change', () => {
+      if (selY.value === 'height') { save({ ...S, y: 'at', yh: S.yh > 0 ? S.yh : 0.6, yref: null }); return; }
+      const c = ch.ys.find(x => x.key === selY.value);
+      if (c) save({ ...S, y: c.S.y, yh: c.S.yh, yref: c.S.yref });
+    });
+    const box = h('div', { class: 'ts-box' },
+      h('div', { class: 'field' }, h('label', { for: 'ts-x-' + letter }, t('Tiles start across')), selX),
+      h('div', { class: 'field' }, h('label', { for: 'ts-dx-' + letter }, t('Shift')), h('div', { class: 'ts-nudge' }, step(-10), h('div', { class: 'input-unit' }, dx, h('span', { class: 'unit' }, 'mm')), step(10))),
+      h('div', { class: 'field' }, h('label', { for: 'ts-y-' + letter }, t('Rows')), selY));
+    if (yKey === 'height') box.appendChild(this.mmField(t('Whole row from'), 'ts-yh-' + letter, S.yh, v => save({ ...S, y: 'at', yh: clamp(v, 0.01, 6), yref: null }), { disabled: ro }));
+    if (!ro) box.appendChild(h('div', { class: 'actions' }, h('button', { class: 'btn sm primary ts-best', id: 'ts-best-' + letter, type: 'button', onclick: () => { const B = bestTileStart(plan, D.f, st, D.fixtures); if (!B) return; const D2 = save(B.S || {}); const cs = D2 && D2.tiles ? D2.tiles.lay.cuts : []; this.toast(cs.length ? t('Best start: the smallest cut is now {c} mm.', { c: fmtMM(Math.min(...cs.map(c => c.c))) }) : t('Best start: no cut tiles.')); } }, icon('check'), t('Best start')),
+      h('span', { class: 'note-muted ts-drag-hint' }, t('or drag the tiles sideways'))));
+    info.appendChild(box);
+    // drag the tiles sideways in the drawing: a live preview, kept when let go
+    if (ro) return;
+    draw.style.touchAction = 'pan-y';
+    let drag = null;
+    draw.onpointerdown = e => {
+      if (e.button) return;
+      const svg = draw.querySelector('svg'), m = svg && svg.getScreenCTM();
+      if (!m) return;
+      drag = { x: e.clientX, k: m.a, dx0: +S.dx || 0, on: false, S: null, id: e.pointerId };
+    };
+    draw.onpointermove = e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const d = (e.clientX - drag.x) / drag.k;
+      if (!drag.on && Math.abs(e.clientX - drag.x) < 6) return;
+      if (!drag.on) { drag.on = true; try { draw.setPointerCapture(e.pointerId); } catch (_) { /* gone */ } draw.classList.add('dragging'); }
+      drag.S = { ...S, dx: Math.round((drag.dx0 + d) * 1000) / 1000 };
+      const D2 = this.roomWallViews(r, letter, drag.S)[0];
+      if (D2) { draw.textContent = ''; draw.appendChild(wallViewSvg(D2)); }
+    };
+    const end = e => {
+      if (!drag) return;
+      const d = drag; drag = null;
+      draw.classList.remove('dragging');
+      if (d.on && d.S && e.type === 'pointerup') save(d.S); else if (d.on) this.wallViewCard(r, D, draw, info, ro);
+    };
+    draw.onpointerup = end; draw.onpointercancel = end;
+  },
+  /** the room's tiled floor: the grid from its start, cut pieces, slivers, the count, where the tiles start */
+  floorTileCard(r, ro, card) {
+    const plan = this.shownVersion().plan, rr = plan.rooms.find(x => x.id === r.id) || r;
+    const lay = floorTileLayout(plan, rr);
+    if (!lay) return card ? (card.remove(), null) : null;
+    card = card || h('div', { class: 'wv-card wv-floor', 'data-letter': 'floor' });
+    card.textContent = '';
+    card.appendChild(h('div', { class: 'wv-draw' }, floorViewSvg(rr, lay, plan)));
+    const S = lay.start || {};
+    const waste = (qtySettings(this.project).floorWaste[lay.F.material] ?? 10);
+    const n = Math.ceil((lay.count.whole + lay.count.cut) * (1 + waste / 100) - 1e-9);
+    const list = floorCutsSummary(lay.cuts);
+    card.appendChild(h('p', { class: 'wv-tilenote-line note-muted' }, `${t('Floor tiles')} · ${fmtMM(lay.F.l)} × ${fmtMM(lay.F.w)} mm` + (list.length ? ' · ' + list.map(x => x.text).join(' · ') : '')));
+    card.appendChild(h('p', { class: 'wv-count note-muted' }, icon('grid'), ' ', t('{n} floor tiles: {w} whole and {c} cut pieces, with {p} % extra', { n, w: lay.count.whole, c: lay.count.cut, p: waste })));
+    const best = lay.slivers.length ? bestFloorStart(plan, rr) : null;
+    const cur = lay.cuts.reduce((m, c) => Math.min(m, c.c / c.size), 1);
+    for (const x of list.filter(q => q.sliver)) card.appendChild(h('p', { class: 'wv-warn' }, icon('alert'), ' ', t('{where} {c} mm is a sliver (under ⅓ tile)', { where: x.place.charAt(0).toUpperCase() + x.place.slice(1), c: fmtMM(x.c) }) + (best && best.score > cur + 0.01 ? ' – ' + t('try {what}', { what: best.label }) : '')));
+    const save = S2 => {
+      const rid = r.id;
+      this.mutate(pl => {
+        const q = pl.rooms.find(x => x.id === rid);
+        if (!q || !q.floor) return;
+        const c = S2 && (S2.at && S2.at !== 'centre' || +S2.dx || +S2.dy) ? { at: S2.at || 'centre', ...(S2.at === 'door' ? { p: S2.p, n: S2.n } : {}), ...(+S2.dx ? { dx: +(+S2.dx).toFixed(4) } : {}), ...(+S2.dy ? { dy: +(+S2.dy).toFixed(4) } : {}) } : null;
+        if (c) q.floor.start = c; else delete q.floor.start;
+      }, { keepInspector: true });
+      this.floorTileCard(r, ro, card);
+    };
+    const ch = floorStartChoices(plan, rr);
+    const key = !S.at || S.at === 'centre' ? 'centre' : S.at === 'door' ? ((ch.find(c => c.S.at === 'door' && S.p && Math.hypot(c.S.p[0] - S.p[0], c.S.p[1] - S.p[1]) < 0.01) || { key: 'centre' }).key) : S.at;
+    const sel = h('select', { class: 'select fs-at', id: 'fs-at', disabled: ro }, ...ch.map(c => h('option', { value: c.key, selected: c.key === key }, c.label)));
+    sel.addEventListener('change', () => { const c = ch.find(x => x.key === sel.value); if (c) save({ ...c.S }); });
+    const nud = (k, lab) => {
+      const inp = h('input', { class: 'input num fs-' + k, id: 'fs-' + k, type: 'text', value: String(Math.round((+S[k] || 0) * 1000)), disabled: ro, autocomplete: 'off' });
+      const set = v => { if (isFinite(v)) save({ ...S, [k]: clamp(v, -5000, 5000) / 1000 }); };
+      inp.addEventListener('change', () => set(parseFloat(inp.value.replace(',', '.'))));
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); });
+      const b = (d, txt) => h('button', { class: 'btn sm ts-step', type: 'button', disabled: ro, onclick: () => set(Math.round((+S[k] || 0) * 1000) + d) }, txt);
+      return h('div', { class: 'field' }, h('label', { for: 'fs-' + k }, lab), h('div', { class: 'ts-nudge' }, b(-10, k === 'dx' ? '◀' : '▲'), h('div', { class: 'input-unit' }, inp, h('span', { class: 'unit' }, 'mm')), b(10, k === 'dx' ? '▶' : '▼')));
+    };
+    const box = h('div', { class: 'ts-box' }, h('div', { class: 'field' }, h('label', { for: 'fs-at' }, t('Floor tiles start')), sel), nud('dx', t('Shift left–right')), nud('dy', t('Shift up–down')));
+    if (!ro) box.appendChild(h('div', { class: 'actions' }, h('button', { class: 'btn sm primary ts-best', id: 'fs-best', type: 'button', onclick: () => { const B = bestFloorStart(plan, rr); if (B) save(B.S); } }, icon('check'), t('Best start'))));
+    card.appendChild(box);
+    card.appendChild(h('p', { class: 'note-muted' }, t('In the plan and in 3D the floor pattern does not follow this start yet.')));
+    return card;
   },
   /** one A4 page (landscape) per wall: the view as a picture, the list of things on it, the house and the date */
   async wallViewsPdf(r) {
@@ -237,7 +443,7 @@ Object.assign(app, {
           const pg = pdf.page(297, 210);
           pg.text(`${p.name} · ${r.name} · ${t('Wall {l}', { l: D.letter })}`, 12, 14, 13, { bold: true });
           pg.text(`${st ? st.name : ''} · ${ver.name} · ${fmtDate(Date.now(), false)} · ${fmtMM(D.L)} mm`, 12, 20, 9, { color: [0.35, 0.38, 0.4] });
-          if (D.tiles) pg.text(wallViewTileNote(D).slice(0, 150), 12, 25, 9, { color: [0.35, 0.38, 0.4] });
+          if (D.tiles) pg.text(wallViewTileNote(D).slice(0, 170), 12, 25, 9, { color: [0.35, 0.38, 0.4] });
           const rows = wallViewRows(D);
           const listH = rows.length ? Math.min(70, 8 + rows.length * 4.6) : 0;
           const top = D.tiles ? 29 : 26, boxW = 273, boxH = 210 - top - 12 - listH;
@@ -267,6 +473,18 @@ Object.assign(app, {
               if (x.text) pp.text(x.text.slice(0, 60), cx, cy + bh + 8.5, 8);
             });
           }
+        }
+        // the tiled floor: one page, its tiles from the start, the cuts at each side
+        const rr = ver.plan.rooms.find(x => x.id === r.id) || r, fl = floorTileLayout(ver.plan, rr);
+        if (fl) {
+          const svg = floorViewSvg(rr, fl, ver.plan, { fs: 0.08 });
+          host.textContent = ''; host.appendChild(svg);
+          const jpeg = await svgJpeg(svg, 2400);
+          const pg = pdf.page(297, 210);
+          pg.text(`${p.name} · ${r.name} · ${t('Floor tiles')}`, 12, 14, 13, { bold: true });
+          pg.text(`${fmtMM(fl.F.l)} × ${fmtMM(fl.F.w)} mm · ` + floorCutsSummary(fl.cuts).map(x => x.text).join(' · ').slice(0, 150), 12, 20, 9, { color: [0.35, 0.38, 0.4] });
+          const k = Math.min(273 / jpeg.w, 172 / jpeg.h);
+          pg.image(jpeg.data, jpeg.pxW, jpeg.pxH, 12 + (273 - jpeg.w * k) / 2, 26, jpeg.w * k, jpeg.h * k);
         }
       } finally { host.remove(); document.documentElement.dataset.theme = theme || ''; if (!theme) delete document.documentElement.dataset.theme; }
       this.downloadBlob(`${slugify(p.name)}_${slugify(r.name)}_${slugify(t('wall views'))}.pdf`, pdf.blob());
@@ -503,49 +721,3 @@ Object.assign(app, {
     return { faces, n: faces.length, withPhotos: faces.filter(f => wallPhotosOf(this.project, f).length).length };
   },
 });
-
-/* room details → Each wall, and a wall's details (the 2D plan's wall pick): a camera mark on walls with photos, the
-   count per room, and the photo strip in the open wall – added after finish.js has drawn those parts */
-{
-  const roomWalls = app.roomWallsSection, wallFinish = app.wallFinishSection;
-  app.roomWallsSection = function (el, r, ro, upd, plan) {
-    roomWalls.call(this, el, r, ro, upd, plan);
-    try {
-      const pl = plan || this.shownVersion().plan;
-      const { faces, n, withPhotos } = this.roomWallPhotoCount(r, pl);
-      if (!n) return;
-      const byLetter = new Map(faces.map(f => [f.letter, f]));
-      const list = el.querySelector('.face-list:last-of-type') || [...el.querySelectorAll('.face-list')].pop();
-      if (!list) return;
-      for (const row of list.querySelectorAll('.face-row')) {
-        const f = byLetter.get((row.querySelector('.face-letter') || {}).textContent);
-        if (!f) continue;
-        const k = wallPhotosOf(this.project, f).length;
-        if (k) row.querySelector('.face-letter').after(h('span', { class: 'wp-mark', title: t('{n} photos of the bare wall', { n: k }), 'aria-label': t('{n} photos of the bare wall', { n: k }) }, icon('camera'), h('span', { class: 'num' }, String(k))));
-        // the open wall: its photos under its editor
-        if (row.classList.contains('on') && row.nextElementSibling && !row.nextElementSibling.classList.contains('face-row')) {
-          row.nextElementSibling.appendChild(this.wallPhotoStrip(f, () => this.renderInspector()));
-        }
-      }
-      const actions = [...list.children].find(c => c.classList.contains('actions'));
-      const line = h('p', { class: 'note-muted wp-count-line', id: 'wp-count' }, icon('camera'), ' ', t('{k} of {n} walls have photos of the bare wall', { k: withPhotos, n }));
-      if (actions) actions.before(line); else list.appendChild(line);
-    } catch (e) { console.error(e); }
-  };
-  app.wallFinishSection = function (el, w) {
-    const before = el.childElementCount;
-    wallFinish.call(this, el, w);
-    try {
-      if (el.childElementCount === before) return;
-      const box = el.lastElementChild, v = this.shownVersion();
-      const faces = wallFaces(v.plan, w.storey).filter(f => f.wall.id === w.id);
-      [...box.querySelectorAll('.face-row')].forEach((row, i) => {
-        const f0 = faces[i];
-        if (!f0) return;
-        const f = roomFaces(v.plan, f0.room).find(x => x.wall.id === w.id && Math.abs(x.u0 - f0.u0) < 0.01) || f0;
-        const k = wallPhotosOf(this.project, f).length;
-        if (k) row.querySelector('.face-letter').after(h('span', { class: 'wp-mark', 'aria-label': t('{n} photos of the bare wall', { n: k }) }, icon('camera'), h('span', { class: 'num' }, String(k))));
-      });
-    } catch (e) { console.error(e); }
-  };
-}

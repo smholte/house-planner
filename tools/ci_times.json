@@ -833,6 +833,13 @@
     "checks": 36
    },
    "note": "task 0031"
+  },
+  "test_hpbake.py": {
+   "made_up": {
+    "seconds": 300.0,
+    "checks": 40
+   },
+   "note": "task 0032"
   }
  },
  "note": "seconds: on the owner's house (measured 12 Nov 2026, tasks 0007a / 0007b, two or three test files at a time); made_up: the same file on the made-up house (public app). ci: what GitHub's runs measured (python3 tools/ci_status.py --record), which tools/ci_groups.py balances by first. checks: the number of checks.",

@@ -23,7 +23,7 @@ LEAVES, MURAL = SHOTS + 'leaves.png', SHOTS + 'mural.jpg'
 leaves(LEAVES); mural(MURAL)
 
 ROOM = "(name) => window.__hp.app.shownVersion().plan.rooms.find(r => r.name === name && r.storey === window.__hp.app.view.storeyId)"
-STATS = "(name) => { const a = window.__hp.app; const r = (" + ROOM + ")(name); const s = window.__hp.roomFinishStats(a.shownVersion().plan, r, a.currentStorey()); return { wall: s.wall, tiled: s.tiled, faces: s.faces.map(x => ({ wall: x.f.wall.id, letter: x.f.letter, len: x.len, area: x.area, tArea: x.tArea, own: x.fin.own, ops: x.ops.length })), tiles: s.tiles.map(x => ({ n: x.tiles, area: x.area, w: x.T.w, h: x.T.h, j: x.T.joint, waste: x.T.waste })) }; }"
+STATS = "(name) => { const a = window.__hp.app; const r = (" + ROOM + ")(name); const s = window.__hp.roomFinishStats(a.shownVersion().plan, r, a.currentStorey()); return { wall: s.wall, tiled: s.tiled, faces: s.faces.map(x => ({ wall: x.f.wall.id, letter: x.f.letter, len: x.len, area: x.area, tArea: x.tArea, own: x.fin.own, ops: x.ops.length })), tiles: s.tiles.map(x => ({ n: x.tiles, area: x.area, w: x.T.w, h: x.T.h, j: x.T.joint, waste: x.T.waste, whole: x.whole, cut: x.cut })) }; }"
 FIN = "([wid, rid]) => { const w = window.__hp.app.shownVersion().plan.walls.find(x => x.id === wid); return w && w.fin ? w.fin[rid] || null : null; }"
 
 def pick_room(pg, name, phone=False):
@@ -77,14 +77,16 @@ def run(p, phone=False, theme='light'):
     gross = sum(f['len'] for f in st['faces']) * H
     check('wall area: around the room × height, less the door and openings', st['wall'] < gross - 0.5 and st['wall'] > gross - 4, (st['wall'], gross))
     T = st['tiles'][0]
-    expect = math.ceil(T['area'] / ((T['w'] + T['j']) * (T['h'] + T['j'])) * 1.1 - 1e-9)
-    check('tile counter: tiles for the tiled area with 10 % extra', T['n'] == expect and T['n'] > 10, (T, expect))
+    # since task 0036 counted from the grid of each wall: every whole tile and cut piece, with 10 % extra
+    expect = math.ceil((T['whole'] + T['cut']) * 1.1 - 1e-9)
+    check('tile counter: whole tiles and cut pieces of the walls’ grids, with 10 % extra', T['n'] == expect and T['n'] > 10 and T['whole'] + T['cut'] >= T['area'] / ((T['w'] + T['j']) * (T['h'] + T['j'])), (T, expect))
     txt = pg.inner_text('.fin-totals')
     check('the counter is shown', f"{T['n']} tiles" in txt, txt)
     # a bigger tile: fewer tiles
     pg.fill('#f-tile-w', '600'); pg.press('#f-tile-w', 'Enter'); pg.wait_for_timeout(600)
     T2 = pg.evaluate(STATS, 'Toilet')['tiles'][0]
-    check('tiles 600 × 600: about half as many', T2['n'] < T['n'] * 0.6 and near(T2['w'], 0.6, 0.001), (T2['n'], T['n']))
+    # (from the grid: in a small room bigger tiles mean relatively more cut pieces, so not quite half)
+    check('tiles 600 × 600: clearly fewer', T2['n'] < T['n'] * 0.7 and near(T2['w'], 0.6, 0.001), (T2['n'], T['n']))
     # wall B: its own colour
     pg.click('.face-row >> nth=1'); pg.wait_for_timeout(500)
     check('wall B opens', pg.evaluate("() => window.__hp.app.selection.face") == st['faces'][1]['wall'] and pg.is_visible('.face-edit'))
