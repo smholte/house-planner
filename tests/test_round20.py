@@ -52,7 +52,10 @@ BRIGHT = """async ([W, H]) => { const A = window.__hp, v = A.app.panes.find(p =>
     const lin = x => { x /= 255; return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
     for (let i = 0; i < d.length; i += 4) { s += 0.2126 * lin(d[i]) + 0.7152 * lin(d[i + 1]) + 0.0722 * lin(d[i + 2]); if (d[i] + d[i + 1] + d[i + 2] < 30) blk++; n++; }
     return [s / n, blk / n]; };
-  const pt = await A.renderPathTraced(v, { W, H, passes: 4 });
+  // (seeded random numbers, the app's view paused, 12 samples – 4 left a few percent of the picture black by chance; task 0040)
+  const sd = (s) => { let a = s >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+  const rnd0 = Math.random; v.rendering = true; Math.random = sd(12345);
+  let pt; try { pt = await A.renderPathTraced(v, { W, H, passes: 12 }); } finally { Math.random = rnd0; v.rendering = false; }
   const lp = await A.renderView3d(v, { W, H, passes: 6 });
   return { pt: stat(pt.canvas), lp: stat(lp.canvas), tiles: pt.tiles }; }"""
 
