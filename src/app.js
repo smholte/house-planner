@@ -181,7 +181,7 @@ const app = new (class App extends Emitter {
     if (isIOS && !standalone && /^https?:$/.test(location.protocol)) $('#btn-install').hidden = false;
 
     document.addEventListener('keydown', e => this.onKey(e));
-    window.addEventListener('resize', () => { if (this.swipe && this.swipeEls) this.setSwipePos(this.swipePos); this.updateInsets(); });
+    window.addEventListener('resize', () => { this.syncSlimBars(); if (this.swipe && this.swipeEls) this.setSwipePos(this.swipePos); this.updateInsets(); });
     window.addEventListener('hp-menu', () => requestAnimationFrame(() => this.updateInsets()));
     document.addEventListener('keyup', e => { if (e.code === 'Space') this.spaceDown = false; if (this.walking) this.walkKey(e, false); });
     window.addEventListener('blur', () => { this.spaceDown = false; if (this.walking) this.walkKey(null, false); });
@@ -777,7 +777,22 @@ const app = new (class App extends Emitter {
     window.addEventListener('pointerup', up, true);
     window.addEventListener('pointercancel', up, true);
   }
-  barsBack() { clearTimeout(this._barsT); this.setBarsAway(false); }
+  barsBack() {
+    clearTimeout(this._barsT);
+    const ed = $('#editor');
+    // side by side on a turned phone: the handle opens the bars (they stay open until side by side closes or the phone is turned upright)
+    if (ed && ed.classList.contains('bars-slim')) { this.slimOpen = true; this.syncSlimBars(); return; }
+    this.setBarsAway(false);
+  }
+  /** side by side on a turned phone (low and wide): the top bars fold to a thin strip with a handle, so each side gets height */
+  syncSlimBars() {
+    const ed = $('#editor');
+    if (!ed) return;
+    const slim = !!this.sideBySide && this.view.dim === '2d' && window.matchMedia('(orientation: landscape) and (max-height: 520px) and (max-width: 1000px)').matches;
+    if (!slim) this.slimOpen = false;
+    ed.classList.toggle('bars-slim', slim && !this.slimOpen);
+    ed.classList.toggle('bars-slim-open', slim && !!this.slimOpen);
+  }
   barsAway(on) {
     const ed = $('#editor');
     clearTimeout(this._barsT);
@@ -995,6 +1010,7 @@ const app = new (class App extends Emitter {
     if (keep) for (const pane of this.panes) if (pane.view.setViewState) pane.view.setViewState(keep);
     if (fresh) this.updateInsets();
     this.updatePip();
+    this.syncSlimBars();
   }
 
   /** side by side in 2D: a new pane size (the phone turned, the window resized) fits both panes to the storey again */

@@ -117,6 +117,21 @@ def phone(p):
     check('phone landscape: the two sides next to each other', abs(f[0]['top'] - f[1]['top']) < 2 and f[1]['left'] > f[0]['left'] + 100, f)
     fitted(pg, 'phone landscape: both sides fitted again')
     pg.screenshot(path=SHOTS + 'sbs-phone-landscape.png')
+    ed = pg.evaluate("() => ({ top: document.querySelector('#stage').getBoundingClientRect().top, slim: document.querySelector('#editor').classList.contains('bars-slim') })")
+    check('phone landscape: the top bars folded to a thin strip', ed['slim'] and ed['top'] < 40, ed)
+    check('phone landscape: each side at least 260 px high', all(x['h'] >= 260 for x in f), [x['h'] for x in f])
+    # the Changes legend: small, in a corner, not over the plans
+    pg.evaluate("() => { const a = window.__hp.app; a.display = 'diff'; a.render && a.render(); }")
+    pg.wait_for_timeout(500)
+    lg = pg.evaluate("""() => { const l = document.querySelector('.legend'); if (!l) return null; const r = l.getBoundingClientRect();
+      return { r: [r.left, r.top, r.right, r.bottom], plans: window.__hp.app.panes.map(pn => { const v = pn.view, en = v.spec.entries.find(e => !e.wallsOnly), b = en.bbox, e0 = pn.el.getBoundingClientRect(),
+        a = v.toScreen([b.minX, b.minY]), z = v.toScreen([b.maxX, b.maxY]); return [e0.left + a[0], e0.top + a[1], e0.left + z[0], e0.top + z[1]]; }) }; }""")
+    if lg:
+        ov = any(not (lg['r'][2] < q[0] or lg['r'][0] > q[2] or lg['r'][3] < q[1] or lg['r'][1] > q[3]) for q in lg['plans'])
+        check('phone landscape: the legend is not over a plan', not ov, lg)
+        pg.screenshot(path=SHOTS + 'sbs-phone-landscape-legend.png')
+    pg.tap('#bars-pull'); pg.wait_for_timeout(500)
+    check('phone landscape: tapping the strip brings the bars back', pg.evaluate("() => !document.querySelector('#editor').classList.contains('bars-slim')"))
     pg.set_viewport_size({'width': 390, 'height': 844})
     pg.wait_for_function("() => { const p = window.__hp.app.panes; return p.length === 2 && p[0].view.H > p[0].view.W * 0.7; }")
     pg.wait_for_timeout(800)
