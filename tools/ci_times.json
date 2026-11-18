@@ -858,7 +858,7 @@
     "seconds": 1500.0,
     "checks": 71
    },
-   "note": "task 0042"
+   "note": "task 0042 (local web session; GitHub: ~2 min)"
   }
  },
  "note": "seconds: on the owner's house (measured 12 Nov 2026, tasks 0007a / 0007b, two or three test files at a time); made_up: the same file on the made-up house (public app). ci: what GitHub's runs measured (python3 tools/ci_status.py --record), which tools/ci_groups.py balances by first. checks: the number of checks.",
@@ -868,5 +868,362 @@
    "seconds": 8551.0,
    "made_up_seconds": 6084.0
   }
+ },
+ "ci": {
+  "jobs": {
+   "Precheck (picks the mode)": 0.3,
+   "Build and web check": 0.2,
+   "Tests 4": 11.3,
+   "Tests 3": 12.6,
+   "Tests 6": 9.5,
+   "Tests 8": 17.6,
+   "Tests 2": 10.3,
+   "Tests 7": 10.5,
+   "Tests 10": 17.9,
+   "Tests 9": 18.5,
+   "Tests 5": 17.5,
+   "Tests 1": 1.9
+  },
+  "history": {
+   "test_docs_lib.py": [
+    19.8
+   ],
+   "test_phone.py": [
+    73.7
+   ],
+   "test_pictures.py": [
+    36.4
+   ],
+   "test_quickwins.py": [
+    109.4
+   ],
+   "test_round16.py": [
+    54.7
+   ],
+   "test_round19.py": [
+    70.3
+   ],
+   "test_round24.py": [
+    107.4
+   ],
+   "test_round3.py": [
+    152.2
+   ],
+   "test_tour.py": [
+    26.9
+   ],
+   "test_install.py": [
+    75.0
+   ],
+   "test_kitchen.py": [
+    44.3
+   ],
+   "test_library.py": [
+    153.2
+   ],
+   "test_openings.py": [
+    32.2
+   ],
+   "test_round27.py": [
+    201.5
+   ],
+   "test_round30.py": [
+    32.3
+   ],
+   "test_round38.py": [
+    56.1
+   ],
+   "test_safety1.py": [
+    51.6
+   ],
+   "test_sun.py": [
+    71.3
+   ],
+   "test_furniture.py": [
+    60.5
+   ],
+   "test_garden_wall.py": [
+    23.2
+   ],
+   "test_round13.py": [
+    88.5
+   ],
+   "test_round20.py": [
+    148.8
+   ],
+   "test_round28.py": [
+    42.3
+   ],
+   "test_round32.py": [
+    83.2
+   ],
+   "test_round9.py": [
+    36.6
+   ],
+   "test_sidebyside.py": [
+    33.3
+   ],
+   "test_tiles3d.py": [
+    30.1
+   ],
+   "test_finish.py": [
+    57.5
+   ],
+   "test_furniture_lib.py": [
+    70.9
+   ],
+   "test_merge.py": [
+    27.1
+   ],
+   "test_pdf.py": [
+    21.9
+   ],
+   "test_round10.py": [
+    65.4
+   ],
+   "test_round11.py": [
+    106.8
+   ],
+   "test_round12.py": [
+    39.6
+   ],
+   "test_round29.py": [
+    95.4
+   ],
+   "test_voids.py": [
+    39.0
+   ],
+   "test_handover.py": [
+    19.2
+   ],
+   "test_hpbake.py": [
+    130.4
+   ],
+   "test_i18n.py": [
+    38.1
+   ],
+   "test_materials.py": [
+    39.3
+   ],
+   "test_quantities.py": [
+    30.8
+   ],
+   "test_round26.py": [
+    119.9
+   ],
+   "test_site3d.py": [
+    74.9
+   ],
+   "test_tilestart.py": [
+    43.6
+   ],
+   "test_view3d.py": [
+    66.6
+   ],
+   "test_web.py": [
+    19.3
+   ],
+   "test_backup.py": [
+    57.6
+   ],
+   "test_budget.py": [
+    29.4
+   ],
+   "test_hpscene.py": [
+    53.4
+   ],
+   "test_kitchen_parts.py": [
+    17.5
+   ],
+   "test_onewriter.py": [
+    77.6
+   ],
+   "test_regress.py": [
+    186.0
+   ],
+   "test_roomjump.py": [
+    37.0
+   ],
+   "test_round23.py": [
+    108.1
+   ],
+   "test_round31.py": [
+    10.8
+   ],
+   "test_round37.py": [
+    23.2
+   ],
+   "test_doors_fill.py": [
+    66.8
+   ],
+   "test_drawings.py": [
+    66.7
+   ],
+   "test_editing.py": [
+    67.3
+   ],
+   "test_round14.py": [
+    113.3
+   ],
+   "test_round17.py": [
+    36.0
+   ],
+   "test_round21.py": [
+    27.9
+   ],
+   "test_round22.py": [
+    47.8
+   ],
+   "test_round25.py": [
+    129.1
+   ],
+   "test_round7.py": [
+    34.9
+   ],
+   "test_doors.py": [
+    71.3
+   ],
+   "test_facade.py": [
+    68.3
+   ],
+   "test_notes.py": [
+    30.1
+   ],
+   "test_oldfile.py": [
+    36.4
+   ],
+   "test_round18.py": [
+    164.3
+   ],
+   "test_round5.py": [
+    59.7
+   ],
+   "test_round6.py": [
+    131.2
+   ],
+   "test_tasks.py": [
+    21.7
+   ],
+   "test_wallphotos.py": [
+    56.4
+   ],
+   "test_garden.py": [
+    58.9
+   ],
+   "test_levels.py": [
+    78.6
+   ],
+   "test_models.py": [
+    80.2
+   ],
+   "test_phone_taps.py": [
+    47.8
+   ],
+   "test_round15.py": [
+    141.8
+   ],
+   "test_round4.py": [
+    23.4
+   ],
+   "test_round8.py": [
+    99.2
+   ],
+   "test_viewer.py": [
+    30.3
+   ],
+   "test_walk.py": [
+    36.8
+   ],
+   "test_toolbox.py": [
+    75.4
+   ]
+  },
+  "files": {
+   "test_docs_lib.py": 19.8,
+   "test_phone.py": 73.7,
+   "test_pictures.py": 36.4,
+   "test_quickwins.py": 109.4,
+   "test_round16.py": 54.7,
+   "test_round19.py": 70.3,
+   "test_round24.py": 107.4,
+   "test_round3.py": 152.2,
+   "test_tour.py": 26.9,
+   "test_install.py": 75.0,
+   "test_kitchen.py": 44.3,
+   "test_library.py": 153.2,
+   "test_openings.py": 32.2,
+   "test_round27.py": 201.5,
+   "test_round30.py": 32.3,
+   "test_round38.py": 56.1,
+   "test_safety1.py": 51.6,
+   "test_sun.py": 71.3,
+   "test_furniture.py": 60.5,
+   "test_garden_wall.py": 23.2,
+   "test_round13.py": 88.5,
+   "test_round20.py": 148.8,
+   "test_round28.py": 42.3,
+   "test_round32.py": 83.2,
+   "test_round9.py": 36.6,
+   "test_sidebyside.py": 33.3,
+   "test_tiles3d.py": 30.1,
+   "test_finish.py": 57.5,
+   "test_furniture_lib.py": 70.9,
+   "test_merge.py": 27.1,
+   "test_pdf.py": 21.9,
+   "test_round10.py": 65.4,
+   "test_round11.py": 106.8,
+   "test_round12.py": 39.6,
+   "test_round29.py": 95.4,
+   "test_voids.py": 39.0,
+   "test_handover.py": 19.2,
+   "test_hpbake.py": 130.4,
+   "test_i18n.py": 38.1,
+   "test_materials.py": 39.3,
+   "test_quantities.py": 30.8,
+   "test_round26.py": 119.9,
+   "test_site3d.py": 74.9,
+   "test_tilestart.py": 43.6,
+   "test_view3d.py": 66.6,
+   "test_web.py": 19.3,
+   "test_backup.py": 57.6,
+   "test_budget.py": 29.4,
+   "test_hpscene.py": 53.4,
+   "test_kitchen_parts.py": 17.5,
+   "test_onewriter.py": 77.6,
+   "test_regress.py": 186.0,
+   "test_roomjump.py": 37.0,
+   "test_round23.py": 108.1,
+   "test_round31.py": 10.8,
+   "test_round37.py": 23.2,
+   "test_doors_fill.py": 66.8,
+   "test_drawings.py": 66.7,
+   "test_editing.py": 67.3,
+   "test_round14.py": 113.3,
+   "test_round17.py": 36.0,
+   "test_round21.py": 27.9,
+   "test_round22.py": 47.8,
+   "test_round25.py": 129.1,
+   "test_round7.py": 34.9,
+   "test_doors.py": 71.3,
+   "test_facade.py": 68.3,
+   "test_notes.py": 30.1,
+   "test_oldfile.py": 36.4,
+   "test_round18.py": 164.3,
+   "test_round5.py": 59.7,
+   "test_round6.py": 131.2,
+   "test_tasks.py": 21.7,
+   "test_wallphotos.py": 56.4,
+   "test_garden.py": 58.9,
+   "test_levels.py": 78.6,
+   "test_models.py": 80.2,
+   "test_phone_taps.py": 47.8,
+   "test_round15.py": 141.8,
+   "test_round4.py": 23.4,
+   "test_round8.py": 99.2,
+   "test_viewer.py": 30.3,
+   "test_walk.py": 36.8,
+   "test_toolbox.py": 75.4
+  },
+  "recorded_from": "run 44401187510 (claude/task-0042-house-planner-h96clv @ 865024b, 2026-11-18)"
  }
 }
