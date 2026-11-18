@@ -387,17 +387,21 @@ def pc_test(p, tmp):
     pg2.goto(BASE)
     pg2.wait_for_function("() => window.__hp && window.__hp.app._tb && window.__hp.app._tb.box", timeout=60000)
     check('a second window finds the kept folder and its permission by itself', True)
-    wrap = """() => { const a = window.__hp.app; window.__reads = 0; const f = a.tbReadInbox.bind(a);
-      a.tbReadInbox = async () => { window.__reads++; await new Promise(r => setTimeout(r, 20000)); return f(); }; }"""
-    pg.evaluate(wrap); pg2.evaluate(wrap)
-    pg.evaluate("() => { window.__hp.app._tb.busy = false; window.__hp.app.tbTick(true); }")
-    pg.wait_for_function("() => window.__reads === 1")
-    pg2.evaluate("async () => { window.__hp.app._tb.busy = false; await window.__hp.app.tbTick(true); }")
-    r2 = pg2.evaluate("() => window.__reads")
-    still = pg.evaluate("() => window.__reads === 1 && window.__hp.app._tb.busy")
-    pg.wait_for_function("() => !window.__hp.app._tb.busy", timeout=60000)
-    check('two windows: while one reads the inbox, the other does not (Web Lock)', r2 == 0 and still, (r2, still))
+    # window 1 holds the inbox's lock (as while it reads); window 2's look at the inbox is refused meanwhile
+    # (both windows' own regular looks paused for this, so only these two ask for the lock)
+    pause = "() => { const a = window.__hp.app; a.__tick = a.tbTick; a.tbTick = async () => {}; }"
+    pg.evaluate(pause); pg2.evaluate(pause)
+    for q in (pg, pg2):
+        q.wait_for_function("() => !window.__hp.app._tb.busy", timeout=120000)
+    pg.evaluate("() => { window.__held = true; window.__hp.app._tb.box.exclusively(() => new Promise(r => setTimeout(() => { window.__held = false; r('one'); }, 15000))); }")
+    pg.wait_for_timeout(300)
+    r2 = pg2.evaluate("async () => (await window.__hp.app._tb.box.exclusively(async () => 'two')) ?? null")
+    still = pg.evaluate("() => window.__held")
+    pg.wait_for_function("() => !window.__held", timeout=60000)
+    r3 = pg2.evaluate("async () => (await window.__hp.app._tb.box.exclusively(async () => 'two')) ?? null")
+    check('two windows: while one reads the inbox, the other does not (Web Lock); after it, the other may', r2 is None and still and r3 == 'two', (r2, still, r3))
     pg2.close()
+    pg.evaluate("() => { const a = window.__hp.app; a.tbTick = a.__tick; }")
 
     # a .hpbake opened by the installed app (launchQueue hands the file to tbOpenBakeFile)
     o = quick_opts(pg)
