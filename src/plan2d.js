@@ -314,7 +314,7 @@ class PlanView extends Emitter {
       if (r.storey !== en.storey.id) continue;
       const pts = r.poly.map(p => p.join(',')).join(' ');
       let fill = 'none';
-      if (colorBy === 'floor') fill = r.floor ? this.floorFill(r) : 'none';
+      if (colorBy === 'floor') fill = r.floor ? this.floorFill(r, en.plan) : 'none';
       else if (colorBy === 'walls') fill = r.wallColor || 'none';
       else if (colorBy === 'progress') { const f = this.app.project ? roomProgress(tasksOf(this.app.project), r.id) : null; fill = f == null || !roomCounted(r) ? 'none' : progressColor(f); }
       const holes = roomHoles(en.plan, r);

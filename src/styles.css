@@ -1359,6 +1359,7 @@ button.sun-lab:hover, button.sun-lab:focus-visible { background: var(--surface-2
   #editor.bars-slim .topbar { height: var(--pull-h); min-height: 0; padding: 0; overflow: hidden; gap: 0; }
   #editor.bars-slim .topbar > :not(.bars-pull) { display: none !important; }
   #editor.bars-slim .bars-pull { display: flex; }
+  #editor.bars-slim-open .bars-pull { display: flex; order: -1; flex: 0 0 44px; width: 44px; min-height: 36px; }
   .stage.split .legend { top: auto !important; bottom: 4px !important; left: auto; right: 4px; gap: 6px; padding: 2px 6px; font-size: 10px; flex-wrap: nowrap; white-space: nowrap; }
   .stage.split .legend i { width: 12px; margin-right: 3px; }
   .stage.split .legend .lg-room { width: 7px; }

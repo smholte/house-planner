@@ -244,14 +244,26 @@ function paintMat(color, sheen, base) {
 
 /* ───────── the plan: the floor pattern as fine lines ───────── */
 Object.assign(PlanView.prototype, {
-  floorFill(r) {
+  floorFill(r, plan) {
     const F = floorSpec(r.floor);
     if (this.spec.floorPatterns === false) return F.color;
     const src = F.photo ? imageSrc(projectImage(F.photo.img)) : null;
     if (!F.kind && !src) return F.color;
     let defs = this.svg.querySelector('defs');
     if (!defs) defs = this.svg.insertBefore(s('defs'), this.svg.firstChild);
-    const id = 'fp-' + hashStr(floorSpecKey(F) + (src ? ':' + src.length : ''));
+    // tiles: the pattern sits on the floor layout's grid (task 0043) – its origin, its period with the joint, its turn
+    let pt = null;
+    if (F.kind === 'tile' && plan && !(F.photo && F.photo.mode === 'pattern')) {
+      let L = null;
+      try { L = floorTileLayout(plan, r); } catch (e) { console.error(e); }
+      if (L) {
+        const G = L.G, j = FLOOR_JOINT, f = v => +v.toFixed(5);
+        const a = f(G.MU / F.l), d = f(G.MV / F.w), e = f(G.ou - j / 2), g = f(G.ov - j / 2);
+        // the layout's frame (u along the run, v across) in the plan: swapped when the floor runs top–bottom
+        pt = L.turn ? `matrix(0 ${a} ${d} 0 ${g} ${e})` : `matrix(${a} 0 0 ${d} ${e} ${g})`;
+      }
+    }
+    const id = 'fp-' + hashStr(floorSpecKey(F) + (src ? ':' + src.length : '') + (pt ? '|' + pt : ''));
     if (src) {
       // the sample photo: once in the defs, used in every plank / tile or as one repeat of the floor
       const iid = 'fpi-' + hashStr(F.photo.img + ':' + src.length);
@@ -264,7 +276,7 @@ Object.assign(PlanView.prototype, {
           defs.appendChild(p);
         } else {
           const lay = floorLayout(F);
-          const p = s('pattern', { id, patternUnits: 'userSpaceOnUse', width: lay.pw, height: lay.ph, patternTransform: `rotate(${lay.angle + F.dir})` });
+          const p = s('pattern', { id, patternUnits: 'userSpaceOnUse', width: lay.pw, height: lay.ph, patternTransform: pt || `rotate(${lay.angle + F.dir})` });
           p.appendChild(s('rect', { x: 0, y: 0, width: lay.pw, height: lay.ph, fill: F.kind === 'wood' ? shadeHex(F.color, 0.7) : F.grout }));
           const landscape = (im.w || 1) >= (im.h || 1);
           let d = '', k = 0;
@@ -286,7 +298,7 @@ Object.assign(PlanView.prototype, {
     if (!F.kind) return F.color;
     if (!defs.querySelector('#' + id)) {
       const lay = floorLayout(F);
-      const p = s('pattern', { id, patternUnits: 'userSpaceOnUse', width: lay.pw, height: lay.ph, patternTransform: `rotate(${lay.angle + F.dir})` });
+      const p = s('pattern', { id, patternUnits: 'userSpaceOnUse', width: lay.pw, height: lay.ph, patternTransform: pt || `rotate(${lay.angle + F.dir})` });
       p.appendChild(s('rect', { x: 0, y: 0, width: lay.pw, height: lay.ph, fill: F.color }));
       let d = '';
       for (const q of lay.polys) for (const dx of [-lay.pw, 0, lay.pw]) for (const dy of [-lay.ph, 0, lay.ph]) d += 'M' + q.map(([x, y]) => (x + dx).toFixed(4) + ' ' + (y + dy).toFixed(4)).join('L') + 'Z';

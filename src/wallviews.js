@@ -421,7 +421,6 @@ Object.assign(app, {
     const box = h('div', { class: 'ts-box' }, h('div', { class: 'field' }, h('label', { for: 'fs-at' }, t('Floor tiles start')), sel), nud('dx', t('Shift left–right')), nud('dy', t('Shift up–down')));
     if (!ro) box.appendChild(h('div', { class: 'actions' }, h('button', { class: 'btn sm primary ts-best', id: 'fs-best', type: 'button', onclick: () => { const B = bestFloorStart(plan, rr); if (B) save(B.S); } }, icon('check'), t('Best start'))));
     card.appendChild(box);
-    card.appendChild(h('p', { class: 'note-muted' }, t('In the plan and in 3D the floor pattern does not follow this start yet.')));
     return card;
   },
   /** one A4 page (landscape) per wall: the view as a picture, the list of things on it, the house and the date */

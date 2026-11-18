@@ -780,7 +780,9 @@ const app = new (class App extends Emitter {
   barsBack() {
     clearTimeout(this._barsT);
     const ed = $('#editor');
-    // side by side on a turned phone: the handle opens the bars (they stay open until side by side closes or the phone is turned upright)
+    // side by side on a turned phone: the handle opens the bars and, tapped again, folds them (task 0043); they also fold
+    // when side by side closes or the phone is turned upright
+    if (ed && ed.classList.contains('bars-slim-open')) { this.slimOpen = false; this.syncSlimBars(); return; }
     if (ed && ed.classList.contains('bars-slim')) { this.slimOpen = true; this.syncSlimBars(); return; }
     this.setBarsAway(false);
   }
