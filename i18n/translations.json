@@ -12170,5 +12170,189 @@
  "{w} whole and {c} cut pieces, with {p} % extra": [
   "{w} hele tegels en {c} snijtegels, met {p} % extra",
   "{w} hele fliser og {c} kappede biter, med {p} % ekstra"
+ ],
+ "A newer Toolbox folder": [
+  "Een nieuwere Toolbox-map",
+  "En nyere Toolbox-mappe"
+ ],
+ "Ask Fresing Render to stop": [
+  "Vraag Fresing Render te stoppen",
+  "Be Fresing Render om å stoppe"
+ ],
+ "Baked light for “{name}” has arrived – open that house to take it in.": [
+  "Gebakken licht voor “{name}” is binnen – open dat huis om het over te nemen.",
+  "Bakt lys for «{name}» har kommet – åpne det huset for å ta det inn."
+ ],
+ "Baked – the light is coming in.": [
+  "Gebakken – het licht komt binnen.",
+  "Bakt – lyset kommer inn."
+ ],
+ "Baking: {t}": [
+  "Bakken: {t}",
+  "Baker: {t}"
+ ],
+ "Baking…": [
+  "Bezig met bakken…",
+  "Baker…"
+ ],
+ "Connect to Fresing Render": [
+  "Verbinden met Fresing Render",
+  "Koble til Fresing Render"
+ ],
+ "Connect to Fresing Render…": [
+  "Verbinden met Fresing Render…",
+  "Koble til Fresing Render…"
+ ],
+ "Connected to the Toolbox folder.": [
+  "Verbonden met de Toolbox-map.",
+  "Koblet til Toolbox-mappen."
+ ],
+ "Could not ask Fresing Render to stop: {e}": [
+  "Fresing Render kon niet gevraagd worden te stoppen: {e}",
+  "Kunne ikke be Fresing Render om å stoppe: {e}"
+ ],
+ "Disconnect": [
+  "Verbinding verbreken",
+  "Koble fra"
+ ],
+ "Fresing Render could not bake it: {t}": [
+  "Fresing Render kon het niet bakken: {t}",
+  "Fresing Render kunne ikke bake det: {t}"
+ ],
+ "Fresing Render in this folder is of another version: update both apps.": [
+  "Fresing Render in deze map is een andere versie: werk beide apps bij.",
+  "Fresing Render i denne mappen er en annen versjon: oppdater begge appene."
+ ],
+ "Fresing Render is not set up in this folder yet – open it once.": [
+  "Fresing Render staat nog niet in deze map – open het één keer.",
+  "Fresing Render er ikke satt opp i denne mappen ennå – åpne det én gang."
+ ],
+ "Fresing Render may have sent something.": [
+  "Fresing Render heeft misschien iets gestuurd.",
+  "Fresing Render kan ha sendt noe."
+ ],
+ "Fresing Render was asked to stop.": [
+  "Fresing Render is gevraagd te stoppen.",
+  "Fresing Render er bedt om å stoppe."
+ ],
+ "Fresing Render: {t}": [
+  "Fresing Render: {t}",
+  "Fresing Render: {t}"
+ ],
+ "Fresing Render’s file in the Toolbox folder cannot be read.": [
+  "Het bestand van Fresing Render in de Toolbox-map is niet te lezen.",
+  "Fresing Renders fil i Toolbox-mappen kan ikke leses."
+ ],
+ "Handing the house to Fresing Render…": [
+  "Het huis gaat naar Fresing Render…",
+  "Huset gis til Fresing Render…"
+ ],
+ "House Planner and Fresing Render hand files to each other through the Toolbox folder on this PC.": [
+  "House Planner en Fresing Render geven elkaar bestanden via de Toolbox-map op deze pc.",
+  "House Planner og Fresing Render gir hverandre filer gjennom Toolbox-mappen på denne PC-en."
+ ],
+ "House Planner cannot take this: {e}": [
+  "House Planner kan dit niet overnemen: {e}",
+  "House Planner kan ikke ta inn dette: {e}"
+ ],
+ "House Planner did not take this bake in.": [
+  "House Planner heeft deze bake niet overgenomen.",
+  "House Planner tok ikke inn denne bakingen."
+ ],
+ "House Planner may not use the Toolbox folder: allow it when the browser asks.": [
+  "House Planner mag de Toolbox-map niet gebruiken: sta het toe als de browser het vraagt.",
+  "House Planner får ikke bruke Toolbox-mappen: tillat det når nettleseren spør."
+ ],
+ "In the next window pick the folder Toolbox in your user folder: C:\\Users\\<your name>\\Toolbox.": [
+  "Kies in het volgende venster de map Toolbox in je gebruikersmap: C:\\Users\\<jouw naam>\\Toolbox.",
+  "Velg mappen Toolbox i brukermappen din i neste vindu: C:\\Users\\<ditt navn>\\Toolbox."
+ ],
+ "Not connected to Fresing Render yet.": [
+  "Nog niet verbonden met Fresing Render.",
+  "Ikke koblet til Fresing Render ennå."
+ ],
+ "Nothing heard from Fresing Render for a while.": [
+  "Al een tijd niets gehoord van Fresing Render.",
+  "Ikke hørt noe fra Fresing Render på en stund."
+ ],
+ "Open Fresing Render once (it makes the folder), then pick C:\\Users\\<your name>\\Toolbox.": [
+  "Open Fresing Render één keer (het maakt de map), kies dan C:\\Users\\<jouw naam>\\Toolbox.",
+  "Åpne Fresing Render én gang (det lager mappen), og velg så C:\\Users\\<ditt navn>\\Toolbox."
+ ],
+ "Pick the folder…": [
+  "Map kiezen…",
+  "Velg mappen…"
+ ],
+ "Send to Fresing Render": [
+  "Naar Fresing Render sturen",
+  "Send til Fresing Render"
+ ],
+ "Sent. Fresing Render is open and will pick the house up.": [
+  "Verstuurd. Fresing Render is open en pakt het huis op.",
+  "Sendt. Fresing Render er åpent og henter huset."
+ ],
+ "Sent. Open Fresing Render and it will pick the house up.": [
+  "Verstuurd. Open Fresing Render, dan pakt het het huis op.",
+  "Sendt. Åpne Fresing Render, så henter det huset."
+ ],
+ "Something arrived from the Toolbox folder that House Planner cannot take: {e}": [
+  "Er kwam iets uit de Toolbox-map dat House Planner niet kan overnemen: {e}",
+  "Noe kom fra Toolbox-mappen som House Planner ikke kan ta inn: {e}"
+ ],
+ "The Toolbox folder cannot be read: {e}": [
+  "De Toolbox-map is niet te lezen: {e}",
+  "Toolbox-mappen kan ikke leses: {e}"
+ ],
+ "The Toolbox folder is no longer used on this device.": [
+  "De Toolbox-map wordt op dit apparaat niet meer gebruikt.",
+  "Toolbox-mappen brukes ikke lenger på denne enheten."
+ ],
+ "The bake was stopped.": [
+  "Het bakken is gestopt.",
+  "Bakingen ble stoppet."
+ ],
+ "The baked light is in.": [
+  "Het gebakken licht is binnen.",
+  "Det bakte lyset er inne."
+ ],
+ "The baked light went to another copy of House Planner.": [
+  "Het gebakken licht ging naar een andere kopie van House Planner.",
+  "Det bakte lyset gikk til en annen kopi av House Planner."
+ ],
+ "The house could not be handed over: {e}": [
+  "Het huis kon niet worden doorgegeven: {e}",
+  "Huset kunne ikke gis videre: {e}"
+ ],
+ "This Toolbox folder is of a newer version. Update House Planner to use it.": [
+  "Deze Toolbox-map is van een nieuwere versie. Werk House Planner bij om hem te gebruiken.",
+  "Denne Toolbox-mappen er av en nyere versjon. Oppdater House Planner for å bruke den."
+ ],
+ "This bake is for a house that is not in House Planner on this device.": [
+  "Deze bake hoort bij een huis dat niet in House Planner op dit apparaat staat.",
+  "Denne bakingen er for et hus som ikke finnes i House Planner på denne enheten."
+ ],
+ "This is not the Toolbox folder": [
+  "Dit is niet de Toolbox-map",
+  "Dette er ikke Toolbox-mappen"
+ ],
+ "This job was written by a newer tool (toolbox format {v}). Update House Planner to read it.": [
+  "Deze opdracht komt van een nieuwer programma (toolbox-formaat {v}). Werk House Planner bij om hem te lezen.",
+  "Denne jobben ble skrevet av et nyere verktøy (toolbox-format {v}). Oppdater House Planner for å lese den."
+ ],
+ "Toolbox folder: {f}": [
+  "Toolbox-map: {f}",
+  "Toolbox-mappe: {f}"
+ ],
+ "Waiting in Fresing Render.": [
+  "Wacht in Fresing Render.",
+  "Venter i Fresing Render."
+ ],
+ "no reason given": [
+  "geen reden opgegeven",
+  "ingen grunn oppgitt"
+ ],
+ "“{f}” is not the Toolbox folder: it has no toolbox-folder.json. Nothing was written there.": [
+  "“{f}” is niet de Toolbox-map: er staat geen toolbox-folder.json in. Er is niets in geschreven.",
+  "«{f}» er ikke Toolbox-mappen: den har ingen toolbox-folder.json. Ingenting ble skrevet der."
  ]
 }

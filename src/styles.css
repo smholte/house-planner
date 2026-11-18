@@ -1700,3 +1700,11 @@ button.sun-lab:hover, button.sun-lab:focus-visible { background: var(--surface-2
 .kp-topwrap svg { display: block; width: 100%; height: auto; max-height: 240px; }
 .kp-tables h2 { font-size: 14px; margin: 14px 0 4px; }
 .kp-table td.d { color: var(--muted, #5b6669); min-width: 140px; }
+/* Send to Fresing Render (task 0042): the line under the top bar, and the row in Export → For Fresing Render… */
+.tb-bar { position: fixed; left: 50%; transform: translateX(-50%); top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 65; display: flex; gap: 8px; align-items: center; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 5px 6px 5px 12px; box-shadow: var(--shadow); font-size: 13.5px; max-width: min(640px, calc(100vw - 24px)); }
+.tb-bar .tb-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-bar .tb-ic svg { width: 16px; height: 16px; }
+.tb-box { display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 10px; }
+.tb-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tb-line:empty { display: none; }
+.tb-line { margin: 0; font-weight: 500; }

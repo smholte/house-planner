@@ -74,6 +74,8 @@ const app = new (class App extends Emitter {
     setTimeout(() => Assets.collectGarbage(), 8000);
     Saver.on('state', st => { if (st === 'saved') this.folderSoon(); });
     setTimeout(() => this.folderInit(), 2500);
+    // the Toolbox folder: Send to Fresing Render and its replies (task 0042, toolbox.js)
+    if (this.tbInit) setTimeout(() => this.tbInit(), 1500);
     this.registerServiceWorker();
   }
 
@@ -424,6 +426,8 @@ const app = new (class App extends Emitter {
     this.renderInspector();
     clearTimeout(this._remindT);
     this._remindT = setTimeout(() => { if (this.project === p) this.backupReminder(); }, 2500);
+    // baked light waiting in the Toolbox folder for this house (task 0042)
+    if (this._tb && this._tb.box) setTimeout(() => this.tbTick(true), 800);
   }
 
   async closeProject(keepHome) {

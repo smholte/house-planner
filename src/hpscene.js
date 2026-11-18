@@ -845,6 +845,9 @@ Object.assign(app, {
     for (const c of cams) camBox.appendChild(chk(`hps-c-${c.key}`, c.label, o.cameras.includes(c.key), on => { o.cameras = on ? [...o.cameras, c.key] : o.cameras.filter(x => x !== c.key); }));
     if (!cams.length) camBox.appendChild(h('span', { class: 'note-muted' }, t('No 3D view or saved viewpoint yet.')));
     const status = h('p', { class: 'note-muted', id: 'hps-status', 'aria-live': 'polite' });
+    // Send to Fresing Render through the Toolbox folder (task 0042): Chrome / Edge on a PC only
+    const tb = typeof this.tbAvailable === 'function' && this.tbAvailable();
+    const tbBox = tb ? h('div', { class: 'tb-box', id: 'tb-box' }, this.tbRow(), h('p', { class: 'tb-line', id: 'tb-dlg-line', 'aria-live': 'polite' }, this.tbText(this.tbCurrent()))) : null;
     const body = h('div', { class: 'hps-dialog', style: { display: 'grid', gap: '12px' } },
       h('p', null, t('A house scene for Fresing Render on your PC: it bakes real light, snow and photos for this version. Open the file there with File > Import > House Planner scene.')),
       h('label', { class: 'field' }, h('span', { class: 'flabel' }, t('Version')), verSel),
@@ -860,14 +863,24 @@ Object.assign(app, {
           chk('hps-open', t('Each storey also open from above'), o.open, on => { o.open = on; }, t('As the app shows one storey without the ones above it.')),
           h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Photos')), camBox),
           h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Light-map pages')), seg('hps-page', [['2048', t('PC (2048)')], ['1024', t('Phone (1024)')]], String(o.pageSize), k => { o.pageSize = +k; })))),
-      status);
+      tbBox, status);
+    const ready = () => {
+      if (!o.moments.length || !Object.values(o.seasons).some(s => s.on)) { status.textContent = t('Pick at least one season and one moment.'); return false; }
+      return true;
+    };
+    let sending = false;
     const go = await UI.dialog({ title: t('For Fresing Render'), body, actions: [
       { label: 'Cancel', value: null },
-      { label: t('Save file'), value: 'save', kind: 'primary', icon: 'download', validate: () => {
-        if (!o.moments.length || !Object.values(o.seasons).some(s => s.on)) { status.textContent = t('Pick at least one season and one moment.'); return false; }
-        return true;
-      } },
+      { label: t('Save file'), value: 'save', kind: tb ? '' : 'primary', icon: 'download', validate: ready },
+      // sent: the dialog stays open and shows what Fresing Render does; closed, the bar under the top bar shows it
+      ...(tb ? [{ label: t('Send to Fresing Render'), value: 'send', kind: 'primary', icon: 'sun', validate: async () => {
+        if (sending || !ready()) return false;
+        sending = true;
+        try { await this.tbSend(o, status); } finally { sending = false; }
+        return false;
+      } }] : []),
     ] });
+    if (tb) this.tbBar();
     if (!go) return;
     this.toast(t('Making the house scene…'));
     try {
