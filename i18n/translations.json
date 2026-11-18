@@ -12315,10 +12315,6 @@
   "Het gebakken licht is binnen.",
   "Det bakte lyset er inne."
  ],
- "The baked light went to another copy of House Planner.": [
-  "Het gebakken licht ging naar een andere kopie van House Planner.",
-  "Det bakte lyset gikk til en annen kopi av House Planner."
- ],
  "The house could not be handed over: {e}": [
   "Het huis kon niet worden doorgegeven: {e}",
   "Huset kunne ikke gis videre: {e}"
@@ -12354,5 +12350,37 @@
  "“{f}” is not the Toolbox folder: it has no toolbox-folder.json. Nothing was written there.": [
   "“{f}” is niet de Toolbox-map: er staat geen toolbox-folder.json in. Er is niets in geschreven.",
   "«{f}» er ikke Toolbox-mappen: den har ingen toolbox-folder.json. Ingenting ble skrevet der."
+ ],
+ "Baked light for a version of “{name}” that is no longer there: not taken in.": [
+  "Gebakken licht voor een versie van “{name}” die er niet meer is: niet overgenomen.",
+  "Bakt lys for en versjon av «{name}» som ikke finnes lenger: ikke tatt inn."
+ ],
+ "Taking the baked light in.": [
+  "Het gebakken licht wordt overgenomen.",
+  "Tar inn det bakte lyset."
+ ],
+ "Baked light for “{v}”: that version is shown now.": [
+  "Gebakken licht voor “{v}”: die versie staat nu open.",
+  "Bakt lys for «{v}»: den versjonen vises nå."
+ ],
+ "Baked light has arrived – open its house to take it in.": [
+  "Gebakken licht is binnen – open het huis om het over te nemen.",
+  "Bakt lys har kommet – åpne huset for å ta det inn."
+ ],
+ "The owner kept the baked light the house had.": [
+  "Het gebakken licht dat het huis al had, is gehouden.",
+  "Det bakte lyset huset hadde, ble beholdt."
+ ],
+ "Not taken in yet – House Planner tries again.": [
+  "Nog niet overgenomen – House Planner probeert het opnieuw.",
+  "Ikke tatt inn ennå – House Planner prøver igjen."
+ ],
+ "the bake has no scene House Planner can read": [
+  "de bake heeft geen scène die House Planner kan lezen",
+  "bakingen har ingen scene House Planner kan lese"
+ ],
+ "This house is open in another window: send it from the window that saves it.": [
+  "Dit huis is open in een ander venster: stuur het vanuit het venster dat het opslaat.",
+  "Dette huset er åpent i et annet vindu: send det fra vinduet som lagrer det."
  ]
 }

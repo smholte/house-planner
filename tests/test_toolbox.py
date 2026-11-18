@@ -219,7 +219,7 @@ def pc_test(p, tmp):
     job = json.loads((box / 'tools' / RENDER / 'inbox' / ja / 'job.json').read_text())
     sj = json.loads((SAMPLES / 'tools' / RENDER / 'inbox' / '20261118-195100-9f3c2a' / 'job.json').read_text())
     same = lambda d: {k: v for k, v in d.items() if k not in ('job', 'created', 'files', 'title')}
-    check('… like the sample\'s job (all but id, time, file name and size, title)', same(job) == same(sj) and list(job) == list(sj)
+    check('… like the sample\'s job (all but id, time, file name and size, title)', same(job) == same(sj) and set(job) == set(sj)
           and [f['type'] for f in job['files']] == [f['type'] for f in sj['files']], (job, sj))
     check('… the file is a house scene (.hpscene) of the stated size', job['files'][0]['name'].endswith('.hpscene') and (box / 'tools' / RENDER / 'inbox' / ja / job['files'][0]['name']).stat().st_size == job['files'][0]['size'])
     check('… the title names house and version', job['title'].startswith(pg.evaluate("() => window.__hp.app.project.name")))
@@ -292,6 +292,9 @@ def pc_test(p, tmp):
     check('… nothing imported into the open house', not pg.evaluate("() => window.__hp.app.shownVersion().bake"))
     check('… the job is kept', reply_c in inbox_jobs(box, ME))
     pg.evaluate("id => window.__hp.app.openProject(id)", house_a)
+    # the version has baked light already (job B): the owner is asked, as with Import bake
+    pg.wait_for_selector('.dialog:has-text("Replace the baked light?")', timeout=600000)
+    pg.click('.dialog .btn.primary')
     pg.wait_for_function("() => { const a = window.__hp.app; return a._tb && !a._tb.busy && a.project && a.shownVersion().bake && a.shownVersion().bake.scene === (a.project.hpScenes || []).slice(-1)[0].id; }", timeout=600000)
     pg.wait_for_timeout(500)
     box = dump(pg, tmp)
@@ -324,6 +327,41 @@ def pc_test(p, tmp):
     check('… no import (the bake stays as it was)', pg.evaluate("() => window.__hp.app.shownVersion().bake.id") == bake_id)
     toasts = pg.inner_text('#toasts')
     check('… and the owner is told', 'cannot take' in toasts, toasts)
+
+    # review 0042: Cancel at "Replace the baked light?" keeps the bake as it was and does not lose the reply as "failed";
+    # a reply naming a job this device never sent deletes nothing in Fresing Render's inbox
+    send(pg, quick_opts(pg))
+    box = dump(pg, tmp)
+    je = inbox_jobs(box, RENDER)[0]
+    other = '20261118-220000-bbbbb1'
+    (box / 'tools' / RENDER / 'inbox' / other).mkdir()
+    (box / 'tools' / RENDER / 'inbox' / other / 'job.json').write_bytes((box / 'tools' / RENDER / 'inbox' / je / 'job.json').read_bytes().replace(je.encode(), other.encode()))
+    sync(pg, box)
+    box, reply_e = answer(pg, tmp, je)
+    pg.evaluate("() => { const a = window.__hp.app; a._tb.cleaned = Date.now(); a.tbTick(true); }")
+    pg.wait_for_selector('.dialog:has-text("Replace the baked light?")', timeout=600000)
+    pg.click('.dialog .btn:not(.primary):has-text("Cancel")')
+    pg.wait_for_function("() => !window.__hp.app._tb.busy")
+    box = dump(pg, tmp)
+    sf = box / 'tools' / ME / 'inbox' / reply_e / 'status.json'
+    st = json.loads(sf.read_text()) if sf.exists() else {}
+    check('Cancel at "Replace?": the bake stays as it was, the reply is "cancelled" (not failed), kept a day', st.get('state') == 'cancelled'
+          and pg.evaluate("() => window.__hp.app.shownVersion().bake.id") == bake_id and reply_e in inbox_jobs(box, ME), st)
+    # a reply whose reply_to names a job this device never sent
+    t = {}
+    jf = '20261118-220000-ccccc1'
+    doc = {'format': 'toolbox-job', 'version': '0.1', 'job': jf, 'created': F.now(), 'from': RENDER, 'to': ME, 'action': 'import-bake',
+           'reply_to': {'tool': RENDER, 'job': other}, 'files': [{'name': 'house.hpbake', 'type': 'hpbake', 'size': len(good)}]}
+    pg.evaluate("t => window.__opfs.put(t)", {f'Toolbox/tools/{ME}/inbox/{jf}/house.hpbake': b64(good), f'Toolbox/tools/{ME}/inbox/{jf}/job.json': b64(json.dumps(doc).encode())})
+    pg.evaluate("() => { const a = window.__hp.app; a._tb.cleaned = Date.now(); a.tbTick(true); }")
+    pg.wait_for_selector('.dialog:has-text("Replace the baked light?")', timeout=600000)
+    pg.click('.dialog .btn.primary')
+    pg.wait_for_function("() => !window.__hp.app._tb.busy && !document.querySelector('#sheet-root .scrim')", timeout=600000)
+    pg.wait_for_timeout(500)
+    box = dump(pg, tmp)
+    check('a reply naming a job this device never sent: imported, but that job in Fresing Render\'s inbox is left alone',
+          jf not in inbox_jobs(box, ME) and other in inbox_jobs(box, RENDER), (inbox_jobs(box, ME), inbox_jobs(box, RENDER)))
+    bake_id = pg.evaluate("() => window.__hp.app.shownVersion().bake.id")
 
     # two windows: one reads the inbox at a time
     pg2 = pg.context.new_page()

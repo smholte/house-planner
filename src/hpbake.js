@@ -1082,13 +1082,17 @@ Object.assign(app, {
 
   /* ───────── import ───────── */
   /** Import bake…: read, check, match to the shown version, keep it with the version */
-  async hpbakeImport(file) {
+  /** why (optional, task 0042): why.reason is set when it returns false – 'refused' (the file is not for this), 'declined'
+      (the owner said no), 'passing' (no 3D, no room, an error: try again later) */
+  async hpbakeImport(file, why = {}) {
     const p = this.project;
+    why.reason = 'passing';
     if (!p || !file) return false;
     if (p.viewer) { this.toast(t('A copy for viewing cannot take baked light.')); return false; }
     const v = this.shownVersion();
     const busy = UI.busy(t('Reading the bake…'));
-    const refuse = async (msgs, title) => {
+    const refuse = async (msgs, title, reason = 'refused') => {
+      why.reason = reason;
       busy.close();
       await UI.dialog({ title: title || t('This bake cannot be used'), body: h('div', { class: 'hpb-refuse', style: { display: 'grid', gap: '8px' } }, ...msgs.slice(0, 6).map(m => h('p', null, m)), msgs.length > 6 ? h('p', { class: 'note-muted' }, t('… and {n} more.', { n: msgs.length - 6 })) : null), actions: [{ label: t('OK'), value: true, kind: 'primary' }] });
       return false;
@@ -1105,7 +1109,7 @@ Object.assign(app, {
       await new Promise(r => setTimeout(r, 30));
       const t0 = performance.now();
       const now = this.hpsSurfacesNow(v, P);
-      if (!now) return refuse([t('3D is not available on this device.')]);
+      if (!now) return refuse([t('3D is not available on this device.')], undefined, 'passing');
       const M = hpbMatchBuild(now, doc, P);
       M.gen = ++HPB_GEN; M.ms = Math.round(performance.now() - t0);
       const same = M.state.filter(x => x === 1 || x === 2).length;
@@ -1115,7 +1119,7 @@ Object.assign(app, {
       busy.close();
       if (v.bake) {
         const ok = await UI.confirm({ title: t('Replace the baked light?'), message: t('“{v}” has baked light from {f}. The new bake takes its place; the old one stays in Save points for 30 days.', { v: v.name, f: v.bake.file }), confirmLabel: t('Replace') });
-        if (!ok) return false;
+        if (!ok) { why.reason = 'declined'; return false; }
         await Saver.flushNow();
         await Snapshots.create(this.project, 'backup', t('Before importing a bake ({d})', { d: fmtDate(Date.now()) }), 30);
       }
@@ -1134,7 +1138,7 @@ Object.assign(app, {
         // room on this device? (kept as text: about 4/3 of the file, twice for safety)
         try {
           const est = navigator.storage && navigator.storage.estimate ? await navigator.storage.estimate() : null;
-          if (est && est.quota && est.quota - (est.usage || 0) < size * 2.7) { busy2.close(); return refuse([t('There is not enough room on this device for this bake ({s}). Free some space, or bake fewer moments.', { s: fmtBytes(size) })], t('Not enough room')); }
+          if (est && est.quota && est.quota - (est.usage || 0) < size * 2.7) { busy2.close(); return refuse([t('There is not enough room on this device for this bake ({s}). Free some space, or bake fewer moments.', { s: fmtBytes(size) })], t('Not enough room'), 'passing'); }
         } catch (e) { /* unknown: try */ }
         try {
           for (const name of need) {
@@ -1149,7 +1153,7 @@ Object.assign(app, {
           // nothing half kept: the files written so far go again
           for (const id of Object.values(ids)) { try { await BakeDB.del(id); } catch (e2) { /* gone */ } Assets.fresh.delete(id); }
           busy2.close();
-          if (e && (e.name === 'QuotaExceededError' || /quota/i.test(String(e.message)))) return refuse([t('There is not enough room on this device for this bake ({s}). Free some space, or bake fewer moments.', { s: fmtBytes(size) })], t('Not enough room'));
+          if (e && (e.name === 'QuotaExceededError' || /quota/i.test(String(e.message)))) return refuse([t('There is not enough room on this device for this bake ({s}). Free some space, or bake fewer moments.', { s: fmtBytes(size) })], t('Not enough room'), 'passing');
           throw e;
         }
         const moments = (doc.moments || []).map(m => {

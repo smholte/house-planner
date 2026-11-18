@@ -175,6 +175,7 @@ Object.assign(app, {
   async tbSend(o, status) {
     const S = this._tbState();
     const say = msg => { if (status) status.textContent = msg; };
+    if (Saver.readonly) { say(t('This house is open in another window: send it from the window that saves it.')); return false; }
     if (!S.root) { await this.tbConnect(); if (!S.root) return false; }
     const box = await this.tbOpenBox(true);
     if (!box) {
@@ -221,14 +222,13 @@ Object.assign(app, {
       case 'imported': return t('The baked light is in.');
       case 'failed': return t('Fresing Render could not bake it: {t}', { t: j.text || t('no reason given') });
       case 'cancelled': return t('The bake was stopped.');
-      case 'elsewhere': return t('The baked light went to another copy of House Planner.');
       default: return '';
     }
   },
   /** the job the bar and the dialog show: the newest one still going, else the newest one */
   tbCurrent() {
     const S = this._tbState(), jobs = S.jobs.filter(j => !j.hidden);
-    return jobs.filter(j => !['failed', 'cancelled', 'imported', 'elsewhere', 'gone'].includes(j.state)).pop() || jobs.filter(j => j.state !== 'gone').pop() || null;
+    return jobs.filter(j => !['failed', 'cancelled', 'imported', 'gone'].includes(j.state)).pop() || jobs.filter(j => j.state !== 'gone').pop() || null;
   },
   /** the small bar under the top bar (and the line in an open export dialog) */
   tbBar() {
@@ -272,6 +272,9 @@ Object.assign(app, {
     if (S.busy) return;
     S.busy = true;
     try {
+      // the device list again (another tab of this site may have sent or closed a job)
+      const all = await TbJobs.all();
+      if (all.length || !S.jobs.length) S.jobs = all;
       await this.tbLookAtSent();
       await S.box.exclusively(() => this.tbReadInbox());
     } catch (e) {
@@ -289,7 +292,8 @@ Object.assign(app, {
       if (!['sent', 'waiting', 'working', 'done'].includes(j.state)) continue;
       const st = await box.status(j.to, j.job);
       const was = j.state + '|' + j.text + '|' + j.fraction;
-      if (!st) j.state = j.state === 'done' ? 'elsewhere' : 'gone';
+      // gone: Fresing Render or another copy cleaned it up (a done job a day later, while its reply may still wait)
+      if (!st) j.state = 'gone';
       else if (st.state !== 'sent') { j.state = st.state; j.text = st.text || ''; j.fraction = st.fraction; j.updated = st.updated; j.reply = st.reply; }
       j.open = S.open;
       // a final status that brings nothing back: the sent job may go (7.4)
@@ -301,8 +305,21 @@ Object.assign(app, {
   /** our inbox: replies (6.3), jobs left waiting for another house, and the clean-up of a day-old final job (7.4) */
   async tbReadInbox() {
     const S = this._tbState(), box = S.box, me = tbManifest();
-    const ids = [...await box.pending(), ...(await box.unfinished()).filter(u => u.status.state === 'waiting').map(u => u.id)];
+    // waiting: for another house of this copy; working: being taken in – by a copy that stopped, after 5 minutes
+    const left = (await box.unfinished()).filter(u => u.status.state === 'waiting' || (u.status.state === 'working' && ToolboxFolder.stalled(u.status)));
+    const ids = [...await box.pending(), ...left.map(u => u.id)];
     for (const id of ids) {
+      if (S.taken && S.taken.has(id)) continue;                     // taken in already; its delete failed (Windows held it)
+      if (S.retry && S.retry[id] > Date.now()) continue;            // a passing problem: tried again later
+      try { await this.tbOneJob(id, me); }
+      catch (e) { if (e && e.name === 'NotFoundError' && !(await box.status(TB_ME, id))) continue; if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) throw e; console.warn('[toolbox] job', id, e); }
+    }
+    await this.tbClean();
+  },
+  /** one job of our inbox */
+  async tbOneJob(id, me) {
+    const S = this._tbState(), box = S.box;
+    {
       let got;
       try { got = await box.take(me, id); }
       catch (e) {
@@ -310,24 +327,30 @@ Object.assign(app, {
         if (e.code === 'not-complete') {
           // a file still being written gets a minute
           S.seen[id] = S.seen[id] || Date.now();
-          if (Date.now() - S.seen[id] < 60000) continue;
+          if (Date.now() - S.seen[id] < 60000) return;
         }
         const code = ['bad-job', 'unknown-action', 'wrong-type'].includes(e.code) ? e.code : 'bad-job';
         const newer = /is version (\d+\.\d+)/.exec(e.message);
         const text = newer ? t('This job was written by a newer tool (toolbox format {v}). Update House Planner to read it.', { v: newer[1] }) : t('House Planner cannot take this: {e}', { e: e.message });
         await box.writeStatus(id, 'failed', { code, text });
         this.toast(t('Something arrived from the Toolbox folder that House Planner cannot take: {e}', { e: text }), { ms: 9000 });
-        continue;
+        return;
       }
       const file = got.files[0].file;
       const scene = S.places[id] !== undefined ? S.places[id].scene : await tbSceneOf(file);
+      if (!scene) {
+        const text = t('House Planner cannot take this: {e}', { e: t('the bake has no scene House Planner can read') });
+        await box.writeStatus(id, 'failed', { code: 'bad-job', text });
+        this.toast(t('Something arrived from the Toolbox folder that House Planner cannot take: {e}', { e: text }), { ms: 9000 });
+        return;
+      }
       // which house of this copy sent that scene?
       const open = this.project;
       if (open && scene && (open.hpScenes || []).some(x => x.id === scene)) {
-        if (!this.tbQuiet()) continue;                              // later: a dialog is open or something is dragged
-        if (Saver.readonly) continue;                               // another window writes this house
+        if (!this.tbQuiet()) return;                                // later: a dialog is open or something is dragged
+        if (Saver.readonly) return;                                 // another window writes this house
         await this.tbImport(got, file, scene);
-        continue;
+        return;
       }
       let house = S.places[id] && S.places[id].house;
       if (house === undefined) {
@@ -335,7 +358,7 @@ Object.assign(app, {
         try { for (const p of await DB.all('projects')) if (!p.viewer && (p.hpScenes || []).some(x => x.id === scene)) { house = { id: p.id, name: p.name }; break; } } catch (e) { /* no list */ }
         S.places[id] = { scene, house };
       }
-      if (!house) continue;                                         // not this copy's: left alone for another one
+      if (!house) return;                                           // not this copy's: left alone for another one
       const text = t('Baked light for “{name}” has arrived – open that house to take it in.', { name: house.name });
       const st = await box.status(TB_ME, id);
       if (!st || st.state !== 'waiting' || st.text !== text) {
@@ -343,7 +366,6 @@ Object.assign(app, {
         this.toast(text, { ms: 9000, action: { label: t('Open'), fn: () => this.openProject(house.id) } });
       }
     }
-    await this.tbClean();
   },
   /** nothing in the way: no dialog, no sheet, nothing being dragged */
   tbQuiet() {
@@ -354,17 +376,43 @@ Object.assign(app, {
   async tbImport(got, file, scene) {
     const S = this._tbState(), box = S.box, p = this.project, id = got.job.job;
     const rec = (p.hpScenes || []).find(x => x.id === scene);
-    if (rec && rec.versionId && getVersion(p, rec.versionId) && this.shownVersion().id !== rec.versionId) this.setActiveVersion(rec.versionId);
-    const sent = S.jobs.find(j => got.job.reply_to && j.job === got.job.reply_to.job);
+    // the version it was sent from is gone: not into whatever version shows
+    if (!rec || (rec.versionId && !getVersion(p, rec.versionId))) {
+      const text = t('Baked light for a version of “{name}” that is no longer there: not taken in.', { name: p.name });
+      await box.writeStatus(id, 'failed', { code: 'error', text });
+      this.toast(text, { ms: 9000 });
+      return;
+    }
+    // taken: other copies (the other kind of copy has another Web Lock) leave a job with a status alone
+    await box.writeStatus(id, 'working', { text: t('Taking the baked light in.') });
+    if (rec.versionId && this.shownVersion().id !== rec.versionId) {
+      const v = getVersion(p, rec.versionId);
+      this.setActiveVersion(rec.versionId);
+      this.toast(t('Baked light for “{v}”: that version is shown now.', { v: v.name || t('Original') }), { ms: 6000 });
+    }
+    const sent = S.jobs.find(j => got.job.reply_to && j.job === got.job.reply_to.job && j.to === got.job.from);
     if (sent) { sent.state = 'done'; await TbJobs.put(sent); this.tbBar(); }
-    const ok = await this.hpbakeImport(new File([file], file.name || 'bake.hpbake'));
+    if (this.project !== p) { await box.writeStatus(id, 'waiting', { text: t('Baked light has arrived – open its house to take it in.') }); return; }
+    const why = {};
+    const ok = await this.hpbakeImport(new File([file], file.name || 'bake.hpbake'), why);
     if (ok) {
+      // final first: should the delete fail (Windows holds a file), the job is not taken in twice
+      await box.writeStatus(id, 'done', { text: t('The baked light is in.') });
+      (S.taken || (S.taken = new Set())).add(id);
       await box.remove(TB_ME, id);
-      if (got.job.reply_to && got.job.reply_to.tool === got.job.from) await box.remove(got.job.reply_to.tool, got.job.reply_to.job);
+      // the job it answers: only one this device sent to that tool (7.4)
+      if (sent) await box.remove(sent.to, sent.job);
       if (sent) { sent.state = 'imported'; await TbJobs.put(sent); }
-    } else {
+    } else if (why.reason === 'declined') {
+      await box.writeStatus(id, 'cancelled', { text: t('The owner kept the baked light the house had.') });
+      if (sent) { sent.state = 'cancelled'; await TbJobs.put(sent); }
+    } else if (why.reason === 'refused') {
       await box.writeStatus(id, 'failed', { code: 'error', text: t('House Planner did not take this bake in.') });
       if (sent) { sent.state = 'failed'; sent.text = t('House Planner did not take this bake in.'); await TbJobs.put(sent); }
+    } else {
+      // a passing problem (no room, no 3D, an error): kept, tried again in 5 minutes
+      await box.writeStatus(id, 'waiting', { text: t('Not taken in yet – House Planner tries again.') });
+      (S.retry || (S.retry = {}))[id] = Date.now() + 5 * 60000;
     }
     delete S.places[id];
   },
@@ -380,7 +428,8 @@ Object.assign(app, {
       try {
         const f = await (await hd.getFileHandle('status.json')).getFile();
         const st = ToolboxFolder.parseJson(new Uint8Array(await f.arrayBuffer()));
-        if (ToolboxFolder.FINAL.includes(st.state) && Date.now() - Date.parse(st.updated) > TB_DAY) await S.box.remove(TB_ME, name);
+        const age = Date.now() - Date.parse(st.updated);
+        if ((ToolboxFolder.FINAL.includes(st.state) && age > TB_DAY) || age > 30 * TB_DAY) await S.box.remove(TB_ME, name);
       } catch (e) { /* no status, or being replaced: next time */ }
     }
   },
