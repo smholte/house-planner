@@ -279,7 +279,7 @@ def pc_test(p, tmp):
     o = quick_opts(pg)
     check('a second send', send(pg, o))
     box = dump(pg, tmp)
-    jb = inbox_jobs(box, RENDER)[0]
+    jb = pg.evaluate("async () => (await window.__hp.TbJobs.all()).pop().job")
     box, reply = answer(pg, tmp, jb)
     ok_report(tb_check(box), 'the folder with Fresing Render\'s reply (written by the tag\'s Python)')
     tick(pg)
@@ -296,7 +296,7 @@ def pc_test(p, tmp):
     # job C: a bake for another house of this copy waits, and is taken in when that house opens
     send(pg, quick_opts(pg))
     box = dump(pg, tmp)
-    jc = inbox_jobs(box, RENDER)[0]
+    jc = pg.evaluate("async () => (await window.__hp.TbJobs.all()).pop().job")
     name_a = pg.evaluate("() => window.__hp.app.project.name")
     pg.evaluate("async () => { const p = window.__hp.newProject('Second house', ['Ground floor']); await window.__hp.DB.put('projects', p); await window.__hp.app.openProject(p.id); }")
     box, reply_c = answer(pg, tmp, jc)
@@ -350,7 +350,7 @@ def pc_test(p, tmp):
     # a reply naming a job this device never sent deletes nothing in Fresing Render's inbox
     send(pg, quick_opts(pg))
     box = dump(pg, tmp)
-    je = inbox_jobs(box, RENDER)[0]
+    je = pg.evaluate("async () => (await window.__hp.TbJobs.all()).pop().job")
     other = '20261118-220000-bbbbb1'
     (box / 'tools' / RENDER / 'inbox' / other).mkdir()
     (box / 'tools' / RENDER / 'inbox' / other / 'job.json').write_bytes((box / 'tools' / RENDER / 'inbox' / je / 'job.json').read_bytes().replace(je.encode(), other.encode()))
@@ -407,7 +407,7 @@ def pc_test(p, tmp):
     o = quick_opts(pg)
     send(pg, o)
     box = dump(pg, tmp)
-    jd = inbox_jobs(box, RENDER)[0]
+    jd = pg.evaluate("async () => (await window.__hp.TbJobs.all()).pop().job")   # the job just sent (another lies there)
     scene = next((box / 'tools' / RENDER / 'inbox' / jd).glob('*.hpscene')).read_bytes()
     bake = make_bake(scene, snow=False, open_storeys=False)
     pg.evaluate("async () => { const p = window.__hp.newProject('Third house', ['Ground floor']); await window.__hp.DB.put('projects', p); await window.__hp.app.openProject(p.id); }")
