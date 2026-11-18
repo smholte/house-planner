@@ -370,14 +370,15 @@ def pc_test(p, tmp):
     pg2.wait_for_function("() => window.__hp && window.__hp.app._tb && window.__hp.app._tb.box", timeout=60000)
     check('a second window finds the kept folder and its permission by itself', True)
     wrap = """() => { const a = window.__hp.app; window.__reads = 0; const f = a.tbReadInbox.bind(a);
-      a.tbReadInbox = async () => { window.__reads++; await new Promise(r => setTimeout(r, 4000)); return f(); }; }"""
+      a.tbReadInbox = async () => { window.__reads++; await new Promise(r => setTimeout(r, 20000)); return f(); }; }"""
     pg.evaluate(wrap); pg2.evaluate(wrap)
     pg.evaluate("() => { window.__hp.app._tb.busy = false; window.__hp.app.tbTick(true); }")
     pg.wait_for_function("() => window.__reads === 1")
     pg2.evaluate("async () => { window.__hp.app._tb.busy = false; await window.__hp.app.tbTick(true); }")
     r2 = pg2.evaluate("() => window.__reads")
-    pg.wait_for_timeout(4500)
-    check('two windows: while one reads the inbox, the other does not (Web Lock)', r2 == 0, r2)
+    still = pg.evaluate("() => window.__reads === 1 && window.__hp.app._tb.busy")
+    pg.wait_for_function("() => !window.__hp.app._tb.busy", timeout=60000)
+    check('two windows: while one reads the inbox, the other does not (Web Lock)', r2 == 0 and still, (r2, still))
     pg2.close()
 
     # a .hpbake opened by the installed app (launchQueue hands the file to tbOpenBakeFile)
@@ -398,7 +399,6 @@ def pc_test(p, tmp):
     lq = pg.evaluate("() => 'launchQueue' in window")
     print(f'   (launchQueue in the test browser: {lq}; a real launch from Explorer cannot be made here)')
     check('no errors on the page', not pg.errors, pg.errors[:3])
-    print(f'   (Send to the job on disk, whole house: {sent_s:.0f} s in the test browser, software 3D)')
     b.close()
 
 
