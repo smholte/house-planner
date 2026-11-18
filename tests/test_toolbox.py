@@ -29,6 +29,13 @@ ROOT = HERE.parent
 OPFS = """
 const b64 = bytes => { let s = ''; for (let i = 0; i < bytes.length; i += 8192) s += String.fromCharCode(...bytes.subarray(i, i + 8192)); return btoa(s); };
 const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+// the folder kept on this device: on GitHub's test machine the page closed when a handle of the private file system
+// was read back from IndexedDB (ToolboxFolder.remembered). Here "kept" is a flag, and the handle is fetched again.
+Object.defineProperty(window, 'ToolboxFolder', { configurable: true, get() { return this.__tf; }, set(v) {
+  v.remember = async root => { localStorage.setItem('__tb_root', root.name); };
+  v.forget = async () => { localStorage.removeItem('__tb_root'); };
+  v.remembered = async () => { const n = localStorage.getItem('__tb_root'); return n ? (await navigator.storage.getDirectory()).getDirectoryHandle(n) : null; };
+  this.__tf = v; } });
 window.__opfs = {
   async top() { return navigator.storage.getDirectory(); },
   async dir(path, create = true) { let d = await this.top(); for (const p of path.split('/').filter(Boolean)) d = await d.getDirectoryHandle(p, { create }); return d; },
