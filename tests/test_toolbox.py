@@ -389,6 +389,9 @@ def pc_test(p, tmp):
     bake = make_bake(scene, snow=False, open_storeys=False)
     pg.evaluate("async () => { const p = window.__hp.newProject('Third house', ['Ground floor']); await window.__hp.DB.put('projects', p); await window.__hp.app.openProject(p.id); }")
     pg.evaluate("b => { window.__od = null; window.__hp.app.tbOpenBakeFile(new File([Uint8Array.from(atob(b), c => c.charCodeAt(0))], 'house.hpbake')).then(r => { window.__od = { r }; }); }", b64(bake))
+    # that house's version has baked light already: asked, as with Import bake
+    pg.wait_for_selector('.dialog:has-text("Replace the baked light?")', timeout=600000)
+    pg.click('.dialog .btn.primary')
     pg.wait_for_function("() => window.__od", timeout=600000)
     check('a .hpbake opened with the app goes to the house that sent it (that house opens, the bake is in)',
           pg.evaluate("id => { const a = window.__hp.app; return window.__od.r === true && a.project.id === id; }", house_a))
