@@ -155,8 +155,19 @@ def files_test():
 
 
 # ───────────────────────────────── 2. the PC
+def full_chromium(p):
+    """open_app with the full Chromium (new headless mode): GitHub's headless shell closed the page when a folder
+    handle kept in IndexedDB was read back (ToolboxFolder.remembered)"""
+    launch = p.chromium.launch
+    p.chromium.launch = lambda **k: launch(channel='chromium', **k)
+    try:
+        return open_app(p, theme='light', init=[])
+    finally:
+        p.chromium.launch = launch
+
+
 def pc_test(p, tmp):
-    b, pg = open_app(p, theme='light', init=[])
+    b, pg = full_chromium(p)
     pg.add_init_script(OPFS)
     pg.reload(); pg.wait_for_timeout(800)
     open_example(pg)

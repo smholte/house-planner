@@ -180,7 +180,7 @@ with sync_playwright() as p:
     pg.click('#hps-quality [data-k="NORMAL"]'); pg.click('#hps-m-night')
     pg.screenshot(path=SHOTS + 'hpscene-dialog-pc.png')
     with pg.expect_download(timeout=180000) as dl:
-        pg.click('.dialog .btn.primary:has-text("Save file")')
+        pg.click('.dialog .dlg-foot .btn:has-text("Save file")')
     f = dl.value
     path = os.path.join(SHOTS, 'dialog-export.hpscene')
     f.save_as(path)
