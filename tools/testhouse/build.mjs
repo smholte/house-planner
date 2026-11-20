@@ -312,7 +312,7 @@ planB.garden.areas.push({ id: uid('ga_'), kind: 'water', name: 'Pond', poly: rec
   g.areas.push({ id: uid('ga_'), kind: 'planting', name: 'Front border', poly: rect(-0.4, -0.4, 2.2, -1.5) });
   g.areas.push({ id: uid('ga_'), kind: 'planting', name: 'Front border', poly: rect(3.9, -0.4, 8.4, -1.5) });
   g.areas.push({ id: uid('ga_'), kind: 'planting', name: 'Back border', poly: rect(-3.9, 20.3, 8.4, 21.7) });
-  g.areas.push({ id: uid('ga_'), kind: 'tiles', size: [0.6, 0.6], name: 'Path to the back', poly: rect(5.4, 13.5, 6.0, 20.3) });
+  g.areas.push({ id: uid('ga_'), kind: 'bark', name: 'Path to the back', poly: rect(5.2, 13.5, 6.0, 20.3) });
   const P = (kind, x, y, d, h, name) => g.plants.push({ id: uid('gp_'), kind, x: pt(x, y)[0], y: pt(x, y)[1], d, h, ...(name ? { name } : {}) });
   P('small', -1.6, -3.6, 2.6, 3.6, 'Japanese maple');
   for (const [x, y] of [[0.2, -0.95], [1.6, -0.95], [4.6, -0.95], [7.6, -0.95]]) P('shrub', x, y, 0.9, 0.8);
