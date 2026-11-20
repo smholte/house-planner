@@ -263,10 +263,11 @@ planB.garden.areas.push({ id: uid('ga_'), kind: 'water', name: 'Pond', poly: rec
 {
   const L1 = layout1;
   const move = (type, x, y, front, n = 0) => { const f = L1.filter(q => q.type === type)[n]; const p = pt(x, y); Object.assign(f, { x: p[0], y: p[1], rot: ROT[front] }); };
-  // the living room: the seats round the TV wall, the dining table by the garden doors (clear of their leaves)
-  move('sofa3', 5.9, 7.05, 'street'); move('coffee', 5.9, 5.95, 'street'); move('armchair', 3.55, 5.95, 'right');
-  move('dtable', 3.3, 8.45, 'garden');
-  [[2.85, 7.8, 'garden'], [3.75, 7.8, 'garden'], [2.85, 9.1, 'street'], [3.75, 9.1, 'street']].forEach(([x, y, fr], i) => move('chair', x, y, fr, i));
+  // the living room: the seats round the TV wall, the dining table lengthwise against the study wall (clear of the garden
+  // doors' leaves). The room's middle and the spots the tests tap stay free floor (IFC 5.0 7.05, 3.2 6.0, 3.5 8.3)
+  move('sofa3', 6.2, 6.4, 'street'); move('coffee', 6.2, 5.5, 'street'); move('armchair', 4.4, 5.5, 'right'); move('tvunit', 6.2, 4.75, 'garden');
+  move('dtable', 2.75, 8.3, 'right');   // (its length along y)
+  [[3.5, 7.75, 'left'], [3.5, 8.85, 'left'], [2.75, 6.95, 'garden'], [1.55, 8.8, 'left']].forEach(([x, y, fr], i) => move('chair', x, y, fr, i));
   Object.assign(L1.find(f => f.type === 'sofa3'), { color: '#5E6B66' });
   Object.assign(L1.find(f => f.type === 'armchair'), { color: '#B08A62' });
   Object.assign(L1.find(f => f.type === 'dtable'), { color: '#C49A6C' });
@@ -274,10 +275,10 @@ planB.garden.areas.push({ id: uid('ga_'), kind: 'water', name: 'Pond', poly: rec
   const K = (id, s, x, y, front, extra = {}) => { const m = MODEL_SIZES[id]; return F('model', s, x, y, front, m[0], m[1], m[2], { color: extra.color || '#B7B2A8', model: 'k:' + id, ...extra }); };
   const outside = [
     // living room
-    F('rug', BG, 5.7, 6.0, 'street', 2.6, 1.8, 0.012, { color: '#D8CFC0' }),
-    F('tv', BG, 5.9, 4.68, 'garden', 1.45, 0.25, 0.85, { color: '#1E1F21' }),
-    F('floorlamp', BG, 7.55, 7.35, 'left', 0.4, 0.4, 1.6, { color: '#2E2E2E' }),
-    F('pendant', BG, 3.3, 8.45, 'garden', 0.4, 0.4, 0.7, { color: '#2E2E2E' }),
+    F('rug', BG, 5.9, 5.6, 'street', 2.6, 1.6, 0.012, { color: '#D8CFC0' }),
+    F('tv', BG, 6.2, 4.68, 'garden', 1.45, 0.25, 0.85, { color: '#1E1F21' }),
+    F('floorlamp', BG, 7.6, 6.4, 'left', 0.4, 0.4, 1.6, { color: '#2E2E2E' }),
+    F('pendant', BG, 2.75, 8.3, 'garden', 0.4, 0.4, 0.7, { color: '#2E2E2E' }),
     F('sideboard', BG, 2.3, 6.0, 'right', 1.6, 0.45, 0.8, { color: '#8A6A4C' }),
     K('pottedPlant', BG, 7.65, 9.2, 'street'), K('pottedPlant', BG, 2.35, 4.85, 'right'),
     K('lampRoundTable', BG, 2.3, 6.45, 'right'),

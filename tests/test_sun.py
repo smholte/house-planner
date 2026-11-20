@@ -53,7 +53,8 @@ with sync_playwright() as p:
     g = pg.evaluate("() => { const G = window.__hp.app._sunHours.garden; return [G.length, G.reduce((s, q) => s + q.hours, 0) / G.length]; }")
     check('21 June: the living room gets sun (more than 3 hours)', R.get('Woonkamer|Begane grond', 0) > 3, R.get('Woonkamer|Begane grond'))
     check('the meter cupboard (no window) gets none', R.get('Meterkast|Begane grond', 1) == 0)
-    check('the garden: points all over the plot, about 8 or more hours on average', g[0] > 300 and g[1] > 7, g)
+    # (task 0044 planted small trees and borders in the example's garden: 6.6 hours on average on 21 June, before ~8)
+    check('the garden: points all over the plot, about 6 or more hours on average', g[0] > 300 and g[1] > 6, g)
     check('the table and the garden map are shown', pg.evaluate("() => document.querySelectorAll('.sunh-row').length > 10 && !!document.querySelector('.sunh-map')"))
     pg.screenshot(path=SHOTS + 'sun-hours.png')
     pg.select_option('#sunh-day', index=3)   # 21 December

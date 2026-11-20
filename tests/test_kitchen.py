@@ -17,8 +17,8 @@ with sync_playwright() as p:
     without_renato(pg)
     pg.click('#mode-switch button[data-mode="furnish"]'); pg.wait_for_timeout(1000)
     pg.evaluate("() => { window.__hp.app.settings.pip = false; window.__hp.app.updatePip(); }")
-    # (the example has its own kitchen: test_round9.py; here a kitchen is made from scratch)
-    pg.evaluate("() => window.__hp.app.furnMutate(l => { l.items = l.items.filter(i => !(window.__hp.ownId(i.id) && /kit/.test(i.id)) && i.type !== 'krun' && i.type !== 'island' && !i.island); })"); pg.wait_for_timeout(600)
+    # (the example has its own kitchen – and since task 0044 stools at its island: test_round9.py; here a kitchen is made from scratch)
+    pg.evaluate("() => window.__hp.app.furnMutate(l => { l.items = l.items.filter(i => !(window.__hp.ownId(i.id) && /kit/.test(i.id)) && i.type !== 'krun' && i.type !== 'island' && !i.island && i.type !== 'stool'); })"); pg.wait_for_timeout(600)
     kk = rooms(pg)['Keuken']
     run = add(pg, 'kitchen run')
     u = pg.evaluate(UNITS)
