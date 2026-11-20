@@ -66,10 +66,11 @@ with sync_playwright() as p:
     lv = pg.evaluate(SHAPES)
     tot = [sum(f[i] for f in lv) for i in range(3)] if lv else [0, 0, 0]
     check('the trees have a light and a far version: at most ½ and ⅕ of their triangles', lv and tot[1] <= tot[0] / 2 and tot[2] <= tot[0] / 5, tot)
-    # budget (the made-up site: a plot, two streets, 4 trees and 3 shrubs; before task 0029 18k triangles, 321 draw calls whole house)
+    # budget (the made-up site: a plot, two streets, 4 trees and 3 shrubs; before task 0029 18k triangles, 321 draw calls whole house;
+    # task 0044 made it a show house: +21 plants → 20.8k triangles, +37 pieces of furniture → 420 draw calls)
     calls = pg.evaluate("() => { const v = %s, r = v.renderer; r.render(v.scene, v.camera); v.needs = true; return r.info.render.calls; }" % V)
     # (the owner's house: its own budget in house/tests/test_site3d_own.py)
-    T, C = by_house(pg, (20000, 330), (170000, 470))
+    T, C = by_house(pg, (23000, 430), (170000, 470))
     check(f'budget: the site within {T // 1000}k triangles, the whole house within {C} draw calls', s['tri'] <= T and calls <= C, [s, calls])
     # far away all trees light; close by the tree in view full
     pg.evaluate(CAM, [[10, 0, 10], [-140, 120, 180]]); pg.wait_for_timeout(1200); still(pg)

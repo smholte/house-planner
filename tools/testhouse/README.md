@@ -11,7 +11,10 @@ from any real house, plot or builder's drawing.
 - rooms: Hal, Toilet, Meterkast, Bijkeuken, Keuken, Woonkamer · Overloop, Badkamer, Toilet boven, Slaapkamer 1–3 ·
   Zolder, Zolderkamer, 2 × Opslag achter knieschot
 - versions: Original (as delivered) · Plan – study (the living room split: Woonkamer + Werkkamer; oak floors, warm
-  white walls; the one it opens on, like the owner's house opens on its first plan) · Plan – open kitchen (the wall
+  white walls, a green-grey accent wall behind the TV, a soft green study, tinted bedrooms; the one it opens on, like the
+  owner's house opens on its first plan, and the "show" version – task 0044: Layout 1 furnished around the garden doors
+  with rugs, lamps, plants, stools at the island, a table and chairs on the terrace and a car on the parking place;
+  its garden planted in front of the house, along the back fence and by the pond) · Plan – open kitchen (the wall
   between kitchen and living room taken out: Woonkeuken; PVC floors, greige walls); floor heating; the toilets tiled
   to 1.5 m (30 × 60)
 - two furniture layouts with a kitchen run and an island (marble-look worktop), and a cabinet from the app's 3D model library; 69 electrics

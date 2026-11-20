@@ -94,6 +94,17 @@ Object.assign(View3D.prototype, {
       }
       if (low) break;
     }
+    // a roof slope drawn as one long plane has its corners only at the eaves, the ridge and the gables – none of them
+    // inside the room – so also ask the roof's own height over the room (every 25 cm inside the outline, 20 cm in from
+    // its edges); the attic's flat ceiling stuck out through the made-up house's slopes (task 0044)
+    if (!low) {
+      const F = this.roofCeiling(sid), step = 0.25;
+      if (F) for (let x = bb.minX + 0.2; x <= bb.maxX - 0.2 && !low; x += step) for (let z = bb.minY + 0.2; z <= bb.maxY - 0.2 && !low; z += step) {
+        if (!pointInPolygon([x, z], poly)) continue;
+        const y = F.at(x, z);
+        if (y != null && y > 0.3 && y < hgt - 0.05) low = true;
+      }
+    }
     this.roofCache.set(key, low);
     return low;
   },

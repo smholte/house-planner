@@ -23,6 +23,8 @@ Date.now = () => Date.UTC(2026, 10, 12, 12);
 const L = loadSrc(['util.js', 'model.js', 'ifc.js', 'ifc2house.js'],
   ['IFC', 'IfcHouse', 'uid', 'clone', 'V', 'wallDir', 'wallLen', 'splitWall', 'findAllRooms', 'labelPoint', 'pointInPolygon', 'bboxOfPoints', 'roomArea', 'joinWalls']);
 const { IFC, IfcHouse, uid, clone, V } = L;
+// the library models the example uses: their real sizes (w, d, h) from the app's model library
+const MODEL_SIZES = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(ROOT, 'build', 'models.json'), 'utf8')).models.map(m => [m.id, m.s]));
 const cfg = JSON.parse(fs.readFileSync(path.join(here, 'rooms.json'), 'utf8'));
 const model = IFC.parse(fs.readFileSync(path.join(here, 'testhouse.ifc'), 'utf8'));
 const res = IfcHouse.convert([model], cfg);
@@ -251,6 +253,75 @@ orig.garden = delivered;
 planA.garden = sample(delivered);
 planB.garden = sample(delivered);
 planB.garden.areas.push({ id: uid('ga_'), kind: 'water', name: 'Pond', poly: rect(1.0, 16.0, 3.4, 18.0) });
+
+/* ───────── task 0044: the show version (Plan – study, the one the example opens on) made to look lived in ─────────
+   Added at the end, so every id above stays the same. Layout 1 (the one it opens on): the living room arranged around
+   the garden doors (dining by the doors, the seats round a rug facing the TV wall), the study, stools and pendants at the
+   island, a table and chairs on the terrace, a car on the parking place; library models are Kenney's (CC0). The
+   garden of Plan – study: planting in front of the house, a small tree, borders along the back fence, grasses by the
+   pond, pots on the terrace. Colours: a darker accent wall behind the TV, a soft green study, bedrooms in soft tints. */
+{
+  const L1 = layout1;
+  const move = (type, x, y, front, n = 0) => { const f = L1.filter(q => q.type === type)[n]; const p = pt(x, y); Object.assign(f, { x: p[0], y: p[1], rot: ROT[front] }); };
+  // the living room: the seats round the TV wall, the dining table by the garden doors (clear of their leaves)
+  move('sofa3', 5.9, 7.05, 'street'); move('coffee', 5.9, 5.95, 'street'); move('armchair', 3.55, 5.95, 'right');
+  move('dtable', 3.3, 8.45, 'garden');
+  [[2.85, 7.8, 'garden'], [3.75, 7.8, 'garden'], [2.85, 9.1, 'street'], [3.75, 9.1, 'street']].forEach(([x, y, fr], i) => move('chair', x, y, fr, i));
+  Object.assign(L1.find(f => f.type === 'sofa3'), { color: '#5E6B66' });
+  Object.assign(L1.find(f => f.type === 'armchair'), { color: '#B08A62' });
+  Object.assign(L1.find(f => f.type === 'dtable'), { color: '#C49A6C' });
+  Object.assign(L1.find(f => f.type === 'tvunit'), { color: '#E9E4DA' });
+  const K = (id, s, x, y, front, extra = {}) => { const m = MODEL_SIZES[id]; return F('model', s, x, y, front, m[0], m[1], m[2], { color: extra.color || '#B7B2A8', model: 'k:' + id, ...extra }); };
+  const outside = [
+    // living room
+    F('rug', BG, 5.7, 6.0, 'street', 2.6, 1.8, 0.012, { color: '#D8CFC0' }),
+    F('tv', BG, 5.9, 4.68, 'garden', 1.45, 0.25, 0.85, { color: '#1E1F21' }),
+    F('floorlamp', BG, 7.55, 7.35, 'left', 0.4, 0.4, 1.6, { color: '#2E2E2E' }),
+    F('pendant', BG, 3.3, 8.45, 'garden', 0.4, 0.4, 0.7, { color: '#2E2E2E' }),
+    F('sideboard', BG, 2.3, 6.0, 'right', 1.6, 0.45, 0.8, { color: '#8A6A4C' }),
+    K('pottedPlant', BG, 7.65, 9.2, 'street'), K('pottedPlant', BG, 2.35, 4.85, 'right'),
+    K('lampRoundTable', BG, 2.3, 6.45, 'right'),
+    // the study (the living room's garden end in the other versions)
+    F('desk', BG, 0.4, 6.8, 'right', 1.4, 0.7, 0.75, { color: '#D8CFC0' }), F('ochair', BG, 1.05, 6.8, 'left', 0.62, 0.62, 1.05, { color: '#2F3437' }),
+    F('shelf', BG, 1.7, 5.2, 'left', 0.8, 0.4, 1.5, { color: '#C9A77F' }), K('plantSmall1', BG, 0.3, 7.4, 'right', { z: 0.75 }),
+    // the kitchen island: stools and two pendants
+    ...[1.6, 2.2, 2.8].map(y => F('stool', BG, 4.6, y, 'right', 0.4, 0.4, 0.65, { color: '#3C3C3C' })),
+    F('pendant', BG, 5.4, 1.75, 'right', 0.4, 0.4, 0.7, { color: '#2E2E2E' }), F('pendant', BG, 5.4, 2.65, 'right', 0.4, 0.4, 0.7, { color: '#2E2E2E' }),
+    // the main bedroom and the back bedrooms
+    F('rug', V1, 6.0, 2.2, 'garden', 2.2, 1.4, 0.012, { color: '#C9BFAE' }),
+    K('lampRoundTable', V1, 4.85, 0.25, 'garden'), K('lampRoundTable', V1, 7.15, 0.25, 'garden'), K('pottedPlant', V1, 7.6, 3.9, 'left'),
+    F('rug', V1, 5.5, 7.2, 'street', 1.6, 1.0, 0.012, { color: '#B9C3C9' }),
+    // outside: a table and chairs on the terrace, a car on the parking place
+    K('tableRound', BG, 3.0, 11.9, 'street'),
+    ...[[3.0, 11.15, 'garden'], [3.0, 12.65, 'street'], [2.25, 11.9, 'right'], [3.75, 11.9, 'left']].map(([x, y, fr]) => K('chairRounded', BG, x, y, fr)),
+    F('car', BG, 10.0, -3.4, 'street', 1.82, 4.6, 1.45, { color: '#4E5A63' }),
+  ];
+  L1.push(...outside);
+
+  // colours of the show version: an accent wall behind the TV, the study a soft green, the bedrooms soft tints
+  const living = room(planB, BG, 'Woonkamer'), tvWall = wallAt(planB, BG, 6.0, 4.45);
+  if (!tvWall) throw new Error('the wall behind the TV was not found');
+  tvWall.fin = { ...(tvWall.fin || {}), [living.id]: { color: '#6B7A72', name: 'Groengrijs (accent)' } };
+  Object.assign(room(planB, BG, 'Werkkamer'), { wallColor: '#D5DCCF', wallColorName: 'Zacht saliegroen' });
+  Object.assign(room(planB, V1, 'Slaapkamer 1'), { wallColor: '#E4DDD2', wallColorName: 'Zandbeige' });
+  Object.assign(room(planB, V1, 'Slaapkamer 2'), { wallColor: '#DCE3E6', wallColorName: 'Lichtblauwgrijs' });
+
+  // the garden of the show version
+  const g = planB.garden;
+  g.areas.push({ id: uid('ga_'), kind: 'planting', name: 'Front border', poly: rect(-0.4, -0.4, 2.2, -1.5) });
+  g.areas.push({ id: uid('ga_'), kind: 'planting', name: 'Front border', poly: rect(3.9, -0.4, 8.4, -1.5) });
+  g.areas.push({ id: uid('ga_'), kind: 'planting', name: 'Back border', poly: rect(-3.9, 20.3, 8.4, 21.7) });
+  g.areas.push({ id: uid('ga_'), kind: 'gravel', name: 'Path to the back', poly: rect(5.0, 13.5, 6.0, 20.3) });
+  g.lines.push(line('kerb', [pt(2.3, -0.4), pt(2.3, -6.3)], 0.05, 0.08), line('kerb', [pt(3.8, -0.4), pt(3.8, -6.3)], 0.05, 0.08));
+  const P = (kind, x, y, d, h, name) => g.plants.push({ id: uid('gp_'), kind, x: pt(x, y)[0], y: pt(x, y)[1], d, h, ...(name ? { name } : {}) });
+  P('small', -1.6, -3.6, 2.6, 3.6, 'Japanese maple');
+  for (const [x, y] of [[0.2, -0.95], [1.6, -0.95], [4.6, -0.95], [7.6, -0.95]]) P('shrub', x, y, 0.9, 0.8);
+  for (const [x, y] of [[0.9, -1.0], [5.6, -1.0], [6.6, -1.0]]) P('grass', x, y, 0.7, 0.8);
+  for (const [x, y] of [[-3.0, 21.0], [0.0, 21.0], [3.0, 21.0]]) P('shrub', x, y, 1.3, 1.4);
+  P('small', 7.0, 20.9, 2.6, 3.6);
+  for (const [x, y] of [[0.7, 17.4], [3.7, 16.6], [2.2, 18.5]]) P('grass', x, y, 0.8, 0.9);
+  for (const [x, y] of [[-0.1, 10.4], [3.9, 10.35]]) P('pot', x, y, 0.5, 0.8);
+}
 
 /* ───────── a document: the floor plans as a PDF ───────── */
 const pdf = fs.readFileSync(path.join(here, 'plans.pdf')), thumb = fs.readFileSync(path.join(here, 'plans-thumb.jpg'));
