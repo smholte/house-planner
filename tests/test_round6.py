@@ -100,6 +100,8 @@ with sync_playwright() as p:
     pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
     # on the parking place (the made-up house: one car on its drive, the other on the front lawn; the owner's: both on the
     # parking place beside his kitchen wall)
+    # (the made-up house has its own car on the parking place since task 0044: taken away here, so the drag finds ours)
+    if is_testhouse(pg): pg.evaluate("() => window.__hp.app.furnMutate(l => { l.items = l.items.filter(f => f.type !== 'car'); })"); pg.wait_for_timeout(600)
     C1, C2 = by_house(pg, ([10.9, 13.7], [-1.5, 13.0]), ([15.6, 10.6], [18.6, 10.6]))
     pg.evaluate("([a, b, p, q]) => { const app = window.__hp.app; app.updateFurn(a, f => { f.x = p[0]; f.y = p[1]; f.rot = 0; }); app.updateFurn(b, f => { f.x = q[0]; f.y = q[1]; f.rot = 0; }); }", [car['id'], car2['id'], C1, C2]); pg.wait_for_timeout(1200)
     pg.evaluate("(c) => window.__hp.app.panes[0].view.setViewState({ kind: '2d', c, s: 34 })", [C1[0] + 0.9, C1[1] - 0.6]); pg.wait_for_timeout(800)
