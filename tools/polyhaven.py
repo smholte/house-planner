@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Free realistic models from Poly Haven (CC0) for Add furniture → Library (task 0051).
 
+    python3 tools/polyhaven.py list                  GitHub only: prints every Poly Haven model with its categories and tags
     python3 tools/polyhaven.py fetch  <work dir>    GitHub only (the chat machines cannot reach polyhaven.com): the list of
                                                      all models + the chosen ones' glTF files at 1K into <work dir>
     python3 tools/polyhaven.py import <work dir>    <work dir>'s models packed (node tools/glb-pack.mjs: meshopt, WebP ≤ 1024 px,
@@ -159,9 +160,19 @@ def check():
     return bad
 
 
+def list_all():
+    assets = json.loads(get(API + '/assets?t=models'))
+    for aid, a in sorted(assets.items()):
+        print(f"{aid} | {a.get('name')} | {','.join(a.get('categories', []))} | {','.join(a.get('tags', []))} | dl {a.get('download_count')} | "
+              f"{a.get('dimensions')} | {a.get('polycount')}")
+    print(len(assets), 'models')
+
+
 if __name__ == '__main__':
     a = sys.argv[1:]
-    if a[:1] == ['fetch'] and len(a) == 2:
+    if a[:1] == ['list']:
+        list_all()
+    elif a[:1] == ['fetch'] and len(a) == 2:
         fetch(a[1])
     elif a[:1] == ['import'] and len(a) == 2:
         do_import(a[1])

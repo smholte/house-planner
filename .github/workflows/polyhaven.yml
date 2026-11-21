@@ -30,17 +30,23 @@ jobs:
         run: |
           npm ci --prefix tools
           bash tools/web_setup.sh
+      - name: List every Poly Haven model (for choosing)
+        run: python3 tools/polyhaven.py list
       - name: Fetch from Poly Haven
+        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         run: python3 tools/polyhaven.py fetch /tmp/ph
       - name: Pack into the library
+        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         run: python3 tools/polyhaven.py import /tmp/ph
       - name: Catalogue pictures
+        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         run: |
           python3 build.py --no-house
           python3 tools/model-thumbs.py --library
           python3 tools/build-library.py --check
           python3 tools/polyhaven.py --check
       - name: Commit to this branch
+        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         run: |
           git config user.name "poly-haven-fetch"
           git config user.email "actions@users.noreply.github.com"
@@ -48,6 +54,7 @@ jobs:
           git commit -m "Task 0051: Poly Haven models fetched, packed and pictured (workflow run ${{ github.run_id }})" || echo "nothing new"
           git push origin HEAD:${{ github.ref_name }}
       - uses: actions/upload-artifact@v4
+        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         with:
           name: polyhaven-fetch
           path: |
