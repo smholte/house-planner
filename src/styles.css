@@ -1709,3 +1709,30 @@ button.sun-lab:hover, button.sun-lab:focus-visible { background: var(--surface-2
 .tb-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .tb-line:empty { display: none; }
 .tb-line { margin: 0; font-weight: 500; }
+
+/* ═════════ the Fresing top bar of the projects page (task 0049) – dark as on Fresing Render's page ═════════ */
+.fbar { background: #1A2027; border-bottom: 1px solid #2B343D; }
+.fbar-in { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 1040px; margin: 0 auto; min-height: 52px; padding: 6px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px)); }
+.fbar-logo { flex: none; display: block; line-height: 0; }
+.fbar-logo img { height: 30px; width: auto; max-width: 100%; }
+.fbar-tools { display: flex; align-items: center; gap: 6px; font-size: 14px; flex: none; }
+.ftool, .fmore summary { color: #D3D9DE; background: none; font: inherit; text-decoration: none; padding: 5px 10px; border: 1px solid #3A4550; border-radius: 3px; cursor: pointer; white-space: nowrap; min-height: 32px; display: inline-flex; align-items: center; }
+.ftool:hover, .fmore summary:hover { color: #fff; border-color: #5B6670; }
+.ftool.here { color: #fff; border-color: #479B29; background: rgba(71, 155, 41, .16); cursor: default; }
+.fmore { position: relative; }
+.fmore summary { list-style: none; }
+.fmore summary::-webkit-details-marker { display: none; }
+.fmore summary::after { content: " ▾"; white-space: pre; }
+.fmore[open] summary::after { content: " ▴"; white-space: pre; }
+.fmore ul { position: absolute; right: 0; top: calc(100% + 8px); margin: 0; padding: 6px; list-style: none; min-width: 230px; background: #fff; border: 1px solid #D3D9DE; border-radius: 4px; box-shadow: 0 8px 24px rgba(26, 32, 39, .25); z-index: 20; }
+.fmore li a { display: block; padding: 8px 10px; color: #252E36; text-decoration: none; font-weight: 600; border-radius: 3px; }
+.fmore li a span { display: block; font-weight: 400; color: #5B6670; font-size: 13px; }
+.fmore li a:hover { background: #F1F3F5; }
+.intro-back { margin-top: -14px; }
+@media (max-width: 520px) {
+  .fbar-in { gap: 6px; }
+  .fbar-tools { gap: 4px; font-size: 13px; }
+  .ftool, .fmore summary { padding: 4px 7px; }
+  .fbar-logo img { height: 26px; }
+}
+@media (max-width: 400px) { .ftool.here { display: none; } }
