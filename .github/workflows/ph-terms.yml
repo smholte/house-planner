@@ -7,6 +7,15 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - run: |
-          curl -sSL https://raw.githubusercontent.com/Poly-Haven/Public-API/main/ToS.md | head -80
-          echo ----; curl -sSL https://raw.githubusercontent.com/Poly-Haven/Public-API/main/README.md | grep -i -n "credit\|commercial\|attribution\|license\|terms" | head -20
-          echo ----; curl -sSL https://polyhaven.com/license | sed 's/<[^>]*>//g' | grep -v '^\s*$' | head -40
+          curl -sSL https://api.github.com/repos/Poly-Haven/Public-API/contents | python3 -c "import sys,json;print([x['name'] for x in json.load(sys.stdin)])"
+          curl -sSL https://api.github.com/repos/Poly-Haven/Public-API/readme -H 'Accept: application/vnd.github.raw' | head -60 | cut -c1-400
+          echo ---- LICENSE PAGE
+          curl -sSL https://polyhaven.com/license | python3 -c "
+          import sys,re
+          h=sys.stdin.read()
+          h=re.sub(r'<(script|style|svg)[^>]*>.*?</\1>','',h,flags=re.S)
+          t=re.sub(r'<[^>]+>','\n',h)
+          for l in t.split('\n'):
+              l=l.strip()
+              if len(l)>30: print(l[:400])
+          " | head -40
