@@ -1,0 +1,4705 @@
+{
+ "source": "Poly Haven (polyhaven.com), CC0",
+ "limits": {
+  "triangles": 100000,
+  "models": 160,
+  "source_kb": 12000
+ },
+ "models": {
+  "potted_plant_04": {
+   "name": "Potted Plant 04",
+   "categories": [
+    "decorative",
+    "plants",
+    "potted plants",
+    "succulent",
+    "nature"
+   ],
+   "tags": [
+    "cactus",
+    "aloe",
+    "succulent",
+    "potplant",
+    "small",
+    "pot",
+    "plant",
+    "decor"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.17,
+    0.186,
+    0.268
+   ],
+   "room": "decor",
+   "source_kb": 2123,
+   "tris": 8929,
+   "size": [
+    0.1679,
+    0.1848,
+    0.2675
+   ],
+   "bytes": 209392
+  },
+  "sofa_02": {
+   "name": "Sofa 02",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "wood",
+    "furniture",
+    "chair",
+    "prop",
+    "couch",
+    "leather",
+    "fabric"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.807,
+    0.818,
+    0.709
+   ],
+   "room": "living-room",
+   "source_kb": 427,
+   "tris": 2728,
+   "size": [
+    1.8072,
+    0.8178,
+    0.7095
+   ],
+   "bytes": 177864
+  },
+  "Lantern_01": {
+   "name": "Lantern 01",
+   "categories": [
+    "props",
+    "lighting"
+   ],
+   "tags": [
+    "prop",
+    "metal",
+    "glass",
+    "lantern",
+    "antique",
+    "vintage",
+    "hurricane",
+    "lamp",
+    "bronze",
+    "oldfashioned",
+    "brass",
+    "copper"
+   ],
+   "authors": [
+    "Rajil Jose Macatangay"
+   ],
+   "dims": [
+    0.122,
+    0.097,
+    0.294
+   ],
+   "room": "lighting",
+   "source_kb": 1420,
+   "tris": 33902,
+   "size": [
+    0.1221,
+    0.0972,
+    0.2942
+   ],
+   "bytes": 414440
+  },
+  "wooden_table_02": {
+   "name": "Wooden Table 02",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "wooden",
+    "worn",
+    "village",
+    "rural",
+    "natural",
+    "simple"
+   ],
+   "authors": [
+    "Serhii Khromov"
+   ],
+   "dims": [
+    1.134,
+    0.706,
+    0.8
+   ],
+   "room": "dining",
+   "source_kb": 485,
+   "tris": 196,
+   "size": [
+    1.1344,
+    0.706,
+    0.7995
+   ],
+   "bytes": 209712
+  },
+  "sofa_03": {
+   "name": "Sofa 03",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "vintage",
+    "chair",
+    "couch",
+    "seat",
+    "fancy",
+    "mansion",
+    "manor",
+    "victorian",
+    "antique",
+    "leather"
+   ],
+   "authors": [
+    "Fran Calvente"
+   ],
+   "dims": [
+    2.731,
+    0.925,
+    1.118
+   ],
+   "room": "living-room",
+   "source_kb": 668,
+   "tris": 8004,
+   "size": [
+    2.7312,
+    0.9251,
+    1.1183
+   ],
+   "bytes": 318916
+  },
+  "modern_arm_chair_01": {
+   "name": "Modern Arm Chair 01",
+   "categories": [
+    "furniture",
+    "seating",
+    "office"
+   ],
+   "tags": [
+    "wood",
+    "leather",
+    "fancy",
+    "modern",
+    "chair",
+    "contemporary",
+    "wooden",
+    "lounge"
+   ],
+   "authors": [
+    "Vibrant Nordic"
+   ],
+   "dims": [
+    0.82,
+    0.987,
+    1.023
+   ],
+   "room": "office",
+   "source_kb": 2698,
+   "tris": 8916,
+   "size": [
+    0.8203,
+    0.9866,
+    1.0229
+   ],
+   "bytes": 348196
+  },
+  "Sofa_01": {
+   "name": "Sofa 01",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "wood",
+    "prop",
+    "furniture",
+    "vintage",
+    "gothic",
+    "chair",
+    "couch",
+    "victorian",
+    "decorative"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.571,
+    0.658,
+    0.797
+   ],
+   "room": "living-room",
+   "source_kb": 518,
+   "tris": 4101,
+   "size": [
+    1.5715,
+    0.658,
+    0.7965
+   ],
+   "bytes": 218004
+  },
+  "fancy_picture_frame_01": {
+   "name": "Fancy Picture Frame 01",
+   "categories": [
+    "decorative",
+    "wall decoration"
+   ],
+   "tags": [
+    "art",
+    "vintage",
+    "old",
+    "dutch",
+    "painting",
+    "oil",
+    "antique",
+    "fancy",
+    "frame",
+    "picture"
+   ],
+   "authors": [
+    "Rico Cilliers",
+    "Rob Tuytel"
+   ],
+   "dims": [
+    0.603,
+    0.02,
+    0.464
+   ],
+   "room": "decor",
+   "source_kb": 742,
+   "tris": 938,
+   "size": [
+    0.603,
+    0.02,
+    0.4641
+   ],
+   "bytes": 105484
+  },
+  "round_wooden_table_01": {
+   "name": "Round Wooden Table 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "vintage",
+    "wooden",
+    "wood",
+    "polish",
+    "circle",
+    "dark",
+    "old"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    1.399,
+    1.399,
+    1.005
+   ],
+   "room": "dining",
+   "source_kb": 550,
+   "tris": 8640,
+   "size": [
+    1.3993,
+    1.3993,
+    1.005
+   ],
+   "bytes": 204284
+  },
+  "GothicCabinet_01": {
+   "name": "Gothic Cabinet 01",
+   "categories": [
+    "furniture",
+    "shelves"
+   ],
+   "tags": [
+    "vintage",
+    "wood",
+    "gothic",
+    "furniture",
+    "table",
+    "shelf",
+    "decorative"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.719,
+    1.129,
+    2.361
+   ],
+   "room": "living-room",
+   "source_kb": 1015,
+   "tris": 12170,
+   "size": [
+    1.7191,
+    1.1165,
+    2.3609
+   ],
+   "bytes": 401468
+  },
+  "outdoor_table_chair_set_01": {
+   "name": "Outdoor Table Chair Set 01",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "outdoor",
+    "foldable",
+    "folding",
+    "seating",
+    "coffee",
+    "diner",
+    "street",
+    "urban",
+    "deli",
+    "wood",
+    "city",
+    "cafe"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.776,
+    1.831,
+    0.859
+   ],
+   "room": "outside",
+   "source_kb": 1242,
+   "tris": 9828,
+   "size": [
+    0.7417,
+    1.7173,
+    0.8586
+   ],
+   "bytes": 446512
+  },
+  "GreenChair_01": {
+   "name": "Green Chair 01",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "vintage",
+    "wood",
+    "gothic",
+    "furniture",
+    "chair",
+    "fabric",
+    "decorative"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.673,
+    0.664,
+    1.059
+   ],
+   "room": "living-room",
+   "source_kb": 608,
+   "tris": 4213,
+   "size": [
+    0.6731,
+    0.6644,
+    1.0585
+   ],
+   "bytes": 292860
+  },
+  "ClassicConsole_01": {
+   "name": "Classic Console 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "wood",
+    "vintage",
+    "table",
+    "gothic",
+    "victorian",
+    "decorative"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.543,
+    0.589,
+    0.949
+   ],
+   "room": "living-room",
+   "source_kb": 741,
+   "tris": 7566,
+   "size": [
+    1.543,
+    0.5893,
+    0.9491
+   ],
+   "bytes": 363500
+  },
+  "GothicCommode_01": {
+   "name": "Gothic Commode 01",
+   "categories": [
+    "furniture",
+    "shelves"
+   ],
+   "tags": [
+    "vintage",
+    "wood",
+    "table",
+    "gothic",
+    "shelf",
+    "furniture",
+    "decorative"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.201,
+    0.581,
+    1.212
+   ],
+   "room": "bedroom",
+   "source_kb": 604,
+   "tris": 3897,
+   "size": [
+    1.2014,
+    0.5807,
+    1.212
+   ],
+   "bytes": 233600
+  },
+  "Chandelier_03": {
+   "name": "Chandelier 03",
+   "categories": [
+    "lighting",
+    "decorative"
+   ],
+   "tags": [
+    "lighting",
+    "ceiling",
+    "hanging",
+    "fixture",
+    "chandelier",
+    "ornate",
+    "decor",
+    "elegant"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.78,
+    0.785,
+    1.041
+   ],
+   "room": "lighting",
+   "source_kb": 1364,
+   "tris": 29301,
+   "size": [
+    0.7804,
+    0.7855,
+    1.0406
+   ],
+   "bytes": 569228
+  },
+  "GothicBed_01": {
+   "name": "Gothic Bed 01",
+   "categories": [
+    "furniture",
+    "bed"
+   ],
+   "tags": [
+    "vintage",
+    "gothic",
+    "furniture",
+    "bed",
+    "wood",
+    "decorative"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.494,
+    2.04,
+    1.534
+   ],
+   "room": "bedroom",
+   "source_kb": 1155,
+   "tris": 18745,
+   "size": [
+    1.4938,
+    2.04,
+    1.5338
+   ],
+   "bytes": 463704
+  },
+  "Chandelier_01": {
+   "name": "Chandelier 01",
+   "categories": [
+    "lighting",
+    "decorative"
+   ],
+   "tags": [
+    "lighting",
+    "ceiling",
+    "hanging",
+    "fixture",
+    "chandelier",
+    "ornate",
+    "vintage"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.746,
+    0.816,
+    0.798
+   ],
+   "room": "lighting",
+   "source_kb": 1306,
+   "tris": 26860,
+   "size": [
+    0.7465,
+    0.8155,
+    0.7983
+   ],
+   "bytes": 492424
+  },
+  "Ottoman_01": {
+   "name": "Ottoman 01",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "furniture",
+    "leather",
+    "chair",
+    "fabric",
+    "ottoman",
+    "upholstery",
+    "interior design",
+    "living room",
+    "lounge"
+   ],
+   "authors": [
+    "Caspian Fortune"
+   ],
+   "dims": [
+    0.885,
+    0.621,
+    0.624
+   ],
+   "room": "living-room",
+   "source_kb": 652,
+   "tris": 4240,
+   "size": [
+    0.8846,
+    0.6211,
+    0.6243
+   ],
+   "bytes": 329612
+  },
+  "WoodenTable_01": {
+   "name": "Wooden Table 01",
+   "categories": [
+    "furniture"
+   ],
+   "tags": [
+    "vintage",
+    "wood",
+    "prop",
+    "table",
+    "school",
+    "desk",
+    "old",
+    "worn"
+   ],
+   "authors": [
+    "Ethan Place"
+   ],
+   "dims": [
+    1.8,
+    0.657,
+    0.549
+   ],
+   "room": "dining",
+   "source_kb": 554,
+   "tris": 952,
+   "size": [
+    1.7996,
+    0.6572,
+    0.5488
+   ],
+   "bytes": 233656
+  },
+  "plastic_monobloc_chair_01": {
+   "name": "Plastic Monobloc Chair 01",
+   "categories": [
+    "furniture",
+    "seating",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "plastic",
+    "dirty",
+    "old",
+    "monobloc",
+    "outdoor",
+    "cheap",
+    "shed"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.642,
+    0.628,
+    0.88
+   ],
+   "room": "outside",
+   "source_kb": 1953,
+   "tris": 3356,
+   "size": [
+    0.6419,
+    0.6276,
+    0.8798
+   ],
+   "bytes": 281172
+  },
+  "ornate_mirror_01": {
+   "name": "Ornate Mirror 01",
+   "categories": [
+    "decorative",
+    "wall decoration",
+    "furniture"
+   ],
+   "tags": [
+    "decor",
+    "decoration",
+    "ornate",
+    "fancy",
+    "wealthy",
+    "mansion",
+    "manor",
+    "vintage",
+    "victorian",
+    "floral",
+    "gold",
+    "mirror"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.486,
+    0.026,
+    0.744
+   ],
+   "room": "decor",
+   "source_kb": 677,
+   "tris": 14246,
+   "size": [
+    0.4865,
+    0.026,
+    0.7442
+   ],
+   "bytes": 172868
+  },
+  "ArmChair_01": {
+   "name": "Arm Chair 01",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "gothic",
+    "vintage",
+    "chair",
+    "furniture",
+    "victorian",
+    "couch",
+    "wood",
+    "varnished",
+    "classic"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.848,
+    0.766,
+    1.065
+   ],
+   "room": "living-room",
+   "source_kb": 769,
+   "tris": 5626,
+   "size": [
+    0.8484,
+    0.7658,
+    1.0651
+   ],
+   "bytes": 440624
+  },
+  "Rockingchair_01": {
+   "name": "Rockingchair 01",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "chair",
+    "vintage",
+    "prop",
+    "wood",
+    "furniture",
+    "rocking chair",
+    "rocking",
+    "decorative",
+    "curved legs",
+    "traditional",
+    "solid wood",
+    "armrest",
+    "slatted backrest",
+    "antique style"
+   ],
+   "authors": [
+    "Jorge Camacho"
+   ],
+   "dims": [
+    0.708,
+    0.833,
+    0.995
+   ],
+   "room": "living-room",
+   "source_kb": 805,
+   "tris": 11866,
+   "size": [
+    0.7081,
+    0.8335,
+    0.9949
+   ],
+   "bytes": 326216
+  },
+  "wooden_picnic_table": {
+   "name": "Wooden Picnic Table",
+   "categories": [
+    "furniture",
+    "seating",
+    "table"
+   ],
+   "tags": [
+    "vintage",
+    "old",
+    "worn",
+    "park",
+    "bench",
+    "outdoor",
+    "weathered",
+    "countryside",
+    "outdoor seating"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    2.241,
+    3.022,
+    0.746
+   ],
+   "room": "outside",
+   "source_kb": 4308,
+   "tris": 10210,
+   "size": [
+    2.241,
+    3.0223,
+    0.746
+   ],
+   "bytes": 528904
+  },
+  "modern_ceiling_lamp_01": {
+   "name": "Modern Ceiling Lamp 01",
+   "categories": [
+    "lighting"
+   ],
+   "tags": [
+    "lighting",
+    "light",
+    "modern",
+    "glass",
+    "round",
+    "hanging",
+    "hanging lamp",
+    "ceiling lamp",
+    "decorative lighting",
+    "modern decor",
+    "interior design"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.432,
+    0.432,
+    0.952
+   ],
+   "room": "lighting",
+   "source_kb": 436,
+   "tris": 5602,
+   "size": [
+    0.4316,
+    0.4317,
+    0.9516
+   ],
+   "bytes": 171724
+  },
+  "brass_candleholders": {
+   "name": "Brass Candleholders",
+   "categories": [
+    "decorative",
+    "lighting"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "ornate",
+    "fancy",
+    "brass",
+    "pattern",
+    "candleholders",
+    "elegant",
+    "classic",
+    "ornamental"
+   ],
+   "authors": [
+    "Tina"
+   ],
+   "dims": [
+    1.053,
+    0.365,
+    0.835
+   ],
+   "room": "lighting",
+   "source_kb": 9502,
+   "tris": 41936,
+   "size": [
+    1.0529,
+    0.3647,
+    0.8353
+   ],
+   "bytes": 2028636
+  },
+  "fancy_picture_frame_02": {
+   "name": "Fancy Picture Frame 02",
+   "categories": [
+    "decorative",
+    "wall decoration"
+   ],
+   "tags": [
+    "art",
+    "vintage",
+    "old",
+    "dutch",
+    "painting",
+    "oil",
+    "antique",
+    "fancy",
+    "frame",
+    "picture"
+   ],
+   "authors": [
+    "Rico Cilliers",
+    "Rob Tuytel"
+   ],
+   "dims": [
+    0.661,
+    0.089,
+    0.771
+   ],
+   "room": "decor",
+   "source_kb": 1728,
+   "tris": 35102,
+   "size": [
+    0.6606,
+    0.089,
+    0.771
+   ],
+   "bytes": 404364
+  },
+  "coffee_table_round_01": {
+   "name": "Coffee Table Round 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "modern",
+    "marble",
+    "tea",
+    "coffee",
+    "metal",
+    "sleek",
+    "contemporary",
+    "cocktail"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    1.301,
+    1.301,
+    0.491
+   ],
+   "room": "living-room",
+   "source_kb": 1563,
+   "tris": 4044,
+   "size": [
+    1.3013,
+    1.3013,
+    0.491
+   ],
+   "bytes": 202928
+  },
+  "vintage_wooden_drawer_01": {
+   "name": "Vintage Wooden Drawer 01",
+   "categories": [
+    "furniture",
+    "shelves",
+    "table"
+   ],
+   "tags": [
+    "vintage",
+    "old",
+    "filing",
+    "drawer",
+    "office",
+    "wooden",
+    "worn",
+    "cabinet"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    1.715,
+    1.007,
+    1.091
+   ],
+   "room": "living-room",
+   "source_kb": 2087,
+   "tris": 5184,
+   "size": [
+    1.7151,
+    1.0069,
+    1.0908
+   ],
+   "bytes": 308044
+  },
+  "brass_vase_03": {
+   "name": "Brass Vase 03",
+   "categories": [
+    "containers",
+    "props",
+    "decorative",
+    "vases"
+   ],
+   "tags": [
+    "metal",
+    "prop",
+    "brass",
+    "decorative",
+    "ornate",
+    "vase",
+    "gold",
+    "pitcher",
+    "copper",
+    "container",
+    "pattern",
+    "old",
+    "antique",
+    "fancy",
+    "decor"
+   ],
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "dims": [
+    0.083,
+    0.083,
+    0.2
+   ],
+   "room": "decor",
+   "source_kb": 1582,
+   "tris": 2616,
+   "size": [
+    0.0825,
+    0.0825,
+    0.2004
+   ],
+   "bytes": 85880
+  },
+  "antique_ceramic_vase_01": {
+   "name": "Antique Ceramic Vase 01",
+   "categories": [
+    "decorative",
+    "containers",
+    "vases"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "pot",
+    "fancy",
+    "pattern",
+    "vase"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.255,
+    0.255,
+    0.44
+   ],
+   "room": "decor",
+   "source_kb": 526,
+   "tris": 9408,
+   "size": [
+    0.255,
+    0.255,
+    0.4396
+   ],
+   "bytes": 122100
+  },
+  "WoodenTable_02": {
+   "name": "Wooden Table 02",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "vintage",
+    "wood",
+    "prop",
+    "table",
+    "furniture",
+    "old",
+    "worn",
+    "small"
+   ],
+   "authors": [
+    "Fran Calvente"
+   ],
+   "dims": [
+    0.301,
+    0.301,
+    0.418
+   ],
+   "room": "dining",
+   "source_kb": 503,
+   "tris": 1514,
+   "size": [
+    0.3007,
+    0.3007,
+    0.4177
+   ],
+   "bytes": 99528
+  },
+  "hanging_picture_frame_02": {
+   "name": "Hanging Picture Frame 02",
+   "categories": [
+    "decorative",
+    "wall decoration"
+   ],
+   "tags": [
+    "wood",
+    "painting",
+    "old",
+    "art",
+    "frame"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.752,
+    0.033,
+    0.5
+   ],
+   "room": "decor",
+   "source_kb": 696,
+   "tris": 3678,
+   "size": [
+    0.7518,
+    0.0331,
+    0.5
+   ],
+   "bytes": 103664
+  },
+  "wooden_display_shelves_01": {
+   "name": "Wooden Display Shelves 01",
+   "categories": [
+    "furniture",
+    "shelves"
+   ],
+   "tags": [
+    "modern",
+    "wood",
+    "pine",
+    "square",
+    "display",
+    "shelf",
+    "bookshelf"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    1.078,
+    0.372,
+    1.556
+   ],
+   "room": "living-room",
+   "source_kb": 471,
+   "tris": 3174,
+   "size": [
+    0.3715,
+    1.0778,
+    1.5562
+   ],
+   "bytes": 171292
+  },
+  "throw_pillows_01": {
+   "name": "Throw Pillows 01",
+   "categories": [
+    "decorative"
+   ],
+   "tags": [
+    "decorative",
+    "pillow",
+    "throw",
+    "pattern",
+    "african",
+    "red",
+    "triangle",
+    "orange"
+   ],
+   "authors": [
+    "Serhii Khromov"
+   ],
+   "dims": [
+    1.022,
+    0.627,
+    0.45
+   ],
+   "room": "decor",
+   "source_kb": 1194,
+   "tris": 6362,
+   "size": [
+    0.9401,
+    0.4519,
+    0.4502
+   ],
+   "bytes": 901856
+  },
+  "mid_century_lounge_chair": {
+   "name": "Mid Century Lounge Chair",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "wooden",
+    "leather",
+    "couch",
+    "lounge",
+    "architecture",
+    "modern",
+    "interior design",
+    "home decor",
+    "living room",
+    "comfort",
+    "stylish",
+    "recliner",
+    "retro",
+    "classy"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    1.009,
+    1.19,
+    1.169
+   ],
+   "room": "living-room",
+   "source_kb": 2087,
+   "tris": 6148,
+   "size": [
+    1.0086,
+    1.1903,
+    1.1691
+   ],
+   "bytes": 310128
+  },
+  "CoffeeTable_01": {
+   "name": "Coffee Table 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "wood",
+    "vintage",
+    "table",
+    "painted",
+    "old",
+    "worn",
+    "decorative"
+   ],
+   "authors": [
+    "Fernando Quinn"
+   ],
+   "dims": [
+    1.54,
+    0.973,
+    0.523
+   ],
+   "room": "living-room",
+   "source_kb": 958,
+   "tris": 10404,
+   "size": [
+    1.54,
+    0.9728,
+    0.5232
+   ],
+   "bytes": 392980
+  },
+  "side_table_01": {
+   "name": "Side Table 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "table",
+    "wood",
+    "minimalist",
+    "modern",
+    "decor",
+    "living room",
+    "bedroom",
+    "shelf",
+    "contemporary",
+    "interior",
+    "home",
+    "wooden"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.55,
+    0.45,
+    0.551
+   ],
+   "room": "living-room",
+   "source_kb": 505,
+   "tris": 2756,
+   "size": [
+    0.55,
+    0.45,
+    0.5507
+   ],
+   "bytes": 90524
+  },
+  "Chandelier_02": {
+   "name": "Chandelier 02",
+   "categories": [
+    "lighting"
+   ],
+   "tags": [
+    "lighting",
+    "ceiling",
+    "decorative",
+    "chandelier",
+    "elegant",
+    "hanging",
+    "ornate",
+    "vintage"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.679,
+    0.619,
+    0.848
+   ],
+   "room": "lighting",
+   "source_kb": 1182,
+   "tris": 21514,
+   "size": [
+    0.679,
+    0.6191,
+    0.8481
+   ],
+   "bytes": 510532
+  },
+  "WoodenTable_03": {
+   "name": "Wooden Table 03",
+   "categories": [
+    "furniture",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "vintage",
+    "wood",
+    "prop",
+    "table",
+    "furniture",
+    "metal",
+    "shelf"
+   ],
+   "authors": [
+    "Gabriel Radić"
+   ],
+   "dims": [
+    1.327,
+    0.562,
+    0.83
+   ],
+   "room": "dining",
+   "source_kb": 638,
+   "tris": 2298,
+   "size": [
+    1.3269,
+    0.5753,
+    0.8301
+   ],
+   "bytes": 288320
+  },
+  "ceramic_vase_02": {
+   "name": "Ceramic Vase 02",
+   "categories": [
+    "decorative",
+    "containers",
+    "vases"
+   ],
+   "tags": [
+    "fancy",
+    "modern",
+    "vase",
+    "decor",
+    "clay",
+    "pot",
+    "painted"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.22,
+    0.221,
+    0.309
+   ],
+   "room": "decor",
+   "source_kb": 750,
+   "tris": 11128,
+   "size": [
+    0.2184,
+    0.2184,
+    0.3092
+   ],
+   "bytes": 154444
+  },
+  "ClassicNightstand_01": {
+   "name": "Classic Nightstand 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "wood",
+    "vintage",
+    "table",
+    "gothic",
+    "victorian",
+    "decorative"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.568,
+    0.424,
+    0.7
+   ],
+   "room": "bedroom",
+   "source_kb": 445,
+   "tris": 2002,
+   "size": [
+    0.5678,
+    0.4242,
+    0.7
+   ],
+   "bytes": 75668
+  },
+  "ceramic_vase_01": {
+   "name": "Ceramic Vase 01",
+   "categories": [
+    "vases",
+    "containers",
+    "decorative"
+   ],
+   "tags": [
+    "pot",
+    "clean",
+    "tall",
+    "modern",
+    "fancy",
+    "decor"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.205,
+    0.206,
+    0.401
+   ],
+   "room": "decor",
+   "source_kb": 418,
+   "tris": 10296,
+   "size": [
+    0.2036,
+    0.2036,
+    0.4003
+   ],
+   "bytes": 106876
+  },
+  "Shelf_01": {
+   "name": "Shelf 01",
+   "categories": [
+    "furniture",
+    "shelves"
+   ],
+   "tags": [
+    "wood",
+    "shelf",
+    "furniture",
+    "storage",
+    "home",
+    "organization",
+    "display",
+    "wooden",
+    "bookcase",
+    "shelves",
+    "bookshelf",
+    "dirty",
+    "weathered",
+    "distressed",
+    "aged",
+    "simple"
+   ],
+   "authors": [
+    "Gabriel Radić"
+   ],
+   "dims": [
+    1.003,
+    0.257,
+    2.08
+   ],
+   "room": "living-room",
+   "source_kb": 605,
+   "tris": 182,
+   "size": [
+    1.0034,
+    0.257,
+    2.0803
+   ],
+   "bytes": 324724
+  },
+  "standing_picture_frame_01": {
+   "name": "Standing Picture Frame 01",
+   "categories": [
+    "decorative"
+   ],
+   "tags": [
+    "modern",
+    "minimalist",
+    "clean",
+    "frame",
+    "photo",
+    "simple",
+    "art"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.201,
+    0.1,
+    0.25
+   ],
+   "room": "decor",
+   "source_kb": 447,
+   "tris": 1634,
+   "size": [
+    0.1003,
+    0.2008,
+    0.2497
+   ],
+   "bytes": 63176
+  },
+  "WoodenChair_01": {
+   "name": "Wooden Chair 01",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "wood",
+    "prop",
+    "vintage",
+    "furniture",
+    "chair",
+    "gothic",
+    "victorian",
+    "decorative"
+   ],
+   "authors": [
+    "Jake Mobley"
+   ],
+   "dims": [
+    0.688,
+    0.658,
+    2.274
+   ],
+   "room": "dining",
+   "source_kb": 1080,
+   "tris": 19992,
+   "size": [
+    0.6882,
+    0.6585,
+    2.2735
+   ],
+   "bytes": 467436
+  },
+  "painted_wooden_chair_01": {
+   "name": "Painted Wooden Chair 01",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "chair",
+    "wood",
+    "painted",
+    "farmhouse",
+    "dining",
+    "diner",
+    "american",
+    "kitchen"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.432,
+    0.54,
+    0.956
+   ],
+   "room": "dining",
+   "source_kb": 493,
+   "tris": 724,
+   "size": [
+    0.4318,
+    0.5398,
+    0.9565
+   ],
+   "bytes": 203476
+  },
+  "wooden_stool_02": {
+   "name": "Wooden Stool 02",
+   "categories": [
+    "seating",
+    "furniture"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "vintage",
+    "antique",
+    "wood",
+    "farmhouse",
+    "carpentry",
+    "handcrafted",
+    "footstool"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.265,
+    0.183,
+    0.182
+   ],
+   "room": "dining",
+   "source_kb": 2656,
+   "tris": 11146,
+   "size": [
+    0.2652,
+    0.1831,
+    0.1819
+   ],
+   "bytes": 213504
+  },
+  "painted_wooden_cabinet": {
+   "name": "Painted Wooden Cabinet",
+   "categories": [
+    "furniture",
+    "shelves"
+   ],
+   "tags": [
+    "old",
+    "worn",
+    "antique",
+    "wooden",
+    "vintage",
+    "colonial",
+    "farmhouse",
+    "storage",
+    "aged",
+    "rustic",
+    "weathered"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.195,
+    0.617,
+    1.182
+   ],
+   "room": "living-room",
+   "source_kb": 1862,
+   "tris": 2227,
+   "size": [
+    1.1947,
+    0.6166,
+    1.1819
+   ],
+   "bytes": 243624
+  },
+  "gallinera_table": {
+   "name": "Gallinera Table",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "philippines",
+    "traditional",
+    "old",
+    "wooden"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.83,
+    0.518,
+    0.488
+   ],
+   "room": "outside",
+   "source_kb": 1839,
+   "tris": 5528,
+   "size": [
+    0.8301,
+    0.5183,
+    0.4878
+   ],
+   "bytes": 245796
+  },
+  "modern_coffee_table_01": {
+   "name": "Modern Coffee Table 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "table",
+    "contemporary",
+    "modern",
+    "rectangular",
+    "stone",
+    "wood",
+    "deco",
+    "clean"
+   ],
+   "authors": [
+    "Amin"
+   ],
+   "dims": [
+    1.202,
+    0.6,
+    0.39
+   ],
+   "room": "living-room",
+   "source_kb": 1331,
+   "tris": 4504,
+   "size": [
+    0.6,
+    1.2018,
+    0.39
+   ],
+   "bytes": 187924
+  },
+  "wooden_lantern_01": {
+   "name": "Wooden Lantern 01",
+   "categories": [
+    "props",
+    "lighting",
+    "collection: smugglers_cove"
+   ],
+   "tags": [
+    "lantern",
+    "wooden",
+    "wood",
+    "old",
+    "worn",
+    "farmhouse",
+    "maritime",
+    "colonial",
+    "cove",
+    "prop",
+    "vintage",
+    "candle"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.221,
+    0.235,
+    0.53
+   ],
+   "room": "lighting",
+   "source_kb": 3769,
+   "tris": 8321,
+   "size": [
+    0.221,
+    0.2347,
+    0.5301
+   ],
+   "bytes": 230256
+  },
+  "modern_wooden_cabinet": {
+   "name": "Modern Wooden Cabinet",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "cabinet",
+    "wood",
+    "modern",
+    "minimalist",
+    "interrior",
+    "living room",
+    "contemporary",
+    "design"
+   ],
+   "authors": [
+    "Patrik Pangerl"
+   ],
+   "dims": [
+    2.44,
+    0.52,
+    0.68
+   ],
+   "room": "living-room",
+   "source_kb": 2856,
+   "tris": 24976,
+   "size": [
+    2.44,
+    0.52,
+    0.6801
+   ],
+   "bytes": 532648
+  },
+  "standing_picture_frame_02": {
+   "name": "Standing Picture Frame 02",
+   "categories": [
+    "decorative"
+   ],
+   "tags": [
+    "wood",
+    "painting",
+    "old",
+    "art",
+    "frame",
+    "photo"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.217,
+    0.102,
+    0.266
+   ],
+   "room": "decor",
+   "source_kb": 570,
+   "tris": 2986,
+   "size": [
+    0.1023,
+    0.2169,
+    0.2664
+   ],
+   "bytes": 90256
+  },
+  "dining_chair_02": {
+   "name": "Dining Chair 02",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "modern",
+    "chair",
+    "seat",
+    "dining",
+    "fancy",
+    "leather"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.434,
+    0.576,
+    0.973
+   ],
+   "room": "dining",
+   "source_kb": 921,
+   "tris": 22013,
+   "size": [
+    0.4336,
+    0.5764,
+    0.9734
+   ],
+   "bytes": 340244
+  },
+  "wicker_basket_01": {
+   "name": "Wicker Basket 01",
+   "categories": [
+    "containers",
+    "decorative",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "wood",
+    "wicker",
+    "twine",
+    "basket",
+    "picnic",
+    "outdoor",
+    "kitchen",
+    "dining",
+    "table",
+    "shed",
+    "farm"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.383,
+    0.295,
+    0.117
+   ],
+   "room": "kitchen",
+   "source_kb": 2730,
+   "tris": 22276,
+   "size": [
+    0.3832,
+    0.295,
+    0.1174
+   ],
+   "bytes": 338720
+  },
+  "drawer_cabinet": {
+   "name": "Drawer Cabinet",
+   "categories": [
+    "furniture"
+   ],
+   "tags": [
+    "wood",
+    "furniture",
+    "shelf",
+    "drawer",
+    "metal",
+    "modern"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    1.141,
+    0.488,
+    1.881
+   ],
+   "room": "living-room",
+   "source_kb": 1143,
+   "tris": 26406,
+   "size": [
+    1.1411,
+    0.4881,
+    1.8813
+   ],
+   "bytes": 383220
+  },
+  "hanging_picture_frame_03": {
+   "name": "Hanging Picture Frame 03",
+   "categories": [
+    "wall decoration",
+    "decorative"
+   ],
+   "tags": [
+    "vintage",
+    "photo",
+    "photograph",
+    "old",
+    "antique",
+    "picture",
+    "fancy",
+    "wooden",
+    "varnished"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.385,
+    0.032,
+    0.502
+   ],
+   "room": "decor",
+   "source_kb": 1262,
+   "tris": 24348,
+   "size": [
+    0.385,
+    0.0318,
+    0.5024
+   ],
+   "bytes": 309940
+  },
+  "chinese_tea_table": {
+   "name": "Chinese Tea Table",
+   "categories": [
+    "table",
+    "furniture"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "old",
+    "wooden",
+    "ornate",
+    "traditional"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.841,
+    0.836,
+    0.499
+   ],
+   "room": "living-room",
+   "source_kb": 1581,
+   "tris": 2508,
+   "size": [
+    0.8413,
+    0.8356,
+    0.4986
+   ],
+   "bytes": 156792
+  },
+  "side_table_tall_01": {
+   "name": "Side Table Tall 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "worn",
+    "old",
+    "wood",
+    "side table",
+    "side",
+    "table"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.384,
+    0.384,
+    0.761
+   ],
+   "room": "living-room",
+   "source_kb": 1555,
+   "tris": 6408,
+   "size": [
+    0.384,
+    0.384,
+    0.7612
+   ],
+   "bytes": 109972
+  },
+  "wooden_bowl_01": {
+   "name": "Wooden Bowl 01",
+   "categories": [
+    "props",
+    "decorative",
+    "dishes"
+   ],
+   "tags": [
+    "bowl",
+    "wooden",
+    "carved",
+    "fruit",
+    "fruitbowl",
+    "decoration"
+   ],
+   "authors": [
+    "Oliver Harries"
+   ],
+   "dims": [
+    0.313,
+    0.309,
+    0.094
+   ],
+   "room": "kitchen",
+   "source_kb": 1823,
+   "tris": 14122,
+   "size": [
+    0.3131,
+    0.3091,
+    0.0937
+   ],
+   "bytes": 177096
+  },
+  "jug_01": {
+   "name": "Jug 01",
+   "categories": [
+    "props",
+    "decorative",
+    "dishes",
+    "containers"
+   ],
+   "tags": [
+    "ceramic",
+    "milk",
+    "white",
+    "antique",
+    "vintage",
+    "old",
+    "fancy",
+    "decorative"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.275,
+    0.168,
+    0.211
+   ],
+   "room": "kitchen",
+   "source_kb": 1228,
+   "tris": 5770,
+   "size": [
+    0.2753,
+    0.1675,
+    0.2113
+   ],
+   "bytes": 81472
+  },
+  "small_wooden_table_01": {
+   "name": "Small Wooden Table 01",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "vintage",
+    "wood",
+    "small",
+    "table",
+    "wooden"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.916,
+    0.44,
+    0.533
+   ],
+   "room": "dining",
+   "source_kb": 415,
+   "tris": 3410,
+   "size": [
+    0.9162,
+    0.44,
+    0.5331
+   ],
+   "bytes": 151260
+  },
+  "brass_diya_lantern": {
+   "name": "Brass Diya Lantern",
+   "categories": [
+    "decorative",
+    "lighting"
+   ],
+   "tags": [
+    "lighting",
+    "brass",
+    "metal",
+    "lamp",
+    "candle",
+    "light",
+    "cultural",
+    "hanging"
+   ],
+   "authors": [
+    "Bhargav Kubal"
+   ],
+   "dims": [
+    0.123,
+    0.123,
+    0.381
+   ],
+   "room": "lighting",
+   "source_kb": 1970,
+   "tris": 12742,
+   "size": [
+    0.123,
+    0.123,
+    0.3808
+   ],
+   "bytes": 213172
+  },
+  "painted_wooden_chair_02": {
+   "name": "Painted Wooden Chair 02",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "vintage",
+    "antique",
+    "farmhouse",
+    "seat",
+    "dining",
+    "chair"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.639,
+    0.662,
+    1.264
+   ],
+   "room": "dining",
+   "source_kb": 2396,
+   "tris": 1246,
+   "size": [
+    0.6394,
+    0.6621,
+    1.2638
+   ],
+   "bytes": 408324
+  },
+  "lantern_chandelier_01": {
+   "name": "Lantern Chandelier 01",
+   "categories": [
+    "lighting"
+   ],
+   "tags": [
+    "lighting",
+    "old",
+    "victorian",
+    "metal",
+    "antique",
+    "ornate",
+    "vintage",
+    "brass",
+    "fancy",
+    "ornamental",
+    "chandelier",
+    "light",
+    "indoor light",
+    "light fixture"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.579,
+    0.575,
+    0.878
+   ],
+   "room": "lighting",
+   "source_kb": 1480,
+   "tris": 5971,
+   "size": [
+    0.5792,
+    0.5746,
+    0.8776
+   ],
+   "bytes": 824152
+  },
+  "painted_wooden_stool": {
+   "name": "Painted Wooden Stool",
+   "categories": [
+    "seating",
+    "furniture"
+   ],
+   "tags": [
+    "painted",
+    "worn",
+    "old",
+    "antique",
+    "vintage",
+    "farmhouse",
+    "rustic",
+    "carpentry",
+    "aged",
+    "chair"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.385,
+    0.406,
+    0.579
+   ],
+   "room": "dining",
+   "source_kb": 1875,
+   "tris": 676,
+   "size": [
+    0.3848,
+    0.4061,
+    0.5789
+   ],
+   "bytes": 91944
+  },
+  "wooden_stool_01": {
+   "name": "Wooden Stool 01",
+   "categories": [
+    "seating",
+    "furniture",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "old",
+    "worn",
+    "dirty",
+    "workshop",
+    "outdoor",
+    "stool",
+    "woodwork",
+    "shop"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.425,
+    0.442,
+    0.437
+   ],
+   "room": "dining",
+   "source_kb": 962,
+   "tris": 10946,
+   "size": [
+    0.4254,
+    0.4424,
+    0.4374
+   ],
+   "bytes": 213628
+  },
+  "folding_wooden_stool": {
+   "name": "Folding Wooden Stool",
+   "categories": [
+    "seating",
+    "furniture"
+   ],
+   "tags": [
+    "workshop",
+    "garage",
+    "woodwork",
+    "camping",
+    "folding stool",
+    "portable",
+    "compact",
+    "outdoor",
+    "garden"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.528,
+    0.547,
+    0.442
+   ],
+   "room": "dining",
+   "source_kb": 2268,
+   "tris": 6324,
+   "size": [
+    0.5278,
+    0.5471,
+    0.442
+   ],
+   "bytes": 157776
+  },
+  "metal_office_desk": {
+   "name": "Metal Office Desk",
+   "categories": [
+    "collection: project_lighthouse",
+    "furniture",
+    "table",
+    "office"
+   ],
+   "tags": [
+    "old",
+    "vintage",
+    "metal",
+    "dirty",
+    "scratched",
+    "industrial",
+    "rectangular"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    2.0,
+    0.947,
+    0.788
+   ],
+   "room": "office",
+   "source_kb": 1607,
+   "tris": 6898,
+   "size": [
+    2,
+    0.9472,
+    0.7875
+   ],
+   "bytes": 207296
+  },
+  "steel_frame_shelves_03": {
+   "name": "Steel Frame Shelves 03",
+   "categories": [
+    "shelves",
+    "furniture"
+   ],
+   "tags": [
+    "storage",
+    "home decor",
+    "contemporary",
+    "minimalist",
+    "display",
+    "frame"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    2.351,
+    0.721,
+    2.312
+   ],
+   "room": "living-room",
+   "source_kb": 3563,
+   "tris": 8396,
+   "size": [
+    2.3511,
+    0.7212,
+    2.3118
+   ],
+   "bytes": 430812
+  },
+  "brass_vase_02": {
+   "name": "Brass Vase 02",
+   "categories": [
+    "decorative",
+    "vases"
+   ],
+   "tags": [
+    "brass",
+    "antique",
+    "metal",
+    "ancient",
+    "old",
+    "gold",
+    "container",
+    "vase",
+    "clean",
+    "ornate",
+    "decorative",
+    "pattern"
+   ],
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "dims": [
+    0.21,
+    0.21,
+    0.529
+   ],
+   "room": "decor",
+   "source_kb": 1831,
+   "tris": 6890,
+   "size": [
+    0.2102,
+    0.2102,
+    0.5286
+   ],
+   "bytes": 129872
+  },
+  "brass_pan_01": {
+   "name": "Brass Pan 01",
+   "categories": [
+    "props",
+    "containers",
+    "decorative",
+    "dishes"
+   ],
+   "tags": [
+    "brass",
+    "pan",
+    "copper",
+    "old",
+    "metal",
+    "prop",
+    "container",
+    "cooking",
+    "pot",
+    "cookware",
+    "decorative",
+    "fancy",
+    "gold"
+   ],
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "dims": [
+    0.191,
+    0.45,
+    0.053
+   ],
+   "room": "kitchen",
+   "source_kb": 1616,
+   "tris": 4340,
+   "size": [
+    0.1913,
+    0.4497,
+    0.0525
+   ],
+   "bytes": 96764
+  },
+  "ceramic_vase_04": {
+   "name": "Ceramic Vase 04",
+   "categories": [
+    "containers",
+    "decorative",
+    "vases"
+   ],
+   "tags": [
+    "fancy",
+    "modern",
+    "vase",
+    "decor",
+    "painted",
+    "jug",
+    "clay",
+    "pot"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.183,
+    0.182,
+    0.342
+   ],
+   "room": "decor",
+   "source_kb": 596,
+   "tris": 9000,
+   "size": [
+    0.1811,
+    0.1811,
+    0.3419
+   ],
+   "bytes": 123596
+  },
+  "gothic_coffee_table": {
+   "name": "Gothic Coffee Table",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "old",
+    "wooden",
+    "gothic",
+    "medieval",
+    "dark decor"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    1.443,
+    1.443,
+    0.559
+   ],
+   "room": "living-room",
+   "source_kb": 3267,
+   "tris": 23836,
+   "size": [
+    1.4431,
+    1.4431,
+    0.5588
+   ],
+   "bytes": 641740
+  },
+  "wooden_bookshelf_worn": {
+   "name": "Wooden Bookshelf Worn",
+   "categories": [
+    "furniture",
+    "shelves",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "wood",
+    "worn",
+    "garage",
+    "shed",
+    "rustic",
+    "antique",
+    "distressed",
+    "aged",
+    "weathered",
+    "bookcase",
+    "shelves",
+    "carpentry",
+    "vintage",
+    "storage"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    1.374,
+    0.581,
+    2.063
+   ],
+   "room": "living-room",
+   "source_kb": 2777,
+   "tris": 10106,
+   "size": [
+    1.374,
+    0.5813,
+    2.0634
+   ],
+   "bytes": 605616
+  },
+  "industrial_wall_lamp": {
+   "name": "Industrial Wall Lamp",
+   "categories": [
+    "lighting"
+   ],
+   "tags": [
+    "industrial",
+    "factory",
+    "warehouse",
+    "wall light",
+    "metal",
+    "bunker",
+    "mine"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.273,
+    0.14,
+    0.43
+   ],
+   "room": "lighting",
+   "source_kb": 3778,
+   "tris": 4446,
+   "size": [
+    0.2735,
+    0.1404,
+    0.4299
+   ],
+   "bytes": 182496
+  },
+  "brass_pot_02": {
+   "name": "Brass Pot 02",
+   "categories": [
+    "props",
+    "dishes",
+    "containers",
+    "decorative"
+   ],
+   "tags": [
+    "brass",
+    "metal",
+    "prop",
+    "cooking",
+    "container",
+    "pot",
+    "cookware",
+    "pan",
+    "gold",
+    "copper"
+   ],
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "dims": [
+    0.367,
+    0.302,
+    0.109
+   ],
+   "room": "kitchen",
+   "source_kb": 1412,
+   "tris": 3344,
+   "size": [
+    0.3667,
+    0.3023,
+    0.1085
+   ],
+   "bytes": 72896
+  },
+  "brass_vase_01": {
+   "name": "Brass Vase 01",
+   "categories": [
+    "decorative",
+    "vases"
+   ],
+   "tags": [
+    "brass",
+    "antique",
+    "metal",
+    "ancient",
+    "artifact",
+    "vase",
+    "old",
+    "clean"
+   ],
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "dims": [
+    0.227,
+    0.227,
+    0.692
+   ],
+   "room": "decor",
+   "source_kb": 842,
+   "tris": 21440,
+   "size": [
+    0.2273,
+    0.2273,
+    0.6925
+   ],
+   "bytes": 198972
+  },
+  "round_wooden_table_02": {
+   "name": "Round Wooden Table 02",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "antique",
+    "vintage",
+    "wooden",
+    "traditional",
+    "circle",
+    "lounge",
+    "dining"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.796,
+    0.796,
+    0.746
+   ],
+   "room": "dining",
+   "source_kb": 1921,
+   "tris": 4254,
+   "size": [
+    0.7962,
+    0.7962,
+    0.746
+   ],
+   "bytes": 118708
+  },
+  "modern_coffee_table_02": {
+   "name": "Modern Coffee Table 02",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "contemporary",
+    "modern",
+    "rectangular",
+    "stone",
+    "wood",
+    "deco",
+    "clean"
+   ],
+   "authors": [
+    "Amin"
+   ],
+   "dims": [
+    1.199,
+    1.2,
+    0.369
+   ],
+   "room": "living-room",
+   "source_kb": 2956,
+   "tris": 13645,
+   "size": [
+    1.1991,
+    1.1997,
+    0.3692
+   ],
+   "bytes": 554028
+  },
+  "chinese_chandelier": {
+   "name": "Chinese Chandelier",
+   "categories": [
+    "lighting",
+    "decorative"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "old",
+    "wooden",
+    "ornate",
+    "traditional",
+    "asian"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.878,
+    0.879,
+    0.748
+   ],
+   "room": "lighting",
+   "source_kb": 2159,
+   "tris": 7828,
+   "size": [
+    0.8784,
+    0.8787,
+    0.7482
+   ],
+   "bytes": 365552
+  },
+  "bar_chair_round_01": {
+   "name": "Bar Chair Round 01",
+   "categories": [
+    "seating",
+    "furniture"
+   ],
+   "tags": [
+    "bar",
+    "pub",
+    "stool",
+    "tall",
+    "wooden",
+    "classical",
+    "old",
+    "vintage",
+    "cigar"
+   ],
+   "authors": [
+    "Dairon Sanchez"
+   ],
+   "dims": [
+    0.483,
+    0.486,
+    0.751
+   ],
+   "room": "dining",
+   "source_kb": 2812,
+   "tris": 14373,
+   "size": [
+    0.4832,
+    0.486,
+    0.7505
+   ],
+   "bytes": 490696
+  },
+  "planter_box_01": {
+   "name": "Planter Box 01",
+   "categories": [
+    "decorative",
+    "containers",
+    "potted plants",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "wood",
+    "farmhouse",
+    "shed",
+    "outdoor",
+    "gardening",
+    "greenhouse",
+    "landscaping",
+    "garden",
+    "farm",
+    "planter",
+    "flower box",
+    "planters"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.913,
+    0.414,
+    0.425
+   ],
+   "room": "outside",
+   "source_kb": 2339,
+   "tris": 8094,
+   "size": [
+    0.9126,
+    0.4137,
+    0.425
+   ],
+   "bytes": 380684
+  },
+  "chinese_screen_panels": {
+   "name": "Chinese Screen Panels",
+   "categories": [
+    "furniture"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "old",
+    "wooden",
+    "ornate",
+    "asian",
+    "divider",
+    "wall"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.294,
+    0.377,
+    1.603
+   ],
+   "room": "living-room",
+   "source_kb": 1693,
+   "tris": 784,
+   "size": [
+    1.294,
+    0.3769,
+    1.6031
+   ],
+   "bytes": 222372
+  },
+  "industrial_wall_sconce": {
+   "name": "Industrial Wall Sconce",
+   "categories": [
+    "lighting",
+    "decorative"
+   ],
+   "tags": [
+    "old",
+    "vintage",
+    "antique",
+    "fancy",
+    "farmhouse",
+    "rustic",
+    "brass",
+    "copper",
+    "wall light"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.15,
+    0.252,
+    0.342
+   ],
+   "room": "lighting",
+   "source_kb": 1841,
+   "tris": 9826,
+   "size": [
+    0.1503,
+    0.2516,
+    0.3418
+   ],
+   "bytes": 152708
+  },
+  "painted_wooden_table": {
+   "name": "Painted Wooden Table",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "vintage",
+    "farmhouse",
+    "aged",
+    "worn",
+    "carpentry"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    2.406,
+    1.137,
+    0.959
+   ],
+   "room": "dining",
+   "source_kb": 1779,
+   "tris": 600,
+   "size": [
+    2.4056,
+    1.137,
+    0.9586
+   ],
+   "bytes": 145500
+  },
+  "painted_wooden_nightstand": {
+   "name": "Painted Wooden Nightstand",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "worn",
+    "vintage",
+    "antique",
+    "aged",
+    "bedside",
+    "bedroom",
+    "night",
+    "table"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.505,
+    0.509,
+    0.616
+   ],
+   "room": "bedroom",
+   "source_kb": 2152,
+   "tris": 470,
+   "size": [
+    0.5046,
+    0.5087,
+    0.6155
+   ],
+   "bytes": 84872
+  },
+  "wicker_basket_02": {
+   "name": "Wicker Basket 02",
+   "categories": [
+    "containers",
+    "decorative"
+   ],
+   "tags": [
+    "handcrafted",
+    "home decor",
+    "rattan",
+    "basket",
+    "handwoven",
+    "woven",
+    "rustic decor",
+    "wicker",
+    "twine"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.375,
+    0.271,
+    0.218
+   ],
+   "room": "kitchen",
+   "source_kb": 3065,
+   "tris": 17850,
+   "size": [
+    0.3469,
+    0.2545,
+    0.2005
+   ],
+   "bytes": 318744
+  },
+  "brass_vase_04": {
+   "name": "Brass Vase 04",
+   "categories": [
+    "containers",
+    "props",
+    "vases",
+    "dishes"
+   ],
+   "tags": [
+    "vintage",
+    "fancy",
+    "metal",
+    "brass",
+    "copper",
+    "old",
+    "vase",
+    "pitcher",
+    "ornate",
+    "pattern"
+   ],
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "dims": [
+    0.082,
+    0.061,
+    0.17
+   ],
+   "room": "decor",
+   "source_kb": 394,
+   "tris": 2760,
+   "size": [
+    0.082,
+    0.061,
+    0.1703
+   ],
+   "bytes": 74812
+  },
+  "chinese_armchair": {
+   "name": "Chinese Armchair",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "ornate",
+    "chinese",
+    "asian",
+    "varnished",
+    "elegant",
+    "wooden",
+    "traditional"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.848,
+    0.789,
+    1.587
+   ],
+   "room": "living-room",
+   "source_kb": 1703,
+   "tris": 2675,
+   "size": [
+    0.8483,
+    0.7887,
+    1.5875
+   ],
+   "bytes": 213844
+  },
+  "hanging_picture_frame_01": {
+   "name": "Hanging Picture Frame 01",
+   "categories": [
+    "decorative",
+    "wall decoration"
+   ],
+   "tags": [
+    "modern",
+    "minimalist",
+    "clean",
+    "frame",
+    "simple",
+    "art"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.594,
+    0.016,
+    0.841
+   ],
+   "room": "decor",
+   "source_kb": 397,
+   "tris": 2586,
+   "size": [
+    0.594,
+    0.0157,
+    0.841
+   ],
+   "bytes": 116316
+  },
+  "planter_pot_clay": {
+   "name": "Planter Pot Clay",
+   "categories": [
+    "containers",
+    "vases",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "outdoor",
+    "mossy",
+    "dirty",
+    "used",
+    "worn",
+    "shed",
+    "garden",
+    "gardening",
+    "farmhouse",
+    "greenhouse",
+    "landscaping"
+   ],
+   "authors": [
+    "Amal Kumar"
+   ],
+   "dims": [
+    0.266,
+    0.263,
+    0.222
+   ],
+   "room": "decor",
+   "source_kb": 1797,
+   "tris": 3080,
+   "size": [
+    0.266,
+    0.2635,
+    0.2219
+   ],
+   "bytes": 85680
+  },
+  "brass_pot_01": {
+   "name": "Brass Pot 01",
+   "categories": [
+    "props",
+    "containers",
+    "decorative"
+   ],
+   "tags": [
+    "brass",
+    "metal",
+    "prop",
+    "pot",
+    "cooking",
+    "container",
+    "pattern",
+    "decorative",
+    "copper",
+    "old",
+    "fancy",
+    "cookware"
+   ],
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "dims": [
+    0.302,
+    0.302,
+    0.291
+   ],
+   "room": "kitchen",
+   "source_kb": 1523,
+   "tris": 3760,
+   "size": [
+    0.3019,
+    0.3017,
+    0.2909
+   ],
+   "bytes": 83088
+  },
+  "ceramic_vase_03": {
+   "name": "Ceramic Vase 03",
+   "categories": [
+    "containers",
+    "decorative",
+    "vases"
+   ],
+   "tags": [
+    "clay",
+    "pot",
+    "exterior",
+    "decor",
+    "painted",
+    "vase",
+    "tall",
+    "modern",
+    "fancy"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.112,
+    0.112,
+    0.414
+   ],
+   "room": "decor",
+   "source_kb": 765,
+   "tris": 11136,
+   "size": [
+    0.1122,
+    0.1122,
+    0.4144
+   ],
+   "bytes": 157448
+  },
+  "planter_box_02": {
+   "name": "Planter Box 02",
+   "categories": [
+    "containers",
+    "decorative",
+    "potted plants",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "wood",
+    "worn",
+    "shed",
+    "outdoor",
+    "gardening",
+    "farm",
+    "greenhouse",
+    "landscaping",
+    "farmhouse",
+    "garden",
+    "flower box",
+    "planters"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    1.252,
+    0.467,
+    0.453
+   ],
+   "room": "outside",
+   "source_kb": 2468,
+   "tris": 10944,
+   "size": [
+    1.2516,
+    0.4672,
+    0.4534
+   ],
+   "bytes": 429832
+  },
+  "carved_wooden_plate": {
+   "name": "Carved Wooden Plate",
+   "categories": [
+    "props",
+    "decorative",
+    "dishes"
+   ],
+   "tags": [
+    "vintage",
+    "wood",
+    "antique",
+    "carved",
+    "hand made",
+    "crafted",
+    "fruitbowl",
+    "plate"
+   ],
+   "authors": [
+    "Jan Martens"
+   ],
+   "dims": [
+    0.272,
+    0.269,
+    0.038
+   ],
+   "room": "kitchen",
+   "source_kb": 1564,
+   "tris": 2112,
+   "size": [
+    0.2718,
+    0.2688,
+    0.0381
+   ],
+   "bytes": 74336
+  },
+  "chinese_cabinet": {
+   "name": "Chinese Cabinet",
+   "categories": [
+    "shelves",
+    "furniture"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "vintage",
+    "antique",
+    "ornate",
+    "traditional",
+    "asian",
+    "elegant",
+    "ornamental"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.262,
+    0.545,
+    2.872
+   ],
+   "room": "living-room",
+   "source_kb": 2341,
+   "tris": 15668,
+   "size": [
+    1.2625,
+    0.5452,
+    2.8721
+   ],
+   "bytes": 388172
+  },
+  "vintage_oil_lamp": {
+   "name": "Vintage Oil Lamp",
+   "categories": [
+    "lighting",
+    "decorative"
+   ],
+   "tags": [
+    "lamp",
+    "oil",
+    "antique",
+    "victorian",
+    "manor",
+    "historic"
+   ],
+   "authors": [
+    "Monsta3D"
+   ],
+   "dims": [
+    0.22,
+    0.22,
+    0.802
+   ],
+   "room": "lighting",
+   "source_kb": 2070,
+   "tris": 7208,
+   "size": [
+    0.22,
+    0.22,
+    0.8016
+   ],
+   "bytes": 299788
+  },
+  "wall_clock": {
+   "name": "Wall Clock",
+   "categories": [
+    "collection: project_lighthouse",
+    "decorative",
+    "appliances"
+   ],
+   "tags": [
+    "time",
+    "timepiece",
+    "watch",
+    "watchface",
+    "wall clock",
+    "analog",
+    "modern",
+    "office decor",
+    "home interior",
+    "admin",
+    "office",
+    "90s"
+   ],
+   "authors": [
+    "PierreB3D"
+   ],
+   "dims": [
+    0.32,
+    0.047,
+    0.32
+   ],
+   "room": "decor",
+   "source_kb": 1565,
+   "tris": 3658,
+   "size": [
+    0.3205,
+    0.0472,
+    0.3205
+   ],
+   "bytes": 107412
+  },
+  "industrial_coffee_table": {
+   "name": "Industrial Coffee Table",
+   "categories": [
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "metal",
+    "industrial",
+    "steel",
+    "rustic",
+    "workshop",
+    "metal frame",
+    "garage",
+    "urban loft"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.778,
+    0.758,
+    0.638
+   ],
+   "room": "living-room",
+   "source_kb": 3245,
+   "tris": 41300,
+   "size": [
+    0.7783,
+    0.7579,
+    0.6384
+   ],
+   "bytes": 396936
+  },
+  "chinese_console_table": {
+   "name": "Chinese Console Table",
+   "categories": [
+    "table",
+    "furniture"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "wooden",
+    "ornate",
+    "traditional",
+    "asian"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.72,
+    0.339,
+    0.661
+   ],
+   "room": "living-room",
+   "source_kb": 2792,
+   "tris": 13648,
+   "size": [
+    1.7196,
+    0.3388,
+    0.6607
+   ],
+   "bytes": 527848
+  },
+  "pot_enamel_01": {
+   "name": "Pot Enamel 01",
+   "categories": [
+    "props",
+    "decorative",
+    "dishes"
+   ],
+   "tags": [
+    "pot",
+    "container",
+    "cooking",
+    "cookware",
+    "kitchen",
+    "enamel",
+    "crockery",
+    "cuisine"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.263,
+    0.18,
+    0.178
+   ],
+   "room": "kitchen",
+   "source_kb": 1745,
+   "tris": 11416,
+   "size": [
+    0.2629,
+    0.1805,
+    0.1783
+   ],
+   "bytes": 144592
+  },
+  "planter_box_03": {
+   "name": "Planter Box 03",
+   "categories": [
+    "containers",
+    "decorative",
+    "potted plants",
+    "collection: the_shed"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "wood",
+    "shed",
+    "farm",
+    "gardening",
+    "landscaping",
+    "garden",
+    "greenhouse",
+    "planters",
+    "farmhouse",
+    "outdoor",
+    "flower box"
+   ],
+   "authors": [
+    "James Ray Cock"
+   ],
+   "dims": [
+    0.914,
+    0.656,
+    0.855
+   ],
+   "room": "outside",
+   "source_kb": 2558,
+   "tris": 13112,
+   "size": [
+    0.9143,
+    0.6555,
+    0.8551
+   ],
+   "bytes": 461768
+  },
+  "chinese_stool": {
+   "name": "Chinese Stool",
+   "categories": [
+    "seating",
+    "furniture"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "wooden",
+    "ornate",
+    "traditional",
+    "asian"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.599,
+    0.506,
+    0.631
+   ],
+   "room": "dining",
+   "source_kb": 1793,
+   "tris": 1090,
+   "size": [
+    0.599,
+    0.5064,
+    0.6306
+   ],
+   "bytes": 68932
+  },
+  "painted_wooden_cabinet_02": {
+   "name": "Painted Wooden Cabinet 02",
+   "categories": [
+    "furniture",
+    "shelves"
+   ],
+   "tags": [
+    "storage",
+    "cabinet",
+    "wood",
+    "vintage",
+    "rustic",
+    "worn",
+    "carpentry",
+    "aged",
+    "bookcase"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.997,
+    0.729,
+    2.569
+   ],
+   "room": "living-room",
+   "source_kb": 1596,
+   "tris": 966,
+   "size": [
+    0.9969,
+    0.7223,
+    2.5686
+   ],
+   "bytes": 159536
+  },
+  "gallinera_chair": {
+   "name": "Gallinera Chair",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "philippines",
+    "traditional",
+    "old",
+    "wooden"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.581,
+    0.604,
+    1.034
+   ],
+   "room": "outside",
+   "source_kb": 2359,
+   "tris": 11560,
+   "size": [
+    0.5808,
+    0.6039,
+    1.0337
+   ],
+   "bytes": 362644
+  },
+  "hanging_industrial_lamp": {
+   "name": "Hanging Industrial Lamp",
+   "categories": [
+    "lighting"
+   ],
+   "tags": [
+    "industrial lighting",
+    "hanging lamp",
+    "warehouse lighting",
+    "bunker",
+    "metal lamp",
+    "factory",
+    "warehouse"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.55,
+    0.55,
+    1.355
+   ],
+   "room": "lighting",
+   "source_kb": 3244,
+   "tris": 9530,
+   "size": [
+    0.5496,
+    0.5496,
+    1.3554
+   ],
+   "bytes": 532308
+  },
+  "wooden_bowl_02": {
+   "name": "Wooden Bowl 02",
+   "categories": [
+    "props",
+    "decorative",
+    "dishes"
+   ],
+   "tags": [
+    "antique",
+    "vintage",
+    "old",
+    "wooden",
+    "ornate",
+    "traditional",
+    "fruitbowl",
+    "rustic decor",
+    "home decor"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    0.131,
+    0.125,
+    0.073
+   ],
+   "room": "kitchen",
+   "source_kb": 2511,
+   "tris": 4666,
+   "size": [
+    0.1307,
+    0.1245,
+    0.0731
+   ],
+   "bytes": 190040
+  },
+  "vintage_day_bed": {
+   "name": "Vintage Day Bed",
+   "categories": [
+    "collection: project_lighthouse",
+    "furniture",
+    "bed",
+    "seating"
+   ],
+   "tags": [
+    "old",
+    "vintage",
+    "antique",
+    "wooden",
+    "couch",
+    "bench",
+    "sofa-bed",
+    "matress",
+    "chaise"
+   ],
+   "authors": [
+    "Aron Łyczek"
+   ],
+   "dims": [
+    1.973,
+    0.855,
+    1.127
+   ],
+   "room": "bedroom",
+   "source_kb": 2426,
+   "tris": 2715,
+   "size": [
+    1.9726,
+    0.8548,
+    1.1273
+   ],
+   "bytes": 466460
+  },
+  "painted_wooden_bench": {
+   "name": "Painted Wooden Bench",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "vintage",
+    "old",
+    "wooden",
+    "worn",
+    "antique",
+    "farmhouse",
+    "aged",
+    "rustic",
+    "small",
+    "seat",
+    "stool"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    1.165,
+    0.497,
+    0.889
+   ],
+   "room": "outside",
+   "source_kb": 1990,
+   "tris": 630,
+   "size": [
+    1.1649,
+    0.4965,
+    0.8893
+   ],
+   "bytes": 260204
+  },
+  "chinese_sofa": {
+   "name": "Chinese Sofa",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "wooden",
+    "ornate",
+    "traditional",
+    "fancy"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    2.285,
+    0.969,
+    0.86
+   ],
+   "room": "living-room",
+   "source_kb": 1572,
+   "tris": 704,
+   "size": [
+    2.2854,
+    0.9689,
+    0.86
+   ],
+   "bytes": 171256
+  },
+  "painted_wooden_sofa": {
+   "name": "Painted Wooden Sofa",
+   "categories": [
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "chair",
+    "outdoor",
+    "couch",
+    "wooden",
+    "vintage",
+    "aged"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    2.452,
+    0.787,
+    1.281
+   ],
+   "room": "living-room",
+   "source_kb": 2100,
+   "tris": 5826,
+   "size": [
+    2.4517,
+    0.7873,
+    1.281
+   ],
+   "bytes": 288640
+  },
+  "dining_table": {
+   "name": "Dining Table",
+   "categories": [
+    "collection: project_lighthouse",
+    "furniture",
+    "table"
+   ],
+   "tags": [
+    "old",
+    "scratched",
+    "cloth-covered",
+    "rectangular",
+    "checkered-tablecloth",
+    "tapered-legs",
+    "worn"
+   ],
+   "authors": [
+    "Aron Łyczek"
+   ],
+   "dims": [
+    2.256,
+    1.39,
+    0.877
+   ],
+   "room": "dining",
+   "source_kb": 2284,
+   "tris": 1048,
+   "size": [
+    2.2559,
+    1.3902,
+    0.877
+   ],
+   "bytes": 375024
+  },
+  "metal_jug": {
+   "name": "Metal Jug",
+   "categories": [
+    "containers",
+    "decorative",
+    "vases"
+   ],
+   "tags": [
+    "milk jug",
+    "metal",
+    "vase",
+    "farmhouse",
+    "countryside",
+    "kitchen decor",
+    "vintage",
+    "farmhouse decor",
+    "pitcher",
+    "rustic"
+   ],
+   "authors": [
+    "Anzor Lezhava"
+   ],
+   "dims": [
+    0.197,
+    0.195,
+    0.288
+   ],
+   "room": "decor",
+   "source_kb": 1794,
+   "tris": 6040,
+   "size": [
+    0.1968,
+    0.1955,
+    0.2875
+   ],
+   "bytes": 96892
+  },
+  "painted_wooden_shelves": {
+   "name": "Painted Wooden Shelves",
+   "categories": [
+    "furniture",
+    "shelves"
+   ],
+   "tags": [
+    "old",
+    "wooden",
+    "worn",
+    "vintage",
+    "farmhouse",
+    "aged"
+   ],
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "dims": [
+    0.511,
+    0.367,
+    1.125
+   ],
+   "room": "living-room",
+   "source_kb": 2111,
+   "tris": 524,
+   "size": [
+    0.5111,
+    0.3671,
+    1.1251
+   ],
+   "bytes": 295896
+  },
+  "old_bed_frame": {
+   "name": "Old Bed Frame",
+   "categories": [
+    "collection: project_lighthouse",
+    "bed",
+    "furniture"
+   ],
+   "tags": [
+    "rusty",
+    "metal",
+    "bedroom",
+    "vintage",
+    "antique",
+    "hospital",
+    "traditional"
+   ],
+   "authors": [
+    "Luca B"
+   ],
+   "dims": [
+    0.905,
+    2.002,
+    1.201
+   ],
+   "room": "bedroom",
+   "source_kb": 4042,
+   "tris": 49990,
+   "size": [
+    0.9047,
+    2.0017,
+    1.2015
+   ],
+   "bytes": 797596
+  },
+  "metal_stool_02": {
+   "name": "Metal Stool 02",
+   "categories": [
+    "collection: project_lighthouse",
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "wooden",
+    "metal frame",
+    "industrial",
+    "small",
+    "workshop",
+    "round"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.448,
+    0.473,
+    0.458
+   ],
+   "room": "dining",
+   "source_kb": 2541,
+   "tris": 6532,
+   "size": [
+    0.4481,
+    0.4731,
+    0.4581
+   ],
+   "bytes": 165332
+  },
+  "metal_stool_01": {
+   "name": "Metal Stool 01",
+   "categories": [
+    "collection: project_lighthouse",
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "vintage",
+    "antique",
+    "old",
+    "leather",
+    "round",
+    "metal",
+    "industrial",
+    "barstool"
+   ],
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "dims": [
+    0.352,
+    0.355,
+    0.883
+   ],
+   "room": "dining",
+   "source_kb": 2287,
+   "tris": 8334,
+   "size": [
+    0.352,
+    0.3546,
+    0.8828
+   ],
+   "bytes": 368064
+  },
+  "ceramic_pot": {
+   "name": "Ceramic Pot",
+   "categories": [
+    "containers",
+    "props",
+    "decorative",
+    "dishes",
+    "collection: project_lighthouse"
+   ],
+   "tags": [
+    "earthenware",
+    "glazed",
+    "aged",
+    "weathered",
+    "ceramic"
+   ],
+   "authors": [
+    "Aron Łyczek"
+   ],
+   "dims": [
+    0.656,
+    0.502,
+    0.372
+   ],
+   "room": "kitchen",
+   "source_kb": 1642,
+   "tris": 3592,
+   "size": [
+    0.6563,
+    0.5018,
+    0.3717
+   ],
+   "bytes": 102688
+  },
+  "scandinavian_masonry_heater": {
+   "name": "Scandinavian Masonry Heater",
+   "categories": [
+    "appliances"
+   ],
+   "tags": [
+    "heater",
+    "home heating",
+    "furnace",
+    "fireplace",
+    "wood stove",
+    "central heating"
+   ],
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "dims": [
+    1.168,
+    1.335,
+    2.36
+   ],
+   "room": "kitchen",
+   "source_kb": 2460,
+   "tris": 9350,
+   "size": [
+    1.1677,
+    1.3353,
+    2.3605
+   ],
+   "bytes": 404264
+  },
+  "metal_stool_03": {
+   "name": "Metal Stool 03",
+   "categories": [
+    "collection: project_lighthouse",
+    "furniture",
+    "seating"
+   ],
+   "tags": [
+    "old",
+    "metal",
+    "barstool",
+    "backrest",
+    "heavy-duty",
+    "weathered",
+    "rusted",
+    "workshop"
+   ],
+   "authors": [
+    "Flo Tasser"
+   ],
+   "dims": [
+    0.461,
+    0.471,
+    1.023
+   ],
+   "room": "dining",
+   "source_kb": 2290,
+   "tris": 6576,
+   "size": [
+    0.4606,
+    0.4706,
+    1.0231
+   ],
+   "bytes": 384584
+  },
+  "vintage_electric_kettle": {
+   "name": "Vintage Electric Kettle",
+   "categories": [
+    "collection: project_lighthouse",
+    "decorative",
+    "appliances"
+   ],
+   "tags": [
+    "old",
+    "vintage",
+    "antique",
+    "electric",
+    "gooseneck spout",
+    "metal",
+    "rusted",
+    "dirty",
+    "traditional"
+   ],
+   "authors": [
+    "SV Garip"
+   ],
+   "dims": [
+    0.321,
+    0.249,
+    0.305
+   ],
+   "room": "kitchen",
+   "source_kb": 2387,
+   "tris": 14838,
+   "size": [
+    0.3209,
+    0.2486,
+    0.3047
+   ],
+   "bytes": 248200
+  }
+ },
+ "left_out": {
+  "BarberShopChair_01": "left out by hand (not for a house, or heavy for little use)",
+  "Barrel_01": "not a house model (containers, industrial)",
+  "Barrel_02": "not a house model (containers, industrial)",
+  "Camera_01": "not a house model (electronics, props)",
+  "CashRegister_01": "left out by hand (not for a house, or heavy for little use)",
+  "CheeseBox_01": "not a house model (containers, props)",
+  "CoffeeCart_01": "left out by hand (not for a house, or heavy for little use)",
+  "Drill_01": "not a house model (electronics, props, tools)",
+  "Megaphone_01": "not a house model (electronics, props, tools)",
+  "SchoolChair_01": "left out by hand (not for a house, or heavy for little use)",
+  "SchoolDesk_01": "left out by hand (not for a house, or heavy for little use)",
+  "Television_01": "not a house model (electronics, props)",
+  "Ukulele_01": "not a house model (instrument, props)",
+  "WetFloorSign_01": "not a house model (industrial, office, props)",
+  "adjustable_wrench": "not a house model (industrial, props, tools)",
+  "alarm_clock_01": "left out: rigged",
+  "all_purpose_cleaner": "not a house model (containers, props)",
+  "american_football": "not a house model (props)",
+  "ammo_box": "not a house model (industrial, tools)",
+  "anthurium_botany_01": "not a house model (nature, plants)",
+  "antique_estoc": "not a house model (props)",
+  "antique_katana_01": "not a house model (props)",
+  "bananas": "not a house model (food, nature)",
+  "bark_debris_01": "not a house model (ground cover, nature, plants)",
+  "barrel_03": "not a house model (containers, industrial)",
+  "barrel_stove": "not a house model (containers, industrial)",
+  "baseball_01": "not a house model (props)",
+  "baseball_bat": "not a house model (props)",
+  "bench_vice_01": "not a house model (industrial, rigged, tools)",
+  "binder_notebook": "not a house model (books, props)",
+  "binoculars": "not a house model (props, tools)",
+  "bleach_bottle": "not a house model (containers, props)",
+  "bolt_action_rifle_7_62": "not a house model (firearms, weapons)",
+  "bolt_cutters_01": "not a house model (industrial, props, rigged, tools)",
+  "book_encyclopedia_set_01": "left out: books",
+  "boombox": "left out: electronics",
+  "boulder_01": "not a house model (nature, rocks)",
+  "brass_blowtorch": "not a house model (props, tools)",
+  "brass_goblets": "left out by hand (not for a house, or heavy for little use)",
+  "bronze_ray_statue": "left out by hand (not for a house, or heavy for little use)",
+  "bronze_shark_statue": "left out by hand (not for a house, or heavy for little use)",
+  "bronze_whale_statue": "left out by hand (not for a house, or heavy for little use)",
+  "bull_head": "left out by hand (not for a house, or heavy for little use)",
+  "bunsen_burner": "not a house model (industrial, props, tools)",
+  "caged_hanging_light": "left out: industrial",
+  "calathea_orbifolia_01": "not a house model (ground cover, nature, plants)",
+  "can_rusted": "not a house model (containers)",
+  "cannon_01": "not a house model (props, rigged)",
+  "cardboard_box_01": "not a house model (containers, industrial)",
+  "carrot_cake": "not a house model (food, props)",
+  "carved_wooden_elephant": "left out by hand (not for a house, or heavy for little use)",
+  "cassette_player": "not a house model (electronics, props)",
+  "ceiling_fan": "left out by hand (not for a house, or heavy for little use)",
+  "celandine_01": "not a house model (flowers, ground cover, nature, plants)",
+  "cement_bag": "not a house model (props)",
+  "cheiridopsis_succulent": "not a house model (ground cover, nature, plants)",
+  "chemistry_set": "not a house model (industrial, props, tools)",
+  "chess_set": "left out by hand (not for a house, or heavy for little use)",
+  "chinese_commode": "left out by hand (not for a house, or heavy for little use)",
+  "cigarette_case": "not a house model (props)",
+  "cigarette_pack": "not a house model (containers, props)",
+  "circuit_board": "not a house model (electronics)",
+  "classic_laptop": "not a house model (electronics, office)",
+  "cleaner_tin_01": "not a house model (containers, industrial, tools)",
+  "clipboard": "not a house model (office, props)",
+  "coast_land_rocks_02": "not a house model (nature, rocks)",
+  "coast_land_rocks_03": "not a house model (nature, rocks)",
+  "coast_land_rocks_04": "not a house model (nature, rocks)",
+  "coast_line_01": "not a house model (nature, rocks)",
+  "coast_line_02": "not a house model (nature, rocks)",
+  "coast_rocks_01": "not a house model (nature, rocks)",
+  "coast_rocks_02": "not a house model (nature, rocks)",
+  "coast_rocks_03": "not a house model (nature, rocks)",
+  "coast_rocks_05": "not a house model (nature, rocks)",
+  "coastal_cliff_01": "not a house model (nature)",
+  "coastal_cliff_02": "not a house model (nature)",
+  "coastal_cliff_04": "not a house model (nature, rocks)",
+  "combination_wrench": "not a house model (industrial, tools)",
+  "compost_bag_02": "not a house model (containers, industrial)",
+  "compost_bags": "not a house model (props)",
+  "concrete_cat_statue": "left out by hand (not for a house, or heavy for little use)",
+  "concrete_road_barrier": "not a house model (industrial, structures)",
+  "concrete_road_barrier_02": "not a house model (industrial, structures)",
+  "covered_car": "not a house model (industrial, props)",
+  "croissant": "not a house model (food, props)",
+  "cross_pein_hammer": "not a house model (props, tools)",
+  "crowbar_01": "not a house model (industrial, props, tools)",
+  "crystalline_iceplant": "not a house model (ground cover, nature, plants)",
+  "dandelion_01": "not a house model (flowers, ground cover, nature, plants)",
+  "dartboard": "left out by hand (not for a house, or heavy for little use)",
+  "dead_quiver_branch_01": "not a house model (ground cover, nature, plants)",
+  "dead_quiver_branch_02": "not a house model (ground cover, nature, plants)",
+  "dead_quiver_trunk": "not a house model (nature, trees)",
+  "dead_tree_trunk": "not a house model (ground cover, nature, plants)",
+  "dead_tree_trunk_02": "not a house model (nature, plants, trees)",
+  "decorative_book_set_01": "left out: books",
+  "desk_lamp_arm_01": "left out: rigged",
+  "didelta_spinosa": "not a house model (plants)",
+  "digital_wrist_watch": "not a house model (electronics, props)",
+  "dirty_football": "not a house model (props)",
+  "drain_cleaner": "not a house model (industrial, props, tools)",
+  "drill_press_01": "left out: electronics, industrial, tools",
+  "dry_branches_medium_01": "not a house model (ground cover, nature, plants, props)",
+  "dry_quiver_leaf": "not a house model (ground cover, nature, plants)",
+  "dustpan": "not a house model (props, tools)",
+  "dutch_ship_large_01": "not a house model (ships)",
+  "dutch_ship_large_02": "not a house model (ships)",
+  "dutch_ship_medium": "not a house model (ships)",
+  "electric_stove": "left out: electronics, rigged",
+  "exterior_aircon_unit": "left out: electronics, industrial",
+  "fern_02": "not a house model (nature, plants)",
+  "filmstrip_projector_8mm": "left out: electronics",
+  "fir_sapling": "not a house model (nature, plants, trees)",
+  "fir_sapling_medium": "not a house model (nature, plants, trees)",
+  "fir_tree_01": "not a house model (nature, plants, trees)",
+  "fire_alarm": "left out: industrial",
+  "fire_hydrant": "not a house model (industrial, structures)",
+  "fish_knife": "not a house model (props)",
+  "fishermans_hat": "not a house model (props)",
+  "flathead_screwdriver": "not a house model (industrial, props, tools)",
+  "flood_lights": "left out: electronics, industrial",
+  "flower_empodium": "not a house model (flowers, ground cover, nature, plants)",
+  "flower_gazania": "not a house model (flowers, ground cover, nature, plants)",
+  "flower_heliophila": "not a house model (grass, ground cover, nature, plants)",
+  "flower_stinkkruid": "not a house model (flowers, nature, plants)",
+  "flower_ursinia": "not a house model (flowers, ground cover, nature, plants)",
+  "food_apple_01": "not a house model (food, nature)",
+  "food_avocado_01": "not a house model (food, nature)",
+  "food_ginger_01": "not a house model (food, nature)",
+  "food_kiwi_01": "not a house model (food, nature)",
+  "food_lime_01": "not a house model (food, nature)",
+  "food_lychee_01": "not a house model (food, nature)",
+  "food_pears_asian_01": "not a house model (food, nature)",
+  "food_pomegranate_01": "not a house model (food, nature)",
+  "football": "not a house model (props)",
+  "gamepad": "not a house model (props)",
+  "gaming_console": "left out: electronics",
+  "garden_gloves_01": "not a house model (props)",
+  "garden_gnome": "left out by hand (not for a house, or heavy for little use)",
+  "garden_hose_wall_mounted_01": "left out by hand (not for a house, or heavy for little use)",
+  "garden_sprinkler_01": "left out: tools",
+  "gate_latch_01": "not a house model (buildings, industrial, structures)",
+  "gothic_statue": "left out by hand (not for a house, or heavy for little use)",
+  "grass_bermuda_01": "not a house model (grass, ground cover, nature)",
+  "grass_medium_01": "not a house model (grass, ground cover, nature)",
+  "grass_medium_02": "not a house model (grass, ground cover, nature, plants)",
+  "hamburger_buns": "not a house model (food, props)",
+  "hand_plane_no4": "not a house model (tools)",
+  "hand_truck": "not a house model (industrial, props)",
+  "handsaw_wood": "not a house model (industrial, props, tools)",
+  "hatchet": "not a house model (tools)",
+  "horse_head": "left out by hand (not for a house, or heavy for little use)",
+  "horse_statue_01": "left out by hand (not for a house, or heavy for little use)",
+  "industrial_caged_sconce": "left out: industrial",
+  "industrial_microscope": "left out: industrial, tools",
+  "industrial_pastic_container": "not a house model (containers, industrial, office)",
+  "industrial_pipe_lamp": "left out: industrial",
+  "industrial_storage_cart": "left out: industrial",
+  "island_tree_01": "not a house model (nature, plants, trees)",
+  "island_tree_02": "not a house model (nature, plants, trees)",
+  "island_tree_03": "not a house model (nature, plants, trees)",
+  "jacaranda_tree": "not a house model (nature, plants, trees)",
+  "katana_stand_01": "left out by hand (not for a house, or heavy for little use)",
+  "kite_shield": "not a house model (props)",
+  "korean_fire_extinguisher_01": "not a house model (industrial, props)",
+  "korean_public_payphone_01": "not a house model (props)",
+  "ladder_sectioned_01": "not a house model (industrial, tools)",
+  "lambis_shell": "left out by hand (not for a house, or heavy for little use)",
+  "large_castle_door": "not a house model (buildings, structures)",
+  "large_iron_gate": "not a house model (buildings, structures)",
+  "lateral_sea_marker": "not a house model (props)",
+  "leather_cleaner_can": "not a house model (containers, props)",
+  "leipoldtia_schultzei": "not a house model (plants)",
+  "lemon": "not a house model (food, props)",
+  "life_jacket": "not a house model (props)",
+  "lifebuoy": "left out: industrial",
+  "lightbulb_01": "left out by hand (not for a house, or heavy for little use)",
+  "lightbulb_led": "left out by hand (not for a house, or heavy for little use)",
+  "lion_head": "left out by hand (not for a house, or heavy for little use)",
+  "long_life_food": "not a house model (containers, food, props)",
+  "lubricant_spray": "left out: tools",
+  "machete": "not a house model (props)",
+  "magnifying_glass_01": "not a house model (props, tools)",
+  "mantel_clock_01": "left out: rigged",
+  "marble_bust_01": "left out by hand (not for a house, or heavy for little use)",
+  "measuring_tape_01": "not a house model (industrial, props, tools)",
+  "medical_box": "not a house model (containers, props)",
+  "medical_tape": "not a house model (industrial, props, tools)",
+  "metal_detector": "not a house model (electronics, props)",
+  "metal_jerrycan": "not a house model (containers, props)",
+  "metal_jerrycan_green": "not a house model (containers, props)",
+  "metal_tool_chest": "not a house model (containers, industrial, props, rigged, tools)",
+  "metal_toolbox": "not a house model (containers, industrial, tools)",
+  "metal_trash_can": "not a house model (containers, industrial)",
+  "modified_thermos": "not a house model (containers, props)",
+  "modular_airduct_circular_01": "not a house model (industrial, structures)",
+  "modular_airduct_rectangular_01": "not a house model (industrial)",
+  "modular_chainlink_fence": "not a house model (buildings, industrial, structures)",
+  "modular_electric_cables": "not a house model (industrial)",
+  "modular_electricity_poles": "not a house model (industrial, structures)",
+  "modular_factory_facade": "not a house model (buildings, structures)",
+  "modular_fire_escape": "not a house model (industrial, structures)",
+  "modular_fort_01": "not a house model (buildings, structures)",
+  "modular_industrial_pipes_01": "not a house model (industrial, structures)",
+  "modular_metal_gutter": "not a house model (buildings, industrial, structures)",
+  "modular_pipes": "not a house model (industrial, structures)",
+  "modular_pipes_plastic_01": "not a house model (industrial, structures)",
+  "modular_street_seating": "left out by hand (not for a house, or heavy for little use)",
+  "modular_urban_apartments_facade": "not a house model (buildings, structures)",
+  "modular_wooden_pier": "not a house model (structures)",
+  "moon_rock_01": "not a house model (nature, rocks)",
+  "moon_rock_02": "not a house model (nature, rocks)",
+  "moon_rock_03": "not a house model (nature, rocks)",
+  "moon_rock_04": "not a house model (nature, rocks)",
+  "moon_rock_05": "not a house model (nature, rocks)",
+  "moon_rock_06": "not a house model (nature, rocks)",
+  "moon_rock_07": "not a house model (nature, rocks)",
+  "moss_01": "not a house model (ground cover, nature, plants)",
+  "mountainside": "not a house model (nature, rocks)",
+  "mounted_fluorescent_lights": "left out: industrial",
+  "mousetrap": "not a house model (props)",
+  "multi_cleaner_5_litre": "not a house model (containers, industrial, props)",
+  "multi_cleaner_bottle": "not a house model (containers, props)",
+  "namaqualand_boulder_02": "not a house model (nature, rocks)",
+  "namaqualand_boulder_03": "not a house model (nature, rocks)",
+  "namaqualand_boulder_04": "not a house model (nature, rocks)",
+  "namaqualand_boulder_05": "not a house model (nature, rocks)",
+  "namaqualand_boulder_06": "not a house model (nature, rocks)",
+  "namaqualand_boulders_01": "not a house model (nature, rocks)",
+  "namaqualand_cliff_01": "not a house model (nature, rocks)",
+  "namaqualand_cliff_02": "not a house model (nature, rocks)",
+  "namaqualand_rocks_01": "not a house model (nature, rocks)",
+  "namaqualand_stones_01": "not a house model (nature, rocks)",
+  "nettle_plant": "not a house model (ground cover, nature, plants)",
+  "ocean_buoy": "not a house model (props)",
+  "office_notepads": "not a house model (office, props)",
+  "oil_tin": "not a house model (containers, industrial, props)",
+  "old_drill_press": "not a house model (industrial, tools)",
+  "old_gas_mask": "not a house model (industrial, props, tools)",
+  "old_military_compressor": "not a house model (industrial, tools)",
+  "old_military_crate": "not a house model (containers, props)",
+  "old_tyre": "not a house model (industrial, props)",
+  "ornate_medieval_dagger": "not a house model (props)",
+  "ornate_medieval_mace": "not a house model (props)",
+  "ornate_war_hammer": "not a house model (props)",
+  "othonna_cerarioides": "not a house model (nature, plants, trees)",
+  "overhead_crane": "not a house model (industrial, tools)",
+  "pachira_aquatica_01": "not a house model (nature, plants)",
+  "pastic_torch_6v": "left out: electronics, tools",
+  "periwinkle_plant": "not a house model (flowers, ground cover, nature, plants)",
+  "picke_dirty_01": "not a house model (props, tools)",
+  "pine_roots": "not a house model (ground cover, nature, plants)",
+  "pine_sapling_medium": "not a house model (nature, plants, trees)",
+  "pine_sapling_small": "not a house model (nature, plants, trees)",
+  "pine_tree_01": "not a house model (nature, plants, trees)",
+  "pipe_wrench": "not a house model (industrial, tools)",
+  "plastic_bottle_gallon": "not a house model (containers)",
+  "plastic_broom": "not a house model (props, tools)",
+  "plastic_container": "not a house model (containers, props)",
+  "plastic_crate_01": "not a house model (containers, props)",
+  "plastic_crate_02": "not a house model (containers, props)",
+  "plastic_crate_03": "not a house model (containers, industrial)",
+  "plastic_jerrycan": "not a house model (containers, props)",
+  "plastic_thermos": "not a house model (containers, props)",
+  "pliers": "not a house model (industrial, props, tools)",
+  "plunger": "not a house model (tools)",
+  "pocket_watch": "not a house model (props)",
+  "portable_cassette_player": "not a house model (electronics, props)",
+  "portable_generator": "left out: industrial",
+  "portable_searchlight": "left out: electronics, tools",
+  "portable_welding_cart": "not a house model (containers, industrial)",
+  "postcard_set_01": "not a house model (props)",
+  "potted_plant_01": "96030 faces – over 60000",
+  "potted_plant_02": "69806 faces – over 60000",
+  "power_box_01": "not a house model (electronics, industrial, props, rigged, tools)",
+  "projector_screen": "not a house model (office)",
+  "propane_tank": "not a house model (industrial, props)",
+  "propane_torch": "not a house model (props, tools)",
+  "propane_torch_02": "not a house model (industrial, props, tools)",
+  "pull_chain_light_socket": "left out by hand (not for a house, or heavy for little use)",
+  "quiver_tree_01": "not a house model (nature, plants, trees)",
+  "quiver_tree_02": "not a house model (nature, plants, trees)",
+  "ratchet_wrench": "not a house model (industrial, props, rigged, tools)",
+  "retro_multimeter": "not a house model (electronics, industrial, instrument, props, tools)",
+  "rock_07": "not a house model (nature, rocks)",
+  "rock_09": "not a house model (nature, rocks)",
+  "rock_face_01": "not a house model (nature, rocks)",
+  "rock_face_02": "not a house model (nature, rocks)",
+  "rock_moss_set_01": "not a house model (nature, rocks)",
+  "rock_moss_set_02": "not a house model (nature, rocks)",
+  "rollershutter_door": "not a house model (buildings, industrial, structures)",
+  "rollershutter_window_01": "not a house model (buildings, industrial, structures)",
+  "rollershutter_window_02": "not a house model (buildings, industrial, structures)",
+  "rollershutter_window_03": "not a house model (buildings, industrial, structures)",
+  "root_cluster_01": "not a house model (ground cover, nature, plants)",
+  "root_cluster_02": "not a house model (ground cover, nature)",
+  "round_spectacles": "not a house model (props)",
+  "rubber_boots": "not a house model (props)",
+  "rubber_duck_toy": "left out by hand (not for a house, or heavy for little use)",
+  "russian_food_cans_01": "not a house model (containers, food, props)",
+  "rusted_hacksaw": "not a house model (props, tools)",
+  "rusted_spade_01": "not a house model (props, tools)",
+  "rusted_wheel_rim_01": "not a house model (industrial, props)",
+  "rusted_wheel_rim_02": "not a house model (industrial, props)",
+  "sand_rocks_small_01": "not a house model (nature, rocks)",
+  "screwdriver": "not a house model (props, tools)",
+  "screwdrivers_02": "not a house model (props, tools)",
+  "seadogs_compass": "left out: tools",
+  "searsia_burchellii": "not a house model (nature, trees)",
+  "searsia_lucida": "not a house model (nature, plants, trees)",
+  "security_camera_01": "left out: electronics, industrial, rigged",
+  "security_camera_02": "left out: electronics, industrial, rigged",
+  "security_light": "left out: industrial",
+  "seeding_tray_01": "not a house model (containers)",
+  "service_pistol": "not a house model (firearms, props, weapons)",
+  "ship_pinnace": "not a house model (rigged, ships)",
+  "shrub_01": "not a house model (flowers, ground cover, nature, plants)",
+  "shrub_02": "not a house model (ground cover, nature, plants)",
+  "shrub_03": "not a house model (ground cover, nature, plants)",
+  "shrub_04": "not a house model (ground cover, nature, plants)",
+  "shrub_sorrel_01": "not a house model (flowers, nature, plants)",
+  "signal_flashlight": "not a house model (electronics, props)",
+  "single_root": "not a house model (ground cover, nature, plants)",
+  "sledgehammer_01": "not a house model (industrial, props, tools)",
+  "small_lpg_tank": "not a house model (industrial, props)",
+  "small_oil_can_01": "not a house model (industrial, props, tools)",
+  "small_plastic_torch": "not a house model (props, tools)",
+  "spinning_wheel_01": "not a house model (props, tools)",
+  "spray_paint_bottles": "not a house model (containers, industrial, props)",
+  "spray_paint_bottles_02": "not a house model (industrial, props, tools)",
+  "standing_chalkboard_01": "left out by hand (not for a house, or heavy for little use)",
+  "stationery_supplies": "not a house model (office, props)",
+  "steel_frame_shelves_01": "left out: industrial",
+  "steel_frame_shelves_02": "left out: industrial",
+  "stick_grenade": "not a house model (weapons)",
+  "stone_01": "not a house model (nature, rocks)",
+  "stone_fire_pit": "left out: buildings, structures",
+  "strawberry_chocolate_cake": "not a house model (food, props)",
+  "street_lamp_01": "left out: industrial",
+  "street_lamp_02": "left out: industrial",
+  "street_rat": "not a house model (creature, nature)",
+  "sungka_board": "left out by hand (not for a house, or heavy for little use)",
+  "sungka_board_02": "left out by hand (not for a house, or heavy for little use)",
+  "sweet_potato": "not a house model (food, nature)",
+  "tea_set_01": "left out by hand (not for a house, or heavy for little use)",
+  "television_02": "not a house model (electronics)",
+  "tire_pump": "not a house model (props, tools)",
+  "tongue_groove_pliers": "not a house model (tools)",
+  "tool_cart": "left out: industrial",
+  "trashbag": "not a house model (props)",
+  "treasure_chest": "left out by hand (not for a house, or heavy for little use)",
+  "tree_small_02": "not a house model (nature, plants, trees)",
+  "tree_stump_01": "not a house model (ground cover, nature, plants, trees)",
+  "tree_stump_02": "not a house model (ground cover, nature, plants, trees)",
+  "trowel_01": "not a house model (props, tools)",
+  "utility_box_01": "not a house model (industrial, structures)",
+  "utility_box_02": "not a house model (industrial, structures)",
+  "vintage_binocular": "not a house model (instrument, props)",
+  "vintage_cabinet_01": "61096 faces – over 60000",
+  "vintage_crutches_01": "not a house model (props)",
+  "vintage_flashlight": "left out: electronics, tools",
+  "vintage_grandfather_clock_01": "left out: rigged",
+  "vintage_hand_drill": "not a house model (props, rigged, tools)",
+  "vintage_lighter": "not a house model (props, tools)",
+  "vintage_microscope": "not a house model (industrial, instrument, tools)",
+  "vintage_microwave": "left out: electronics",
+  "vintage_pocket_watch": "not a house model (props)",
+  "vintage_radio_transceiver": "left out: electronics",
+  "vintage_spacecraft_instrument": "not a house model (electronics, industrial, instrument)",
+  "vintage_stapler": "not a house model (office, props, tools)",
+  "vintage_suitcase": "left out by hand (not for a house, or heavy for little use)",
+  "vintage_telephone_wall_clock": "left out by hand (not for a house, or heavy for little use)",
+  "vintage_video_camera": "left out: electronics",
+  "water_manhole_cover": "not a house model (industrial, structures)",
+  "watering_can_metal_01": "not a house model (containers, props, tools)",
+  "weed_plant_02": "not a house model (ground cover, nature, plants)",
+  "wheelchair_01": "not a house model (props)",
+  "wild_rooibos_bush": "not a house model (nature, plants)",
+  "wine_barrel_01": "not a house model (containers)",
+  "wine_bottles_01": "left out by hand (not for a house, or heavy for little use)",
+  "wooden_axe": "not a house model (props)",
+  "wooden_axe_02": "not a house model (props)",
+  "wooden_axe_03": "not a house model (props, tools)",
+  "wooden_barrels_01": "not a house model (containers, props)",
+  "wooden_broom": "not a house model (props, tools)",
+  "wooden_bucket_01": "not a house model (containers, props)",
+  "wooden_bucket_02": "not a house model (containers, props)",
+  "wooden_candlestick": "212992 triangles – over 100000",
+  "wooden_crate_01": "not a house model (containers)",
+  "wooden_crate_02": "not a house model (containers, props)",
+  "wooden_cutting_board": "not a house model (food, props)",
+  "wooden_hammer_01": "not a house model (industrial, props, tools)",
+  "wooden_handle_saber": "not a house model (props)",
+  "wooden_ladder": "not a house model (industrial, tools)",
+  "wooden_ladder_02": "not a house model (tools)",
+  "wooden_military_crate": "not a house model (containers)",
+  "wooden_spoon": "left out by hand (not for a house, or heavy for little use)",
+  "worn_metal_rack": "left out: industrial",
+  "yellow_onion": "not a house model (food, props)"
+ }
+}
