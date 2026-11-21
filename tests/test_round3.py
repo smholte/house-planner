@@ -140,11 +140,13 @@ with sync_playwright() as p:
     cv = pg.evaluate("() => { const r = window.__hp.app.panes[0].view.renderer.domElement.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }")
     y0 = pg.evaluate("() => window.__hp.app.walker.yaw")
     pg.mouse.move(cv[0], cv[1]); pg.mouse.down(); pg.mouse.move(cv[0] + 120, cv[1] - 60, steps=8); pg.mouse.up()
-    mid = pg.evaluate("() => { const w = window.__hp.app.walker; return [w.yaw, w.pitch, w.look.dx]; }")
     pg.wait_for_timeout(1200)
     y1 = pg.evaluate("() => { const w = window.__hp.app.walker; return [w.yaw, w.pitch]; }")
+    # the smoothing is eased by time (the same at any frame rate), so a slow test computer's long frames would finish it at
+    # once: test it with a frame of 1/60 s given by hand – the turn is only partly done, the rest is still to come
+    mid = pg.evaluate("() => { const w = window.__hp.app.walker; w.look.dx = 0.3; w.look.dy = 0; const y = w.yaw; w.tick(1 / 60); const r = [w.yaw - y, w.look.dx]; w.look.dx = 0; return r; }")
     check('walking: moving the mouse to the right turns to the right, up looks up', y1[0] < y0 - 0.1 and y1[1] > 0.05, [y0, y1])
-    check('walking: turning is smoothed (the turn is still going on just after the mouse stops)', abs(mid[2]) > 1e-4 or abs(mid[0] - y1[0]) > 1e-3, mid)
+    check('walking: turning is smoothed (the turn is still going on just after the mouse stops)', 0.01 < mid[0] < 0.29 and mid[1] > 0.01 and abs(mid[0] + mid[1] - 0.3) < 1e-6, mid)
     pg.evaluate("() => { window.__hp.Settings.set('walkInvert', true); const w = window.__hp.app.walker; w.pitch = 0; w.look.dx = 0; w.look.dy = 0; }")
     pg.mouse.move(cv[0], cv[1]); pg.mouse.down(); pg.mouse.move(cv[0], cv[1] - 60, steps=6); pg.mouse.up(); pg.wait_for_timeout(1200)
     pinv = pg.evaluate("() => window.__hp.app.walker.pitch")
