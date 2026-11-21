@@ -1,0 +1,51 @@
+name: Fetch Poly Haven models
+
+# By hand only (task 0051): Actions → "Fetch Poly Haven models" → Run workflow, on the branch that should get the models.
+# The chat machines cannot reach polyhaven.com, GitHub's runners can: this fetches the chosen models (CC0, glTF at 1K) once,
+# packs them (tools/glb-pack.mjs) into build/library, draws their catalogue pictures and commits the result to that branch.
+# It never runs with the normal Tests, and the app never calls Poly Haven.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tools
+        run: |
+          npm ci --prefix tools
+          bash tools/web_setup.sh
+      - name: Fetch from Poly Haven
+        run: python3 tools/polyhaven.py fetch /tmp/ph
+      - name: Pack into the library
+        run: python3 tools/polyhaven.py import /tmp/ph
+      - name: Catalogue pictures
+        run: |
+          python3 build.py --no-house
+          python3 tools/model-thumbs.py --library
+          python3 tools/build-library.py --check
+          python3 tools/polyhaven.py --check
+      - name: Commit to this branch
+        run: |
+          git config user.name "poly-haven-fetch"
+          git config user.email "actions@users.noreply.github.com"
+          git add build/library build/polyhaven.json
+          git commit -m "Task 0051: Poly Haven models fetched, packed and pictured (workflow run ${{ github.run_id }})" || echo "nothing new"
+          git push origin HEAD:${{ github.ref_name }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: polyhaven-fetch
+          path: |
+            /tmp/ph/assets.json
+            /tmp/ph/chosen.json
