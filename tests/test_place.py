@@ -55,6 +55,8 @@ def run(p, phone, theme):
     after = pg.evaluate("() => window.__hp.app.sunNow()")
     check(f'{tag}: the sun in 3D follows at once', abs(after['el'] - before['el']) > 3, (before, after))
     check(f'{tag}: the 3D view\'s sun is the new one', abs(pg.evaluate("() => { const v = window.__hp.app.panes.find(q => q.kind === '3d').view; return v.sunInfo.el; }") - after['el']) < 1e-6)
+    try: pg.wait_for_function("() => /Oslo/.test((document.querySelector('#place-clock') || {}).textContent || '')", timeout=15000)
+    except Exception: pass
     zone_txt = pg.inner_text('#place-clock')
     check(f'{tag}: the clock line names the guessed zone (Oslo)', 'Oslo' in zone_txt, zone_txt)
     # undo
