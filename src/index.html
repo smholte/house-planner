@@ -22,6 +22,17 @@ __CSS__
 <div id="app">
   <!-- ───────── projects ───────── -->
   <section id="home" class="screen">
+    <!-- the Fresing top bar (task 0049): the projects page only. Tools: FRESING_TOOLS in app.js -->
+    <div class="fbar" id="fbar">
+      <div class="fbar-in">
+        <a class="fbar-logo" href="https://fresing.nl" target="_blank" rel="noopener" aria-label="Fresing – fresing.nl"><picture><source media="(max-width: 520px)" srcset="__LOGO_COMPACT__"><img src="__LOGO_FULL__" alt="Fresing" height="30"></picture></a>
+        <nav class="fbar-tools" aria-label="Fresing tools">
+          <span class="ftool here" aria-current="page">House Planner</span>
+          <details class="fmore" id="fmore"><summary>More tools</summary><ul id="fmore-list"></ul></details>
+          <button class="ftool" id="fbar-help" type="button">Help</button>
+        </nav>
+      </div>
+    </div>
     <div class="home-inner">
       <header class="home-head">
         <div class="brand">
@@ -39,6 +50,7 @@ __CSS__
         </div>
         <div class="home-actions">
           <button class="btn" id="btn-import"></button>
+          <button class="btn ghost" id="btn-example-home" hidden></button>
           <button class="btn primary" id="btn-new"></button>
         </div>
       </header>
@@ -53,6 +65,8 @@ __CSS__
           <div class="actions"><button class="btn sm" id="btn-example"></button><button class="btn ghost sm" id="btn-hide-intro">Hide</button></div>
         </div>
       </div>
+
+      <div class="intro-back" id="intro-back" hidden><button class="btn ghost sm" id="btn-show-intro">Show the getting-started steps</button></div>
 
       <div class="section-head"><h2>Projects</h2><span class="note-muted" id="project-count"></span></div>
       <div id="project-list" class="project-list"></div>

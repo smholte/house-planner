@@ -24,4 +24,4 @@ everything stays on the device, houses move only as exported files. Plain JavaSc
 
 Work on this app is planned in a private repository (task list, changelog, the owner's own house); this one holds
 the app, the made-up house and the public tests only – nothing of a real house. Licences: `vendor/`,
-`OFL-barlow.txt`; models and textures in the web version are CC0 / CC BY only.
+`OFL-barlow.txt`; models and textures in the web version are CC0 / CC BY only. `src/brand/`: the Fresing logos of the projects page's top bar, Fresing's own files (copied unchanged from `smholte/CAD-render-animation` `site/brand/`).

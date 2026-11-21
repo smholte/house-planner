@@ -978,6 +978,10 @@ Object.assign(app, {
           (() => { const c = h('input', { type: 'checkbox', id: 'set-openlast' }); c.checked = s.openLast !== false; c.onchange = () => Settings.set('openLast', c.checked); return c; })(),
           h('span', null, t('Open the last house when the app starts'))),
         h('p', { class: 'note-muted' }, t('The list of houses is one tap away: Back, top left.'))),
+      h('div', { class: 'field', id: 'set-intro' }, h('span', { class: 'flabel' }, t('Getting started')),
+        h('div', { class: 'actions' },
+          h('button', { class: 'btn sm', id: 'set-show-intro', onclick: () => { this.setIntro(true); this.toast(t('The getting-started steps are back on the projects page.')); } }, t('Show the getting-started steps')),
+          typeof EXAMPLE_HOUSE === 'undefined' ? null : h('button', { class: 'btn sm', id: 'set-example', onclick: () => { document.querySelector('.scrim .btn.primary')?.click(); this.openExample(); } }, icon('home'), t('Open example house')))),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Storage')),
         h('p', { id: 'set-storage-text' }, DB.memory ? t('This browser does not allow the app to store data here. Use Export to keep your work.') :
           (persisted ? t('Protected on this device: your houses are kept when the device runs low on space.') : t('Not protected: the browser may clear site data when the device runs out of space, so export a copy now and then.')) + (est && est.usage != null ? ' ' + t('Using {s}.', { s: fmtBytes(est.usage) }) : '')),

@@ -348,7 +348,13 @@ favicon_svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rec
 index_src = read(os.path.join(SRC, 'index.html'))
 for pub, own in (HOUSE_CFG or {}).get('texts', []):
     index_src = index_src.replace(pub, own)
-html_src = index_src.replace('__CSS__', css).replace('__FAVICON__', urllib.parse.quote(favicon_svg))
+def fresing_logos(html):
+    """task 0049: the Fresing logos of the projects page's top bar (src/brand/, Fresing's own files, unchanged) as data addresses"""
+    for key, name in (('__LOGO_COMPACT__', 'compact'), ('__LOGO_FULL__', 'full')):
+        svg = open(os.path.join(SRC, 'brand', 'fresing-logo_%s_reversed.svg' % name), 'rb').read()
+        html = html.replace(key, 'data:image/svg+xml;base64,' + base64.b64encode(svg).decode())
+    return html
+html_src = fresing_logos(index_src.replace('__CSS__', css).replace('__FAVICON__', urllib.parse.quote(favicon_svg)))
 html = html_src.replace('__JS__', js)
 html_hosted = html_src.replace('__JS__', js_hosted)
 # the build code: made from the app itself (with the placeholder still in it), so the same app gives the same code; the
@@ -474,7 +480,7 @@ if app_lib:
 # added by importing a file. This script only makes the files (dist/web and dist/house-planner-web.zip); it never puts
 # anything online.
 web_js = wrap('const WEB_BUILD = true;\n' + app_js_web, False)
-web_html = read(os.path.join(SRC, 'index.html')).replace('__CSS__', css).replace('__FAVICON__', urllib.parse.quote(favicon_svg)).replace('__JS__', web_js).replace("'__BUILD__'", "'" + ver + "'")
+web_html = fresing_logos(read(os.path.join(SRC, 'index.html')).replace('__CSS__', css).replace('__FAVICON__', urllib.parse.quote(favicon_svg))).replace('__JS__', web_js).replace("'__BUILD__'", "'" + ver + "'")
 assert 'HOUSE.migrate =' not in web_js and 'Object.assign(HOUSE' not in web_js, 'a house is built into the web version'
 assert web_js.count('EXAMPLE_HOUSE = {') == (1 if os.path.exists(made_up_path) else 0), 'the web version has the made-up example only'
 if os.path.exists(made_up_path):
