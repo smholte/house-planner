@@ -98,7 +98,8 @@ def editor_menu(p, phone, theme):
         press(pg, phone, '#btn-fit')
     else:      # the phone's bar has no room for it: Home view is in the Show menu there
         menu_entry(pg, phone, 'Home view', anchor='#btn-display')
-    pg.wait_for_timeout(600)
+    try: pg.wait_for_function("(v0) => window.__hp.app.panes[0].view.cam.ty !== v0", arg=v0, timeout=20000)
+    except Exception: pass
     check(f'{tag}: Home view brings the plan back', pg.evaluate("() => window.__hp.app.panes[0].view.cam.ty") != v0)
     # covers: menu:All projects
     menu_entry(pg, phone, 'All projects')
