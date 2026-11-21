@@ -1,0 +1,5178 @@
+{
+ "note": "Every action a person can take in the app (task 0047), found in src/ by tools/ui_inventory.py, with the public test files that press it. not_yet_tested: today's gaps – lane, size S/M/L, the task that tests it; it only shrinks. no_stable_id: buttons whose text is made at run time (lines in each file) – a follow-up gives them an id. Written by: python3 tools/ui_inventory.py --write",
+ "counts": {
+  "actions": 430,
+  "tested": 282,
+  "not_yet_tested": 148,
+  "no_stable_id": 167
+ },
+ "actions": {
+  "#ar-across-m": {
+   "tests": [],
+   "where": [
+    "src/ar.js:338"
+   ]
+  },
+  "#ar-across-p": {
+   "tests": [
+    "test_round14.py"
+   ],
+   "where": [
+    "src/ar.js:339"
+   ]
+  },
+  "#ar-again": {
+   "tests": [
+    "test_round14.py"
+   ],
+   "where": [
+    "src/ar.js:343"
+   ]
+  },
+  "#ar-along-m": {
+   "tests": [],
+   "where": [
+    "src/ar.js:336"
+   ]
+  },
+  "#ar-along-p": {
+   "tests": [
+    "test_round14.py"
+   ],
+   "where": [
+    "src/ar.js:337"
+   ]
+  },
+  "#ar-exit": {
+   "tests": [
+    "test_round14.py"
+   ],
+   "where": [
+    "src/ar.js:344"
+   ]
+  },
+  "#ar-place": {
+   "tests": [
+    "test_round14.py"
+   ],
+   "where": [
+    "src/ar.js:320"
+   ]
+  },
+  "#ar-room": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/ar.js:82"
+   ]
+  },
+  "#ar-rot-l": {
+   "tests": [
+    "test_round14.py"
+   ],
+   "where": [
+    "src/ar.js:334"
+   ]
+  },
+  "#ar-rot-r": {
+   "tests": [
+    "test_round14.py"
+   ],
+   "where": [
+    "src/ar.js:335"
+   ]
+  },
+  "#ar-storey": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/ar.js:80"
+   ]
+  },
+  "#bake-abs": {
+   "tests": [],
+   "where": [
+    "src/hpbake.js:1251"
+   ]
+  },
+  "#bake-import": {
+   "tests": [],
+   "where": [
+    "src/hpbake.js:1273",
+    "src/hpbake.js:1292"
+   ]
+  },
+  "#bake-m-*": {
+   "tests": [
+    "test_hpbake.py"
+   ],
+   "where": [
+    "src/hpbake.js:1276"
+   ]
+  },
+  "#bake-moment": {
+   "tests": [
+    "test_hpbake.py"
+   ],
+   "where": [
+    "src/hpbake.js:1242"
+   ]
+  },
+  "#bake-more": {
+   "tests": [
+    "test_hpbake.py"
+   ],
+   "where": [
+    "src/hpbake.js:1252"
+   ]
+  },
+  "#bake-remove": {
+   "tests": [
+    "test_hpbake.py"
+   ],
+   "where": [
+    "src/hpbake.js:1293"
+   ]
+  },
+  "#bake-which": {
+   "tests": [
+    "test_hpbake.py"
+   ],
+   "where": [
+    "src/hpbake.js:1250"
+   ]
+  },
+  "#bars-pull": {
+   "tests": [
+    "test_plan_floor_start.py",
+    "test_round16.py",
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/index.html:95"
+   ]
+  },
+  "#bi-cat": {
+   "tests": [
+    "test_budget.py",
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/budget.js:143"
+   ]
+  },
+  "#bi-note": {
+   "tests": [],
+   "where": [
+    "src/budget.js:154"
+   ]
+  },
+  "#bi-photo-add": {
+   "tests": [
+    "test_budget.py"
+   ],
+   "where": [
+    "src/budget.js:160"
+   ]
+  },
+  "#bi-room": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/budget.js:145"
+   ]
+  },
+  "#bi-ver": {
+   "tests": [
+    "test_budget.py",
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/budget.js:146"
+   ]
+  },
+  "#bk-change": {
+   "tests": [],
+   "where": [
+    "src/backup.js:330"
+   ]
+  },
+  "#bk-choose": {
+   "tests": [
+    "test_backup.py",
+    "test_round17.py"
+   ],
+   "where": [
+    "src/backup.js:323"
+   ]
+  },
+  "#bk-now": {
+   "tests": [],
+   "where": [
+    "src/backup.js:328"
+   ]
+  },
+  "#bk-resume": {
+   "tests": [],
+   "where": [
+    "src/backup.js:329"
+   ]
+  },
+  "#bk-stop": {
+   "tests": [
+    "test_backup.py",
+    "test_round17.py"
+   ],
+   "where": [
+    "src/backup.js:331"
+   ]
+  },
+  "#btn-3d-retry": {
+   "tests": [
+    "test_round38.py"
+   ],
+   "where": [
+    "src/view3d.js:882"
+   ]
+  },
+  "#btn-add-stop": {
+   "tests": [],
+   "where": [
+    "src/tour.js:295"
+   ]
+  },
+  "#btn-back": {
+   "tests": [
+    "test_onewriter.py",
+    "test_quickwins.py",
+    "test_round31.py"
+   ],
+   "where": [
+    "src/index.html:76"
+   ]
+  },
+  "#btn-backup": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/index.html:65"
+   ]
+  },
+  "#btn-compare": {
+   "tests": [
+    "test_furniture.py",
+    "test_regress.py",
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/index.html:111"
+   ]
+  },
+  "#btn-display": {
+   "tests": [
+    "test_plan_floor_start.py",
+    "test_round11.py",
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/index.html:103"
+   ]
+  },
+  "#btn-draw-doc": {
+   "tests": [],
+   "where": [
+    "src/panels.js:340"
+   ]
+  },
+  "#btn-example": {
+   "tests": [
+    "test_library.py",
+    "test_pictures.py",
+    "test_round21.py",
+    "test_web.py"
+   ],
+   "where": [
+    "src/index.html:53"
+   ]
+  },
+  "#btn-export-folder": {
+   "tests": [
+    "test_round17.py"
+   ],
+   "where": [
+    "src/panels.js:1172"
+   ]
+  },
+  "#btn-export-hpscene": {
+   "tests": [
+    "test_hpscene.py"
+   ],
+   "where": [
+    "src/panels.js:1170"
+   ]
+  },
+  "#btn-export-viewer": {
+   "tests": [
+    "test_viewer.py"
+   ],
+   "where": [
+    "src/panels.js:1168"
+   ]
+  },
+  "#btn-fit": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/index.html:115"
+   ]
+  },
+  "#btn-fullscreen": {
+   "tests": [
+    "test_round21.py"
+   ],
+   "where": [
+    "src/index.html:93"
+   ]
+  },
+  "#btn-hide-intro": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/index.html:53"
+   ]
+  },
+  "#btn-history": {
+   "tests": [
+    "test_install.py",
+    "test_openings.py",
+    "test_round12.py",
+    "test_round15.py",
+    "test_voids.py"
+   ],
+   "where": [
+    "src/history.js:85"
+   ]
+  },
+  "#btn-import": {
+   "tests": [
+    "test_regress.py",
+    "test_web.py"
+   ],
+   "where": [
+    "src/index.html:41"
+   ]
+  },
+  "#btn-install": {
+   "tests": [],
+   "where": [
+    "src/index.html:63"
+   ]
+  },
+  "#btn-menu": {
+   "tests": [
+    "test_backup.py",
+    "test_budget.py",
+    "test_cover_menus.py",
+    "test_drawings.py",
+    "test_levels.py",
+    "test_merge.py",
+    "test_pdf.py",
+    "test_quantities.py",
+    "test_quickwins.py",
+    "test_round11.py",
+    "test_round17.py",
+    "test_round21.py",
+    "test_safety1.py"
+   ],
+   "where": [
+    "src/index.html:92"
+   ]
+  },
+  "#btn-new": {
+   "tests": [
+    "test_backup.py",
+    "test_editing.py",
+    "test_garden.py",
+    "test_onewriter.py",
+    "test_openings.py",
+    "test_pdf.py",
+    "test_quickwins.py",
+    "test_round17.py",
+    "test_web.py"
+   ],
+   "where": [
+    "src/index.html:42"
+   ]
+  },
+  "#btn-notes-back": {
+   "tests": [],
+   "where": [
+    "src/notes.js:260"
+   ]
+  },
+  "#btn-paste": {
+   "tests": [],
+   "where": [
+    "src/app.js:1178"
+   ]
+  },
+  "#btn-project-name": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/index.html:78"
+   ]
+  },
+  "#btn-rec": {
+   "tests": [
+    "test_tour.py"
+   ],
+   "where": [
+    "src/walk.js:573",
+    "src/walk.js:574"
+   ]
+  },
+  "#btn-savepoint": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/index.html:89"
+   ]
+  },
+  "#btn-search": {
+   "tests": [
+    "test_round15.py"
+   ],
+   "where": [
+    "src/index.html:91"
+   ]
+  },
+  "#btn-settings": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/index.html:66"
+   ]
+  },
+  "#btn-several": {
+   "tests": [
+    "test_editing.py"
+   ],
+   "where": [
+    "src/edit.js:432"
+   ]
+  },
+  "#btn-share": {
+   "tests": [
+    "test_hpscene.py",
+    "test_phone.py",
+    "test_quickwins.py",
+    "test_round16.py",
+    "test_round17.py",
+    "test_viewer.py"
+   ],
+   "where": [
+    "src/index.html:90"
+   ]
+  },
+  "#btn-stop-here": {
+   "tests": [
+    "test_phone.py",
+    "test_tour.py"
+   ],
+   "where": [
+    "src/walk.js:571"
+   ]
+  },
+  "#btn-swipe": {
+   "tests": [
+    "test_regress.py"
+   ],
+   "where": [
+    "src/index.html:112"
+   ]
+  },
+  "#btn-trash": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/index.html:64"
+   ]
+  },
+  "#btn-version": {
+   "tests": [
+    "test_quickwins.py",
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/index.html:79"
+   ]
+  },
+  "#btn-viewopts": {
+   "tests": [
+    "test_doors_fill.py",
+    "test_install.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round16.py",
+    "test_round3.py",
+    "test_round32.py",
+    "test_sun.py",
+    "test_view3d.py"
+   ],
+   "where": [
+    "src/index.html:114"
+   ]
+  },
+  "#btn-walk-sun": {
+   "tests": [
+    "test_round6.py"
+   ],
+   "where": [
+    "src/walk.js:568"
+   ]
+  },
+  "#bud-add": {
+   "tests": [
+    "test_budget.py"
+   ],
+   "where": [
+    "src/budget.js:126"
+   ]
+  },
+  "#bud-add-mat": {
+   "tests": [
+    "test_budget.py"
+   ],
+   "where": [
+    "src/budget.js:125"
+   ]
+  },
+  "#bud-cmp": {
+   "tests": [
+    "test_budget.py",
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/budget.js:78"
+   ]
+  },
+  "#bud-total": {
+   "tests": [
+    "test_budget.py"
+   ],
+   "where": [
+    "src/budget.js:66"
+   ]
+  },
+  "#cat-lib-load": {
+   "tests": [],
+   "where": [
+    "src/models.js:583"
+   ]
+  },
+  "#diary-add": {
+   "tests": [
+    "test_round12.py"
+   ],
+   "where": [
+    "src/diary.js:46"
+   ]
+  },
+  "#diary-pipes": {
+   "tests": [
+    "test_round12.py"
+   ],
+   "where": [
+    "src/diary.js:47"
+   ]
+  },
+  "#dlg-input": {
+   "tests": [
+    "test_budget.py",
+    "test_cover_menus.py",
+    "test_furniture.py",
+    "test_notes.py",
+    "test_tasks.py",
+    "test_tour.py"
+   ],
+   "where": [
+    "src/ui.js:179"
+   ]
+  },
+  "#docs-add": {
+   "tests": [],
+   "where": [
+    "src/docs.js:48"
+   ]
+  },
+  "#docs-lib-file": {
+   "tests": [
+    "test_docs_lib.py"
+   ],
+   "where": [
+    "src/docs.js:81"
+   ]
+  },
+  "#docs-lib-load": {
+   "tests": [
+    "test_docs_lib.py"
+   ],
+   "where": [
+    "src/docs.js:96"
+   ]
+  },
+  "#draw-pdfset": {
+   "tests": [],
+   "where": [
+    "src/drawings.js:330"
+   ]
+  },
+  "#draw-print": {
+   "tests": [
+    "test_drawings.py"
+   ],
+   "where": [
+    "src/drawings.js:329"
+   ]
+  },
+  "#draw-save": {
+   "tests": [
+    "test_drawings.py"
+   ],
+   "where": [
+    "src/drawings.js:328"
+   ]
+  },
+  "#dv-close": {
+   "tests": [],
+   "where": [
+    "src/docs.js:205"
+   ]
+  },
+  "#dv-zoom": {
+   "tests": [],
+   "where": [
+    "src/docs.js:198"
+   ]
+  },
+  "#ex-bakes": {
+   "tests": [
+    "test_hpbake.py"
+   ],
+   "where": [
+    "src/panels.js:1143"
+   ]
+  },
+  "#ex-saves": {
+   "tests": [],
+   "where": [
+    "src/panels.js:1133"
+   ]
+  },
+  "#ex-zip": {
+   "tests": [
+    "test_backup.py",
+    "test_round17.py"
+   ],
+   "where": [
+    "src/panels.js:1134"
+   ]
+  },
+  "#f-ceil-col": {
+   "tests": [],
+   "where": [
+    "src/finish.js:947"
+   ]
+  },
+  "#f-ceil-fin": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/finish.js:951"
+   ]
+  },
+  "#f-ceil-name": {
+   "tests": [],
+   "where": [
+    "src/finish.js:949"
+   ]
+  },
+  "#f-compare-base": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_sidebyside.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/panels.js:292"
+   ]
+  },
+  "#f-ddoc": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/panels.js:385"
+   ]
+  },
+  "#f-ddoc-page": {
+   "tests": [],
+   "where": [
+    "src/panels.js:386"
+   ]
+  },
+  "#f-doc-draw-storey": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/docs.js:444"
+   ]
+  },
+  "#f-doc-storey": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/docs.js:422"
+   ]
+  },
+  "#f-elec-color": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/install.js:544"
+   ]
+  },
+  "#f-fh-under": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/install.js:598"
+   ]
+  },
+  "#f-floor-col": {
+   "tests": [],
+   "where": [
+    "src/panels.js:177"
+   ]
+  },
+  "#f-floor-grout": {
+   "tests": [
+    "test_materials.py"
+   ],
+   "where": [
+    "src/materials.js:384"
+   ]
+  },
+  "#f-floor-mat": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/panels.js:175"
+   ]
+  },
+  "#f-floor-pack": {
+   "tests": [],
+   "where": [
+    "src/materials.js:323"
+   ]
+  },
+  "#f-floor-prod": {
+   "tests": [],
+   "where": [
+    "src/materials.js:322"
+   ]
+  },
+  "#f-floor-start": {
+   "tests": [
+    "test_tilestart.py"
+   ],
+   "where": [
+    "src/materials.js:381"
+   ]
+  },
+  "#f-furn-col": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:470"
+   ]
+  },
+  "#f-furn-name": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:426"
+   ]
+  },
+  "#f-furn-rot": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:461"
+   ]
+  },
+  "#f-garea-name": {
+   "tests": [],
+   "where": [
+    "src/garden.js:634"
+   ]
+  },
+  "#f-heat": {
+   "tests": [
+    "test_install.py"
+   ],
+   "where": [
+    "src/install.js:618"
+   ]
+  },
+  "#f-heat-zone": {
+   "tests": [
+    "test_install.py"
+   ],
+   "where": [
+    "src/install.js:625"
+   ]
+  },
+  "#f-item-add": {
+   "tests": [],
+   "where": [
+    "src/panels.js:209"
+   ]
+  },
+  "#f-kit-dd": {
+   "tests": [
+    "test_round9.py"
+   ],
+   "where": [
+    "src/kitchen.js:702"
+   ]
+  },
+  "#f-kit-grain": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:786"
+   ]
+  },
+  "#f-kit-kind": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/kitchen.js:675"
+   ]
+  },
+  "#f-kit-lookall": {
+   "tests": [
+    "test_round9.py"
+   ],
+   "where": [
+    "src/kitchen.js:808"
+   ]
+  },
+  "#f-kit-parts": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:635"
+   ]
+  },
+  "#f-kit-topimgw": {
+   "tests": [
+    "test_round11.py"
+   ],
+   "where": [
+    "src/kitchen.js:797"
+   ]
+  },
+  "#f-kit-w": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:678"
+   ]
+  },
+  "#f-note-date": {
+   "tests": [
+    "test_round12.py"
+   ],
+   "where": [
+    "src/diary.js:130"
+   ]
+  },
+  "#f-note-lay": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/notes.js:129"
+   ]
+  },
+  "#f-note-photos": {
+   "tests": [
+    "test_round12.py"
+   ],
+   "where": [
+    "src/diary.js:143"
+   ]
+  },
+  "#f-note-text": {
+   "tests": [
+    "test_handover.py",
+    "test_notes.py",
+    "test_round12.py",
+    "test_viewer.py"
+   ],
+   "where": [
+    "src/notes.js:98"
+   ]
+  },
+  "#f-note-ver": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/notes.js:127"
+   ]
+  },
+  "#f-notes": {
+   "tests": [],
+   "where": [
+    "src/panels.js:200"
+   ]
+  },
+  "#f-plant-name": {
+   "tests": [],
+   "where": [
+    "src/garden.js:691"
+   ]
+  },
+  "#f-pt-dim": {
+   "tests": [],
+   "where": [
+    "src/install.js:538"
+   ]
+  },
+  "#f-pt-kind": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/install.js:529"
+   ]
+  },
+  "#f-pt-label": {
+   "tests": [
+    "test_install.py"
+   ],
+   "where": [
+    "src/install.js:559"
+   ]
+  },
+  "#f-pt-note": {
+   "tests": [],
+   "where": [
+    "src/install.js:561"
+   ]
+  },
+  "#f-pt-turn": {
+   "tests": [
+    "test_round10.py"
+   ],
+   "where": [
+    "src/install.js:554"
+   ]
+  },
+  "#f-room-name": {
+   "tests": [],
+   "where": [
+    "src/panels.js:169"
+   ]
+  },
+  "#f-room-qty": {
+   "tests": [
+    "test_quantities.py"
+   ],
+   "where": [
+    "src/quantities.js:207"
+   ]
+  },
+  "#f-shop-link": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:495"
+   ]
+  },
+  "#f-shop-price": {
+   "tests": [
+    "test_furniture.py"
+   ],
+   "where": [
+    "src/furnish.js:491"
+   ]
+  },
+  "#f-shop-status": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/furnish.js:493"
+   ]
+  },
+  "#f-shop-store": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:489"
+   ]
+  },
+  "#f-st-hole": {
+   "tests": [
+    "test_editing.py"
+   ],
+   "where": [
+    "src/stairs.js:203"
+   ]
+  },
+  "#f-ul-op": {
+   "tests": [],
+   "where": [
+    "src/panels.js:342"
+   ]
+  },
+  "#f-vnote": {
+   "tests": [],
+   "where": [
+    "src/panels.js:276"
+   ]
+  },
+  "#f-wall-views": {
+   "tests": [
+    "test_round12.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/finish.js:890"
+   ]
+  },
+  "#f-water-range": {
+   "tests": [],
+   "where": [
+    "src/garden.js:588"
+   ]
+  },
+  "#fb-pic": {
+   "tests": [
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/feedback.js:55"
+   ]
+  },
+  "#fb-text": {
+   "tests": [
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/feedback.js:54"
+   ]
+  },
+  "#fe-copy": {
+   "tests": [],
+   "where": [
+    "src/edit.js:517"
+   ]
+  },
+  "#fe-mirror-x": {
+   "tests": [
+    "test_editing.py"
+   ],
+   "where": [
+    "src/edit.js:519"
+   ]
+  },
+  "#fe-mirror-y": {
+   "tests": [],
+   "where": [
+    "src/edit.js:520"
+   ]
+  },
+  "#fe-paste": {
+   "tests": [],
+   "where": [
+    "src/edit.js:518"
+   ]
+  },
+  "#fe-spread-x": {
+   "tests": [],
+   "where": [
+    "src/edit.js:527"
+   ]
+  },
+  "#fe-spread-y": {
+   "tests": [
+    "test_editing.py"
+   ],
+   "where": [
+    "src/edit.js:528"
+   ]
+  },
+  "#ff-tile-start": {
+   "tests": [
+    "test_tilestart.py"
+   ],
+   "where": [
+    "src/finish.js:937"
+   ]
+  },
+  "#folder-status": {
+   "tests": [
+    "test_round17.py"
+   ],
+   "where": [
+    "src/index.html:87"
+   ]
+  },
+  "#fs-*": {
+   "tests": [],
+   "where": [
+    "src/wallviews.js:414"
+   ]
+  },
+  "#fs-at": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/wallviews.js:411"
+   ]
+  },
+  "#fs-best": {
+   "tests": [
+    "test_tilestart.py"
+   ],
+   "where": [
+    "src/wallviews.js:422"
+   ]
+  },
+  "#g-fit": {
+   "tests": [],
+   "where": [
+    "src/garden.js:542"
+   ]
+  },
+  "#g-gate-flip": {
+   "tests": [
+    "test_round4.py"
+   ],
+   "where": [
+    "src/garden.js:672"
+   ]
+  },
+  "#g-gate-open": {
+   "tests": [
+    "test_round6.py"
+   ],
+   "where": [
+    "src/garden.js:671"
+   ]
+  },
+  "#g-make-plot": {
+   "tests": [
+    "test_garden.py",
+    "test_web.py"
+   ],
+   "where": [
+    "src/garden.js:519"
+   ]
+  },
+  "#g-plot-btn": {
+   "tests": [],
+   "where": [
+    "src/garden.js:713"
+   ]
+  },
+  "#help-close": {
+   "tests": [
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/help.js:99"
+   ]
+  },
+  "#help-feedback": {
+   "tests": [
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/help.js:101"
+   ]
+  },
+  "#hps-version": {
+   "tests": [],
+   "where": [
+    "src/hpscene.js:830"
+   ]
+  },
+  "#lib-file": {
+   "tests": [
+    "test_library.py"
+   ],
+   "where": [
+    "src/panels.js:1013"
+   ]
+  },
+  "#lib-load": {
+   "tests": [
+    "test_library.py"
+   ],
+   "where": [
+    "src/panels.js:1026"
+   ]
+  },
+  "#md-cat": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/models.js:716"
+   ]
+  },
+  "#md-name": {
+   "tests": [
+    "test_furniture_lib.py"
+   ],
+   "where": [
+    "src/models.js:715"
+   ]
+  },
+  "#md-unit": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/models.js:718"
+   ]
+  },
+  "#md-width": {
+   "tests": [
+    "test_furniture_lib.py"
+   ],
+   "where": [
+    "src/models.js:726"
+   ]
+  },
+  "#md-zup": {
+   "tests": [
+    "test_models.py"
+   ],
+   "where": [
+    "src/models.js:737"
+   ]
+  },
+  "#mi-ao": {
+   "tests": [
+    "test_view3d.py"
+   ],
+   "where": [
+    "src/panels.js:663"
+   ]
+  },
+  "#mi-ar": {
+   "tests": [
+    "test_round14.py"
+   ],
+   "where": [
+    "src/panels.js:638"
+   ]
+  },
+  "#mi-bake": {
+   "tests": [],
+   "where": [
+    "src/panels.js:657"
+   ]
+  },
+  "#mi-docs": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:542"
+   ]
+  },
+  "#mi-export": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:529"
+   ]
+  },
+  "#mi-feedback": {
+   "tests": [
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/panels.js:560"
+   ]
+  },
+  "#mi-folder": {
+   "tests": [
+    "test_round17.py"
+   ],
+   "where": [
+    "src/panels.js:532"
+   ]
+  },
+  "#mi-follow": {
+   "tests": [],
+   "where": [
+    "src/panels.js:670"
+   ]
+  },
+  "#mi-hpscene": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:531"
+   ]
+  },
+  "#mi-kparts": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:539"
+   ]
+  },
+  "#mi-load": {
+   "tests": [
+    "test_round11.py"
+   ],
+   "where": [
+    "src/panels.js:643"
+   ]
+  },
+  "#mi-render": {
+   "tests": [
+    "test_round13.py"
+   ],
+   "where": [
+    "src/panels.js:637"
+   ]
+  },
+  "#mi-render-more": {
+   "tests": [],
+   "where": [
+    "src/panels.js:534"
+   ]
+  },
+  "#ms-copy": {
+   "tests": [
+    "test_editing.py"
+   ],
+   "where": [
+    "src/edit.js:421"
+   ]
+  },
+  "#ms-delete": {
+   "tests": [
+    "test_editing.py"
+   ],
+   "where": [
+    "src/edit.js:427"
+   ]
+  },
+  "#ms-height": {
+   "tests": [],
+   "where": [
+    "src/edit.js:426"
+   ]
+  },
+  "#ms-lineup": {
+   "tests": [],
+   "where": [
+    "src/edit.js:425"
+   ]
+  },
+  "#ms-mirror-x": {
+   "tests": [
+    "test_editing.py"
+   ],
+   "where": [
+    "src/edit.js:423"
+   ]
+  },
+  "#ms-mirror-y": {
+   "tests": [],
+   "where": [
+    "src/edit.js:424"
+   ]
+  },
+  "#ms-paste": {
+   "tests": [],
+   "where": [
+    "src/edit.js:422"
+   ]
+  },
+  "#np-name": {
+   "tests": [],
+   "where": [
+    "src/app.js:316"
+   ]
+  },
+  "#np-storeys": {
+   "tests": [],
+   "where": [
+    "src/app.js:317"
+   ]
+  },
+  "#pdf-*": {
+   "tests": [
+    "test_pdf.py"
+   ],
+   "where": [
+    "src/pdfplans.js:240"
+   ]
+  },
+  "#pdf-make": {
+   "tests": [
+    "test_pdf.py"
+   ],
+   "where": [
+    "src/pdfplans.js:242"
+   ]
+  },
+  "#pip-chip": {
+   "tests": [
+    "test_voids.py"
+   ],
+   "where": [
+    "src/furnish.js:560"
+   ]
+  },
+  "#pt-kind-pick": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/install.js:507"
+   ]
+  },
+  "#q-*": {
+   "tests": [
+    "test_quantities.py"
+   ],
+   "where": [
+    "src/quantities.js:264"
+   ]
+  },
+  "#q-all-vlies": {
+   "tests": [
+    "test_quantities.py"
+   ],
+   "where": [
+    "src/quantities.js:281"
+   ]
+  },
+  "#rl-*": {
+   "tests": [
+    "test_round24.py"
+   ],
+   "where": [
+    "src/render.js:532"
+   ]
+  },
+  "#rl-reset": {
+   "tests": [
+    "test_round24.py"
+   ],
+   "where": [
+    "src/render.js:539"
+   ]
+  },
+  "#rl-skybg": {
+   "tests": [
+    "test_round24.py"
+   ],
+   "where": [
+    "src/render.js:538"
+   ]
+  },
+  "#rn-back": {
+   "tests": [
+    "test_round25.py",
+    "test_round29.py"
+   ],
+   "where": [
+    "src/render.js:492"
+   ]
+  },
+  "#rn-compare": {
+   "tests": [
+    "test_round13.py"
+   ],
+   "where": [
+    "src/render.js:591"
+   ]
+  },
+  "#rn-lock": {
+   "tests": [
+    "test_round29.py"
+   ],
+   "where": [
+    "src/render.js:498"
+   ]
+  },
+  "#rn-more": {
+   "tests": [
+    "test_round25.py",
+    "test_round26.py"
+   ],
+   "where": [
+    "src/render.js:589"
+   ]
+  },
+  "#rn-other": {
+   "tests": [
+    "test_round13.py",
+    "test_round25.py"
+   ],
+   "where": [
+    "src/render.js:590"
+   ]
+  },
+  "#rn-ratio": {
+   "tests": [
+    "test_round25.py",
+    "test_round29.py"
+   ],
+   "where": [
+    "src/render.js:497"
+   ]
+  },
+  "#rn-save": {
+   "tests": [
+    "test_round13.py",
+    "test_round25.py",
+    "test_round26.py"
+   ],
+   "where": [
+    "src/render.js:588"
+   ]
+  },
+  "#rn-start": {
+   "tests": [
+    "test_library.py",
+    "test_round13.py",
+    "test_round18.py",
+    "test_round20.py",
+    "test_round24.py",
+    "test_round25.py",
+    "test_round26.py",
+    "test_round29.py"
+   ],
+   "where": [
+    "src/render.js:582"
+   ]
+  },
+  "#rn-stop": {
+   "tests": [
+    "test_round13.py",
+    "test_round18.py",
+    "test_round20.py",
+    "test_round25.py",
+    "test_round26.py",
+    "test_round29.py"
+   ],
+   "where": [
+    "src/render.js:581"
+   ]
+  },
+  "#save-export": {
+   "tests": [
+    "test_onewriter.py"
+   ],
+   "where": [
+    "src/app.js:869"
+   ]
+  },
+  "#save-takeover": {
+   "tests": [
+    "test_onewriter.py"
+   ],
+   "where": [
+    "src/app.js:857"
+   ]
+  },
+  "#search-q": {
+   "tests": [
+    "test_round15.py",
+    "test_round16.py",
+    "test_round17.py",
+    "test_round21.py"
+   ],
+   "where": [
+    "src/search.js:82"
+   ]
+  },
+  "#set-openlast": {
+   "tests": [
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/panels.js:978"
+   ]
+  },
+  "#set-speed": {
+   "tests": [
+    "test_round11.py"
+   ],
+   "where": [
+    "src/panels.js:1065"
+   ]
+  },
+  "#set-walk-look": {
+   "tests": [],
+   "where": [
+    "src/panels.js:1070"
+   ]
+  },
+  "#show-*": {
+   "tests": [
+    "test_doors_fill.py",
+    "test_round16.py",
+    "test_round32.py"
+   ],
+   "where": [
+    "src/panels.js:614"
+   ]
+  },
+  "#sn-name": {
+   "tests": [
+    "test_viewer.py"
+   ],
+   "where": [
+    "src/share.js:185"
+   ]
+  },
+  "#speed-all": {
+   "tests": [],
+   "where": [
+    "src/speed.js:123"
+   ]
+  },
+  "#speed-use": {
+   "tests": [
+    "test_round11.py"
+   ],
+   "where": [
+    "src/speed.js:118",
+    "src/speed.js:119"
+   ]
+  },
+  "#sun-day": {
+   "tests": [
+    "test_round22.py",
+    "test_sun.py"
+   ],
+   "where": [
+    "src/sun.js:122"
+   ]
+  },
+  "#sun-day-lab": {
+   "tests": [
+    "test_round22.py"
+   ],
+   "where": [
+    "src/sun.js:120"
+   ]
+  },
+  "#sun-fold": {
+   "tests": [
+    "test_round22.py"
+   ],
+   "where": [
+    "src/sun.js:145"
+   ]
+  },
+  "#sun-hours": {
+   "tests": [
+    "test_sun.py"
+   ],
+   "where": [
+    "src/sun.js:153"
+   ]
+  },
+  "#sun-play": {
+   "tests": [
+    "test_sun.py"
+   ],
+   "where": [
+    "src/sun.js:128"
+   ]
+  },
+  "#sun-time": {
+   "tests": [
+    "test_round22.py",
+    "test_round6.py",
+    "test_sun.py"
+   ],
+   "where": [
+    "src/sun.js:123"
+   ]
+  },
+  "#sun-time-lab": {
+   "tests": [
+    "test_round22.py"
+   ],
+   "where": [
+    "src/sun.js:121"
+   ]
+  },
+  "#sunh-day": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_sun.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/sun.js:370"
+   ]
+  },
+  "#tb-all-done": {
+   "tests": [
+    "test_tasks.py"
+   ],
+   "where": [
+    "src/tasks.js:123"
+   ]
+  },
+  "#tb-check": {
+   "tests": [],
+   "where": [
+    "src/toolbox.js:248"
+   ]
+  },
+  "#tb-close": {
+   "tests": [],
+   "where": [
+    "src/toolbox.js:250"
+   ]
+  },
+  "#tb-connect-btn": {
+   "tests": [
+    "test_toolbox.py"
+   ],
+   "where": [
+    "src/toolbox.js:168"
+   ]
+  },
+  "#tb-disconnect": {
+   "tests": [
+    "test_toolbox.py"
+   ],
+   "where": [
+    "src/toolbox.js:166"
+   ]
+  },
+  "#tb-edit": {
+   "tests": [
+    "test_tasks.py"
+   ],
+   "where": [
+    "src/tasks.js:130"
+   ]
+  },
+  "#tb-phase-pick": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/tasks.js:74"
+   ]
+  },
+  "#tb-stop": {
+   "tests": [
+    "test_toolbox.py"
+   ],
+   "where": [
+    "src/toolbox.js:249"
+   ]
+  },
+  "#tc-date": {
+   "tests": [],
+   "where": [
+    "src/tasks.js:144"
+   ]
+  },
+  "#tc-note": {
+   "tests": [
+    "test_tasks.py"
+   ],
+   "where": [
+    "src/tasks.js:145"
+   ]
+  },
+  "#tc-who": {
+   "tests": [
+    "test_tasks.py"
+   ],
+   "where": [
+    "src/tasks.js:143"
+   ]
+  },
+  "#tp-add-phase": {
+   "tests": [
+    "test_tasks.py"
+   ],
+   "where": [
+    "src/tasks.js:177"
+   ]
+  },
+  "#ts-best-*": {
+   "tests": [
+    "test_tilestart.py"
+   ],
+   "where": [
+    "src/wallviews.js:352"
+   ]
+  },
+  "#ts-dx-*": {
+   "tests": [
+    "test_tilestart.py"
+   ],
+   "where": [
+    "src/wallviews.js:335"
+   ]
+  },
+  "#ts-x-*": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/wallviews.js:322"
+   ]
+  },
+  "#ts-y-*": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/wallviews.js:341"
+   ]
+  },
+  "#update-restart": {
+   "tests": [
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/app.js:106"
+   ]
+  },
+  "#ve-draw": {
+   "tests": [],
+   "where": [
+    "src/share.js:37"
+   ]
+  },
+  "#ve-from": {
+   "tests": [
+    "test_viewer.py"
+   ],
+   "where": [
+    "src/share.js:26"
+   ]
+  },
+  "#ve-lay": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/share.js:32"
+   ]
+  },
+  "#ve-notes": {
+   "tests": [],
+   "where": [
+    "src/share.js:36"
+   ]
+  },
+  "#ve-ver": {
+   "tests": [
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture_lib.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_library.py",
+    "test_models.py",
+    "test_openings.py",
+    "test_phone_taps.py",
+    "test_roomjump.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round15.py",
+    "test_round3.py",
+    "test_round37.py",
+    "test_round4.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_tilestart.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/share.js:27"
+   ]
+  },
+  "#void-all": {
+   "tests": [
+    "test_voids.py"
+   ],
+   "where": [
+    "src/voids.js:120"
+   ]
+  },
+  "#void-all-chip": {
+   "tests": [
+    "test_voids.py"
+   ],
+   "where": [
+    "src/app.js:1308"
+   ]
+  },
+  "#void-del-all": {
+   "tests": [
+    "test_voids.py"
+   ],
+   "where": [
+    "src/voids.js:122"
+   ]
+  },
+  "[data-dim=2d]": {
+   "tests": [
+    "test_doors_fill.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_install.py",
+    "test_models.py",
+    "test_notes.py",
+    "test_oldfile.py",
+    "test_plan_floor_start.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round3.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_view3d.py"
+   ],
+   "where": [
+    "src/index.html:108"
+   ]
+  },
+  "[data-dim=3d]": {
+   "tests": [
+    "test_cover_menus.py",
+    "test_doors.py",
+    "test_doors_fill.py",
+    "test_drawings.py",
+    "test_editing.py",
+    "test_facade.py",
+    "test_finish.py",
+    "test_furniture.py",
+    "test_garden.py",
+    "test_garden_wall.py",
+    "test_install.py",
+    "test_kitchen.py",
+    "test_models.py",
+    "test_notes.py",
+    "test_oldfile.py",
+    "test_openings.py",
+    "test_regress.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round3.py",
+    "test_round4.py",
+    "test_round5.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round8.py",
+    "test_round9.py",
+    "test_tiles3d.py",
+    "test_view3d.py"
+   ],
+   "where": [
+    "src/index.html:109"
+   ]
+  },
+  "[data-mode=build]": {
+   "tests": [
+    "test_doors.py",
+    "test_editing.py",
+    "test_install.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round3.py",
+    "test_round6.py",
+    "test_round8.py",
+    "test_view3d.py",
+    "test_viewer.py",
+    "test_voids.py"
+   ],
+   "where": [
+    "src/index.html:82"
+   ]
+  },
+  "[data-mode=diff]": {
+   "tests": [
+    "test_finish.py",
+    "test_garden_wall.py",
+    "test_install.py",
+    "test_round11.py"
+   ],
+   "where": [
+    "src/index.html:101"
+   ]
+  },
+  "[data-mode=furnish]": {
+   "tests": [
+    "test_editing.py",
+    "test_furniture.py",
+    "test_furniture_lib.py",
+    "test_kitchen.py",
+    "test_kitchen_parts.py",
+    "test_models.py",
+    "test_phone.py",
+    "test_phone_taps.py",
+    "test_round11.py",
+    "test_round3.py",
+    "test_round6.py",
+    "test_round7.py",
+    "test_round9.py",
+    "test_viewer.py",
+    "test_voids.py"
+   ],
+   "where": [
+    "src/index.html:83"
+   ]
+  },
+  "[data-mode=original]": {
+   "tests": [
+    "test_doors_fill.py",
+    "test_voids.py"
+   ],
+   "where": [
+    "src/index.html:99"
+   ]
+  },
+  "[data-mode=plan]": {
+   "tests": [
+    "test_budget.py",
+    "test_doors_fill.py",
+    "test_editing.py",
+    "test_finish.py",
+    "test_garden_wall.py",
+    "test_install.py",
+    "test_notes.py",
+    "test_plan_floor_start.py",
+    "test_quantities.py",
+    "test_regress.py",
+    "test_round11.py",
+    "test_round12.py",
+    "test_round3.py",
+    "test_round5.py",
+    "test_round8.py",
+    "test_round9.py",
+    "test_tasks.py",
+    "test_tiles3d.py",
+    "test_view3d.py",
+    "test_voids.py",
+    "test_walk.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/index.html:100"
+   ]
+  },
+  "[data-mode=view]": {
+   "tests": [
+    "test_doors.py",
+    "test_editing.py",
+    "test_handover.py",
+    "test_install.py",
+    "test_notes.py",
+    "test_phone.py",
+    "test_round10.py",
+    "test_round11.py",
+    "test_round16.py",
+    "test_round3.py",
+    "test_round5.py",
+    "test_round6.py",
+    "test_round8.py",
+    "test_tasks.py",
+    "test_tour.py",
+    "test_view3d.py",
+    "test_viewer.py",
+    "test_walk.py"
+   ],
+   "where": [
+    "src/index.html:84"
+   ]
+  },
+  "btn:Add": {
+   "tests": [
+    "test_budget.py",
+    "test_notes.py",
+    "test_viewer.py"
+   ],
+   "where": [
+    "src/extras.js:46"
+   ]
+  },
+  "btn:Add a note": {
+   "tests": [
+    "test_notes.py"
+   ],
+   "where": [
+    "src/notes.js:266"
+   ]
+  },
+  "btn:Add a note to this room": {
+   "tests": [
+    "test_notes.py"
+   ],
+   "where": [
+    "src/notes.js:145"
+   ]
+  },
+  "btn:Add an appliance": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:726"
+   ]
+  },
+  "btn:Add furniture": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:527"
+   ]
+  },
+  "btn:Add photo": {
+   "tests": [
+    "test_notes.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/notes.js:123",
+    "src/wallviews.js:646"
+   ]
+  },
+  "btn:Again": {
+   "tests": [],
+   "where": [
+    "src/tour.js:250"
+   ]
+  },
+  "btn:All": {
+   "tests": [
+    "test_notes.py"
+   ],
+   "where": [
+    "src/app.js:729"
+   ]
+  },
+  "btn:All documents": {
+   "tests": [],
+   "where": [
+    "src/docs.js:497"
+   ]
+  },
+  "btn:All notes": {
+   "tests": [],
+   "where": [
+    "src/notes.js:268"
+   ]
+  },
+  "btn:All phases": {
+   "tests": [],
+   "where": [
+    "src/tasks.js:78"
+   ]
+  },
+  "btn:Ask to protect storage": {
+   "tests": [],
+   "where": [
+    "src/panels.js:984"
+   ]
+  },
+  "btn:Back to the size of the model": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:448"
+   ]
+  },
+  "btn:Back to the work schedule": {
+   "tests": [],
+   "where": [
+    "src/tasks.js:178"
+   ]
+  },
+  "btn:Back up everything": {
+   "tests": [],
+   "where": [
+    "src/backup.js:346"
+   ]
+  },
+  "btn:Budget for this category": {
+   "tests": [
+    "test_budget.py"
+   ],
+   "where": [
+    "src/budget.js:94"
+   ]
+  },
+  "btn:Ceiling colour": {
+   "tests": [
+    "test_finish.py",
+    "test_models.py"
+   ],
+   "where": [
+    "src/finish.js:958",
+    "src/finish.js:964"
+   ]
+  },
+  "btn:Change": {
+   "tests": [
+    "test_quantities.py",
+    "test_round11.py"
+   ],
+   "where": [
+    "src/finish.js:761"
+   ]
+  },
+  "btn:Change this unit": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:644"
+   ]
+  },
+  "btn:Check again": {
+   "tests": [],
+   "where": [
+    "src/space.js:269"
+   ]
+  },
+  "btn:Choose picture": {
+   "tests": [],
+   "where": [
+    "src/finish.js:773"
+   ]
+  },
+  "btn:Clear": {
+   "tests": [],
+   "where": [
+    "src/space.js:270"
+   ]
+  },
+  "btn:Close": {
+   "tests": [
+    "test_backup.py",
+    "test_drawings.py",
+    "test_library.py",
+    "test_oldfile.py",
+    "test_pdf.py",
+    "test_round12.py",
+    "test_round13.py",
+    "test_round14.py",
+    "test_round17.py",
+    "test_round18.py",
+    "test_round20.py",
+    "test_round22.py",
+    "test_round24.py",
+    "test_round25.py",
+    "test_round26.py",
+    "test_round29.py",
+    "test_sun.py",
+    "test_tilestart.py",
+    "test_voids.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/modes.js:157"
+   ]
+  },
+  "btn:Close compare": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:91"
+   ]
+  },
+  "btn:Close off under the worktop": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:713"
+   ]
+  },
+  "btn:Colour": {
+   "tests": [
+    "test_finish.py",
+    "test_models.py",
+    "test_view3d.py"
+   ],
+   "where": [
+    "src/furnish.js:475"
+   ]
+  },
+  "btn:Colour library": {
+   "tests": [
+    "test_view3d.py"
+   ],
+   "where": [
+    "src/furnish.js:476"
+   ]
+  },
+  "btn:Connect to a point": {
+   "tests": [],
+   "where": [
+    "src/walk.js:613"
+   ]
+  },
+  "btn:Default rates": {
+   "tests": [],
+   "where": [
+    "src/quantities.js:288"
+   ]
+  },
+  "btn:Delete": {
+   "tests": [
+    "test_budget.py",
+    "test_install.py",
+    "test_models.py",
+    "test_round11.py",
+    "test_voids.py"
+   ],
+   "where": [
+    "src/furnish.js:484",
+    "src/furnish.js:514",
+    "src/garden.js:640"
+   ]
+  },
+  "btn:Delete all paths": {
+   "tests": [],
+   "where": [
+    "src/walk.js:609"
+   ]
+  },
+  "btn:Delete model": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:303"
+   ]
+  },
+  "btn:Delete note": {
+   "tests": [],
+   "where": [
+    "src/notes.js:137"
+   ]
+  },
+  "btn:Delete photo": {
+   "tests": [
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/wallviews.js:679"
+   ]
+  },
+  "btn:Delete point": {
+   "tests": [],
+   "where": [
+    "src/walk.js:614"
+   ]
+  },
+  "btn:Delete route": {
+   "tests": [],
+   "where": [
+    "src/tour.js:319"
+   ]
+  },
+  "btn:Delete set": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:346"
+   ]
+  },
+  "btn:Delete stair": {
+   "tests": [],
+   "where": [
+    "src/stairs.js:210"
+   ]
+  },
+  "btn:Done": {
+   "tests": [
+    "test_furniture.py",
+    "test_levels.py",
+    "test_round27.py"
+   ],
+   "where": [
+    "src/garden.js:531",
+    "src/garden.js:536"
+   ]
+  },
+  "btn:Draw paths": {
+   "tests": [],
+   "where": [
+    "src/walk.js:608"
+   ]
+  },
+  "btn:Duplicate": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/furnish.js:482",
+    "src/furnish.js:513",
+    "src/garden.js:639"
+   ]
+  },
+  "btn:Earlier": {
+   "tests": [],
+   "where": [
+    "src/tour.js:313"
+   ]
+  },
+  "btn:Export": {
+   "tests": [
+    "test_backup.py",
+    "test_i18n.py",
+    "test_quickwins.py",
+    "test_round15.py"
+   ],
+   "where": [
+    "src/app.js:303"
+   ]
+  },
+  "btn:Fill the wall": {
+   "tests": [
+    "test_kitchen.py"
+   ],
+   "where": [
+    "src/kitchen.js:652"
+   ]
+  },
+  "btn:Floor colour": {
+   "tests": [],
+   "where": [
+    "src/panels.js:190"
+   ]
+  },
+  "btn:Fold or unfold": {
+   "tests": [
+    "test_roomjump.py"
+   ],
+   "where": [
+    "src/finish.js:1027"
+   ]
+  },
+  "btn:From the gallery": {
+   "tests": [
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/wallviews.js:645"
+   ]
+  },
+  "btn:Furniture layout": {
+   "tests": [
+    "test_furniture.py"
+   ],
+   "where": [
+    "src/modes.js:91"
+   ]
+  },
+  "btn:Garden tool": {
+   "tests": [],
+   "where": [
+    "src/garden.js:609",
+    "src/garden.js:709",
+    "src/garden.js:714"
+   ]
+  },
+  "btn:Go": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/notes.js:242"
+   ]
+  },
+  "btn:House": {
+   "tests": [
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/app.js:730"
+   ]
+  },
+  "btn:Import a file": {
+   "tests": [],
+   "where": [
+    "src/backup.js:346"
+   ]
+  },
+  "btn:Import a model …": {
+   "tests": [
+    "test_furniture.py",
+    "test_furniture_lib.py",
+    "test_kitchen.py",
+    "test_models.py",
+    "test_phone.py",
+    "test_round3.py",
+    "test_round38.py",
+    "test_round6.py"
+   ],
+   "where": [
+    "src/furnish.js:293"
+   ]
+  },
+  "btn:Keep proportions": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:447"
+   ]
+  },
+  "btn:Later": {
+   "tests": [],
+   "where": [
+    "src/app.js:107",
+    "src/tour.js:314"
+   ]
+  },
+  "btn:Make paths from rooms and doors": {
+   "tests": [
+    "test_walk.py"
+   ],
+   "where": [
+    "src/walk.js:607"
+   ]
+  },
+  "btn:Model settings": {
+   "tests": [
+    "test_furniture_lib.py",
+    "test_models.py"
+   ],
+   "where": [
+    "src/furnish.js:449"
+   ]
+  },
+  "btn:Move left": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:645"
+   ]
+  },
+  "btn:Move right": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:646"
+   ]
+  },
+  "btn:New route": {
+   "tests": [],
+   "where": [
+    "src/tour.js:318"
+   ]
+  },
+  "btn:Next photo": {
+   "tests": [],
+   "where": [
+    "src/wallviews.js:665"
+   ]
+  },
+  "btn:Next stop": {
+   "tests": [
+    "test_tour.py"
+   ],
+   "where": [
+    "src/tour.js:252"
+   ]
+  },
+  "btn:Open again": {
+   "tests": [],
+   "where": [
+    "src/notes.js:111"
+   ]
+  },
+  "btn:Open door": {
+   "tests": [
+    "test_doors.py"
+   ],
+   "where": [
+    "src/panels.js:148"
+   ]
+  },
+  "btn:Open the gate": {
+   "tests": [
+    "test_round6.py"
+   ],
+   "where": [
+    "src/modes.js:156"
+   ]
+  },
+  "btn:Pick a version for this side": {
+   "tests": [
+    "test_plan_floor_start.py",
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/app.js:1207"
+   ]
+  },
+  "btn:Pieces snap against walls and each other": {
+   "tests": [],
+   "where": [
+    "src/modes.js:96"
+   ]
+  },
+  "btn:Place": {
+   "tests": [
+    "test_kitchen.py"
+   ],
+   "where": [
+    "src/furnish.js:344",
+    "src/install.js:609"
+   ]
+  },
+  "btn:Place bar stools": {
+   "tests": [
+    "test_kitchen.py"
+   ],
+   "where": [
+    "src/kitchen.js:750"
+   ]
+  },
+  "btn:Play": {
+   "tests": [
+    "test_tour.py"
+   ],
+   "where": [
+    "src/tour.js:300"
+   ]
+  },
+  "btn:Play and record as a video": {
+   "tests": [],
+   "where": [
+    "src/tour.js:301"
+   ]
+  },
+  "btn:Play from here": {
+   "tests": [],
+   "where": [
+    "src/tour.js:312"
+   ]
+  },
+  "btn:Previous photo": {
+   "tests": [],
+   "where": [
+    "src/wallviews.js:664"
+   ]
+  },
+  "btn:Previous stop": {
+   "tests": [],
+   "where": [
+    "src/tour.js:248"
+   ]
+  },
+  "btn:Remove": {
+   "tests": [
+    "test_library.py"
+   ],
+   "where": [
+    "src/budget.js:170",
+    "src/finish.js:762",
+    "src/kitchen.js:724"
+   ]
+  },
+  "btn:Remove from my colours": {
+   "tests": [],
+   "where": [
+    "src/extras.js:36"
+   ]
+  },
+  "btn:Remove phase": {
+   "tests": [],
+   "where": [
+    "src/tasks.js:167"
+   ]
+  },
+  "btn:Remove photo": {
+   "tests": [],
+   "where": [
+    "src/notes.js:120"
+   ]
+  },
+  "btn:Remove step": {
+   "tests": [],
+   "where": [
+    "src/tasks.js:171"
+   ]
+  },
+  "btn:Remove stop": {
+   "tests": [],
+   "where": [
+    "src/tour.js:315"
+   ]
+  },
+  "btn:Remove the library from this device?": {
+   "tests": [],
+   "where": [
+    "src/panels.js:1008"
+   ]
+  },
+  "btn:Remove the plot?": {
+   "tests": [],
+   "where": [
+    "src/garden.js:613"
+   ]
+  },
+  "btn:Remove unit": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:647"
+   ]
+  },
+  "btn:Rename set": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:345"
+   ]
+  },
+  "btn:Run around the corner, left": {
+   "tests": [
+    "test_round9.py"
+   ],
+   "where": [
+    "src/kitchen.js:771"
+   ]
+  },
+  "btn:Run around the corner, right": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:772"
+   ]
+  },
+  "btn:Save as set": {
+   "tests": [
+    "test_furniture.py"
+   ],
+   "where": [
+    "src/furnish.js:483",
+    "src/furnish.js:511"
+   ]
+  },
+  "btn:Save the {n} selected as a set": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:337"
+   ]
+  },
+  "btn:Save this view": {
+   "tests": [
+    "test_notes.py"
+   ],
+   "where": [
+    "src/notes.js:275",
+    "src/walk.js:570"
+   ]
+  },
+  "btn:Section drawing of slice": {
+   "tests": [
+    "test_drawings.py"
+   ],
+   "where": [
+    "src/view3d.js:2028"
+   ]
+  },
+  "btn:Sets": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:528"
+   ]
+  },
+  "btn:Settings": {
+   "tests": [
+    "test_backup.py",
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/furnish.js:302"
+   ]
+  },
+  "btn:Shopping list": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:529"
+   ]
+  },
+  "btn:Show photo": {
+   "tests": [
+    "test_round12.py",
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/diary.js:84",
+    "src/notes.js:119",
+    "src/wallviews.js:635"
+   ]
+  },
+  "btn:Split in two": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:733"
+   ]
+  },
+  "btn:Start a new line": {
+   "tests": [],
+   "where": [
+    "src/walk.js:612"
+   ]
+  },
+  "btn:Step": {
+   "tests": [],
+   "where": [
+    "src/tasks.js:173"
+   ]
+  },
+  "btn:Stop the route": {
+   "tests": [
+    "test_tour.py"
+   ],
+   "where": [
+    "src/tour.js:253"
+   ]
+  },
+  "btn:Stop walking (Esc)": {
+   "tests": [],
+   "where": [
+    "src/walk.js:575"
+   ]
+  },
+  "btn:Swap the two sides": {
+   "tests": [
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/app.js:1209"
+   ]
+  },
+  "btn:Take out of the selection": {
+   "tests": [],
+   "where": [
+    "src/edit.js:415"
+   ]
+  },
+  "btn:Take photo": {
+   "tests": [
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/wallviews.js:644"
+   ]
+  },
+  "btn:Tap pieces to add them to the selection (or hold Shift)": {
+   "tests": [],
+   "where": [
+    "src/modes.js:100"
+   ]
+  },
+  "btn:Task board": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/tasks.js:205"
+   ]
+  },
+  "btn:Text": {
+   "tests": [
+    "test_wallphotos.py"
+   ],
+   "where": [
+    "src/wallviews.js:678"
+   ]
+  },
+  "btn:Turn 90°": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:512",
+    "src/stairs.js:208"
+   ]
+  },
+  "btn:Turn around": {
+   "tests": [],
+   "where": [
+    "src/models.js:763"
+   ]
+  },
+  "btn:Turn left": {
+   "tests": [],
+   "where": [
+    "src/models.js:763"
+   ]
+  },
+  "btn:Turn left 90°": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:465"
+   ]
+  },
+  "btn:Turn right": {
+   "tests": [
+    "test_models.py"
+   ],
+   "where": [
+    "src/models.js:763"
+   ]
+  },
+  "btn:Turn right 90°": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:466"
+   ]
+  },
+  "btn:Up the other way": {
+   "tests": [
+    "test_editing.py"
+   ],
+   "where": [
+    "src/stairs.js:209"
+   ]
+  },
+  "btn:Ventilation grilles above": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:711"
+   ]
+  },
+  "btn:Walk through the house": {
+   "tests": [],
+   "where": [
+    "src/notes.js:265"
+   ]
+  },
+  "btn:Wall cabinet above": {
+   "tests": [],
+   "where": [
+    "src/kitchen.js:730"
+   ]
+  },
+  "btn:Wall colour": {
+   "tests": [
+    "test_finish.py",
+    "test_models.py"
+   ],
+   "where": [
+    "src/finish.js:708",
+    "src/finish.js:710"
+   ]
+  },
+  "btn:Who does this step?": {
+   "tests": [
+    "test_tasks.py"
+   ],
+   "where": [
+    "src/tasks.js:88"
+   ]
+  },
+  "btn:Whole house": {
+   "tests": [
+    "test_regress.py",
+    "test_round8.py"
+   ],
+   "where": [
+    "src/quantities.js:196"
+   ]
+  },
+  "btn:all / none": {
+   "tests": [],
+   "where": [
+    "src/merge.js:140"
+   ]
+  },
+  "btn:p. {n}": {
+   "tests": [
+    "test_round37.py"
+   ],
+   "where": [
+    "src/docs.js:498"
+   ]
+  },
+  "btn:walk": {
+   "tests": [
+    "test_install.py",
+    "test_oldfile.py",
+    "test_phone.py",
+    "test_round18.py",
+    "test_round19.py",
+    "test_round24.py",
+    "test_round27.py",
+    "test_round28.py",
+    "test_round3.py",
+    "test_round5.py",
+    "test_round6.py",
+    "test_round8.py",
+    "test_tour.py",
+    "test_walk.py"
+   ],
+   "where": [
+    "src/notes.js:276"
+   ]
+  },
+  "menu:All projects": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:518",
+    "src/panels.js:562"
+   ]
+  },
+  "menu:Automatic backup into a folder…": {
+   "tests": [
+    "test_backup.py",
+    "test_round17.py"
+   ],
+   "where": [
+    "src/backup.js:308"
+   ]
+  },
+  "menu:Back up now": {
+   "tests": [
+    "test_round17.py"
+   ],
+   "where": [
+    "src/backup.js:307"
+   ]
+  },
+  "menu:Budget…": {
+   "tests": [
+    "test_budget.py",
+    "test_round15.py"
+   ],
+   "where": [
+    "src/panels.js:540"
+   ]
+  },
+  "menu:Build": {
+   "tests": [
+    "test_i18n.py",
+    "test_quickwins.py",
+    "test_round12.py"
+   ],
+   "where": [
+    "src/app.js:1349"
+   ]
+  },
+  "menu:Colour library…": {
+   "tests": [
+    "test_view3d.py"
+   ],
+   "where": [
+    "src/panels.js:545"
+   ]
+  },
+  "menu:Compare": {
+   "tests": [
+    "test_round11.py",
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/app.js:759"
+   ]
+  },
+  "menu:Compare with the open version": {
+   "tests": [
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/panels.js:694"
+   ]
+  },
+  "menu:Continue backup": {
+   "tests": [],
+   "where": [
+    "src/backup.js:196"
+   ]
+  },
+  "menu:Copy into a new version": {
+   "tests": [],
+   "where": [
+    "src/panels.js:693"
+   ]
+  },
+  "menu:Copy this layout": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:37"
+   ]
+  },
+  "menu:Delete document": {
+   "tests": [],
+   "where": [
+    "src/docs.js:407"
+   ]
+  },
+  "menu:Delete this layout": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:39"
+   ]
+  },
+  "menu:Drawings: façades and sections…": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:514",
+    "src/panels.js:543"
+   ]
+  },
+  "menu:Duplicate": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/app.js:247"
+   ]
+  },
+  "menu:Export": {
+   "tests": [
+    "test_backup.py",
+    "test_i18n.py",
+    "test_quickwins.py",
+    "test_round15.py"
+   ],
+   "where": [
+    "src/app.js:248"
+   ]
+  },
+  "menu:Export for viewing (family, suppliers)…": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:530"
+   ]
+  },
+  "menu:Front view": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/view3d.js:821"
+   ]
+  },
+  "menu:Go to home view": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/view3d.js:816"
+   ]
+  },
+  "menu:Help: what each button does": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:559"
+   ]
+  },
+  "menu:Home view": {
+   "tests": [
+    "test_round11.py"
+   ],
+   "where": [
+    "src/app.js:760"
+   ]
+  },
+  "menu:Import a house file…": {
+   "tests": [
+    "test_merge.py"
+   ],
+   "where": [
+    "src/panels.js:535"
+   ]
+  },
+  "menu:Make a save point": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:526"
+   ]
+  },
+  "menu:Merge a copy of this house…": {
+   "tests": [
+    "test_merge.py",
+    "test_safety1.py"
+   ],
+   "where": [
+    "src/panels.js:536"
+   ]
+  },
+  "menu:Move to trash": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/app.js:250",
+    "src/panels.js:698"
+   ]
+  },
+  "menu:New empty layout": {
+   "tests": [
+    "test_furniture.py"
+   ],
+   "where": [
+    "src/furnish.js:36"
+   ]
+  },
+  "menu:New version from this one": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:525"
+   ]
+  },
+  "menu:Open": {
+   "tests": [
+    "test_doors.py",
+    "test_round12.py"
+   ],
+   "where": [
+    "src/toolbox.js:366"
+   ]
+  },
+  "menu:Own shape": {
+   "tests": [
+    "test_round25.py"
+   ],
+   "where": [
+    "src/render.js:487"
+   ]
+  },
+  "menu:Plans as PDF, to scale…": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:515",
+    "src/panels.js:544"
+   ]
+  },
+  "menu:Quantities and materials…": {
+   "tests": [
+    "test_quantities.py"
+   ],
+   "where": [
+    "src/panels.js:538"
+   ]
+  },
+  "menu:Rename": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/app.js:246",
+    "src/panels.js:692"
+   ]
+  },
+  "menu:Rename or delete…": {
+   "tests": [],
+   "where": [
+    "src/notes.js:195"
+   ]
+  },
+  "menu:Rename project": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:548"
+   ]
+  },
+  "menu:Rename this layout": {
+   "tests": [],
+   "where": [
+    "src/furnish.js:38"
+   ]
+  },
+  "menu:Rename…": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/docs.js:398"
+   ]
+  },
+  "menu:Reset home view to default": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/view3d.js:818"
+   ]
+  },
+  "menu:Save a copy": {
+   "tests": [
+    "test_backup.py",
+    "test_round17.py"
+   ],
+   "where": [
+    "src/backup.js:138"
+   ]
+  },
+  "menu:Save a picture of this view": {
+   "tests": [],
+   "where": [
+    "src/notes.js:194",
+    "src/panels.js:513",
+    "src/panels.js:533"
+   ]
+  },
+  "menu:Save points and autosaves…": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:527"
+   ]
+  },
+  "menu:Save this view…": {
+   "tests": [
+    "test_notes.py"
+   ],
+   "where": [
+    "src/notes.js:193"
+   ]
+  },
+  "menu:Search…": {
+   "tests": [
+    "test_round15.py"
+   ],
+   "where": [
+    "src/panels.js:557"
+   ]
+  },
+  "menu:Send notes back…": {
+   "tests": [],
+   "where": [
+    "src/panels.js:512"
+   ]
+  },
+  "menu:Settings": {
+   "tests": [
+    "test_backup.py",
+    "test_quickwins.py"
+   ],
+   "where": [
+    "src/panels.js:516",
+    "src/panels.js:561"
+   ]
+  },
+  "menu:Side by side": {
+   "tests": [
+    "test_plan_floor_start.py",
+    "test_round11.py",
+    "test_sidebyside.py"
+   ],
+   "where": [
+    "src/app.js:758"
+   ]
+  },
+  "menu:Storeys…": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:547"
+   ]
+  },
+  "menu:Task board…": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:541"
+   ]
+  },
+  "menu:This page belongs to a storey…": {
+   "tests": [],
+   "where": [
+    "src/docs.js:404"
+   ]
+  },
+  "menu:Top view": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/view3d.js:820"
+   ]
+  },
+  "menu:Undo": {
+   "tests": [
+    "test_round15.py"
+   ],
+   "where": [
+    "src/app.js:670",
+    "src/app.js:677",
+    "src/app.js:1461"
+   ]
+  },
+  "menu:Undo history": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:549"
+   ]
+  },
+  "menu:Use High": {
+   "tests": [
+    "test_round15.py"
+   ],
+   "where": [
+    "src/autoq.js:27"
+   ]
+  },
+  "menu:Use this page as a storey’s drawing…": {
+   "tests": [],
+   "where": [
+    "src/docs.js:405"
+   ]
+  },
+  "menu:Versions": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/app.js:938"
+   ]
+  },
+  "menu:Versions…": {
+   "tests": [
+    "test_cover_menus.py"
+   ],
+   "where": [
+    "src/panels.js:524"
+   ]
+  }
+ },
+ "not_yet_tested": {
+  "#ar-across-m": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#ar-along-m": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#bake-abs": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#bake-import": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#bi-note": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#bk-change": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#bk-now": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#bk-resume": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#btn-add-stop": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#btn-draw-doc": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#btn-install": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#btn-notes-back": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#btn-paste": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#cat-lib-load": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#docs-add": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#draw-pdfset": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#dv-close": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#dv-zoom": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#ex-saves": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-ceil-col": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-ceil-name": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-ddoc-page": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-floor-col": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-floor-pack": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-floor-prod": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-furn-col": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-furn-name": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-furn-rot": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-garea-name": {
+   "lane": "Site",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-item-add": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-kit-grain": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-kit-parts": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-kit-w": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-notes": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-plant-name": {
+   "lane": "Site",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-pt-dim": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-pt-note": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-room-name": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-shop-link": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-shop-store": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-ul-op": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-vnote": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#f-water-range": {
+   "lane": "Site",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#fe-copy": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#fe-mirror-y": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#fe-paste": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#fe-spread-x": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#fs-*": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#g-fit": {
+   "lane": "Site",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#g-plot-btn": {
+   "lane": "Site",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#hps-version": {
+   "lane": "Files & sharing",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#mi-bake": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#mi-follow": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#mi-render-more": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#ms-height": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#ms-lineup": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#ms-mirror-y": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#ms-paste": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#np-name": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#np-storeys": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#set-walk-look": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#speed-all": {
+   "lane": "3D",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#tb-check": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#tb-close": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#tc-date": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#ve-draw": {
+   "lane": "Files & sharing",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "#ve-notes": {
+   "lane": "Files & sharing",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Add an appliance": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Add furniture": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Again": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:All documents": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:All notes": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:All phases": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Ask to protect storage": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Back to the size of the model": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Back to the work schedule": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Back up everything": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Change this unit": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Check again": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Choose picture": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Clear": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Close compare": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Close off under the worktop": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Connect to a point": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Default rates": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Delete all paths": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Delete model": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Delete note": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Delete point": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Delete route": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Delete set": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Delete stair": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Draw paths": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Earlier": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Floor colour": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Garden tool": {
+   "lane": "Site",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Import a file": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Keep proportions": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Later": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Move left": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Move right": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:New route": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Next photo": {
+   "lane": "Fit-out",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Open again": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Pieces snap against walls and each other": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Play and record as a video": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Play from here": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Previous photo": {
+   "lane": "Fit-out",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Previous stop": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Remove from my colours": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Remove phase": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Remove photo": {
+   "lane": "Fit-out",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Remove step": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Remove stop": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Remove the library from this device?": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Remove the plot?": {
+   "lane": "Site",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Remove unit": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Rename set": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Run around the corner, right": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Save the {n} selected as a set": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Sets": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Shopping list": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Split in two": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Start a new line": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Step": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Stop walking (Esc)": {
+   "lane": "3D",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Take out of the selection": {
+   "lane": "Plan & edit",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Tap pieces to add them to the selection (or hold Shift)": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Turn 90°": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Turn around": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Turn left": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Turn left 90°": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Turn right 90°": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Ventilation grilles above": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Walk through the house": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:Wall cabinet above": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "btn:all / none": {
+   "lane": "Files & sharing",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Continue backup": {
+   "lane": "Files & sharing",
+   "size": "M",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Copy into a new version": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Copy this layout": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Delete document": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Delete this layout": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Rename or delete…": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Rename this layout": {
+   "lane": "Furnish",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Save a picture of this view": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Send notes back…": {
+   "lane": "Shared (app, panels, ui)",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:This page belongs to a storey…": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  },
+  "menu:Use this page as a storey’s drawing…": {
+   "lane": "Fit-out",
+   "size": "S",
+   "task": "0047 (gap found; the lead makes the lane task)"
+  }
+ },
+ "no_stable_id": {
+  "src/app.js": [
+   232,
+   233,
+   234,
+   244,
+   253,
+   263,
+   264,
+   727,
+   731,
+   899,
+   905,
+   906,
+   909,
+   1165,
+   1173,
+   1174,
+   1198,
+   1221,
+   1224,
+   1241,
+   1242,
+   1278,
+   1287,
+   1299,
+   1312,
+   1314,
+   1315
+  ],
+  "src/ar.js": [
+   323
+  ],
+  "src/autoq.js": [
+   147,
+   154
+  ],
+  "src/backup.js": [
+   341
+  ],
+  "src/budget.js": [
+   102,
+   108,
+   151
+  ],
+  "src/diary.js": [
+   86,
+   101,
+   137
+  ],
+  "src/docs.js": [
+   63,
+   199
+  ],
+  "src/drawings.js": [
+   323,
+   324
+  ],
+  "src/edit.js": [
+   414,
+   525
+  ],
+  "src/extras.js": [
+   16,
+   25,
+   35
+  ],
+  "src/finish.js": [
+   697,
+   804,
+   874,
+   979,
+   1049
+  ],
+  "src/furnish.js": [
+   288,
+   310,
+   508,
+   537
+  ],
+  "src/garden.js": [
+   521,
+   525
+  ],
+  "src/help.js": [
+   91
+  ],
+  "src/history.js": [
+   110,
+   117
+  ],
+  "src/hpscene.js": [
+   821
+  ],
+  "src/install.js": [
+   557,
+   613
+  ],
+  "src/kitchen.js": [
+   681,
+   741,
+   783
+  ],
+  "src/materials.js": [
+   367,
+   374
+  ],
+  "src/models.js": [
+   553,
+   589
+  ],
+  "src/modes.js": [
+   34,
+   57,
+   58,
+   60,
+   98
+  ],
+  "src/notes.js": [
+   96,
+   106,
+   149,
+   162,
+   309
+  ],
+  "src/panels.js": [
+   80,
+   111,
+   123,
+   124,
+   138,
+   149,
+   150,
+   155,
+   189,
+   207,
+   215,
+   227,
+   261,
+   270,
+   280,
+   316,
+   339,
+   347,
+   348,
+   349,
+   350,
+   351,
+   570,
+   571,
+   575,
+   583,
+   594,
+   607,
+   689,
+   690,
+   714,
+   715,
+   782,
+   795,
+   796,
+   849,
+   850,
+   853,
+   911,
+   915,
+   963,
+   967,
+   1039,
+   1059,
+   1073,
+   1085
+  ],
+  "src/pdfplans.js": [
+   239
+  ],
+  "src/quantities.js": [
+   223,
+   335
+  ],
+  "src/render.js": [
+   506,
+   576
+  ],
+  "src/search.js": [
+   97
+  ],
+  "src/share.js": [
+   43
+  ],
+  "src/space.js": [
+   266,
+   276
+  ],
+  "src/sun.js": [
+   206,
+   209,
+   210,
+   232,
+   233,
+   236
+  ],
+  "src/tasks.js": [
+   79,
+   81,
+   92,
+   108,
+   142
+  ],
+  "src/tour.js": [
+   251,
+   299
+  ],
+  "src/ui.js": [
+   122,
+   136,
+   140,
+   200
+  ],
+  "src/view3d-x.js": [
+   377
+  ],
+  "src/view3d.js": [
+   653,
+   662,
+   663,
+   1724,
+   2001,
+   2022,
+   2111,
+   2126,
+   2127,
+   2128
+  ],
+  "src/walk.js": [
+   562,
+   586
+  ],
+  "src/wallviews.js": [
+   339,
+   418
+  ]
+ }
+}

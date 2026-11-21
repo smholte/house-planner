@@ -8,6 +8,8 @@ private one (workflow "House"): python3 ../house-planner/tools/ci_status.py --wa
     python3 tools/ci_status.py --wait               # wait until the run has finished (max 90 min)
     python3 tools/ci_status.py --run 123456789 --log "Windows"   # whole log of the job(s) matching "Windows"
     python3 tools/ci_status.py --run 123456789 --record   # copy a green run's times into tools/ci_times.json
+    python3 tools/ci_status.py --run 123456789 --record-checks   # a green run's check counts into tools/ci_checks.json
+                                                    # (in the private checkout: house/tests/checks.json) – task 0047
 
 Prints the mode of the run (full / docs / reuse, chosen by the precheck job), each job with its
 time, the run's total, a flag for a job that took more than 1.5 x its recorded time, and for a failed job
@@ -254,6 +256,39 @@ def record(run) -> int:
     return 0
 
 
+def record_checks(run) -> int:
+    """Write a green run's check counts per test file (the CI_FILE_CHECKS lines of its logs) into the record:
+    tools/ci_checks.json here, house/tests/checks.json in the private checkout (task 0047). Ends seeding."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import ci_checks
+    if run.get("conclusion") != "success":
+        print(f"Run {run['id']} is not green: its counts are not recorded.")
+        return 1
+    path = ci_checks.PUBLIC_RECORD
+    if WORKFLOW == "house.yml":
+        path = os.path.join(_git("rev-parse", "--show-toplevel") or ".", "house", "tests", "checks.json")
+    counts = {}
+    for j in gh(f"repos/{REPO}/actions/runs/{run['id']}/jobs?per_page=100")["jobs"]:
+        if j.get("conclusion") == "success":
+            for line in _log(j["id"]).splitlines():
+                if line.startswith("CI_FILE_CHECKS "):
+                    counts.update(json.loads(line[len("CI_FILE_CHECKS "):]))
+    if not counts:
+        print(f"Run {run['id']} has no CI_FILE_CHECKS lines (made before task 0047?): nothing recorded.")
+        return 1
+    rec = ci_checks.load(path)
+    old = dict(rec.get("files", {}))
+    rec.setdefault("files", {}).update(counts)
+    rec.pop("seeding", None)
+    rec["recorded_from"] = f"run {run['id']} ({run['head_branch']} @ {run['head_sha'][:7]}, {run['created_at'][:10]})"
+    ci_checks.save(path, rec)
+    down = [f"{n}: {old[n]} → {c}" for n, c in counts.items() if n in old and c < old[n]]
+    print(f"Recorded the checks of {len(counts)} test files from run {run['id']} into {path}")
+    if down:
+        print("Fewer than before (the commit needs a line \"Fewer checks: <file> – why\" for each): " + "; ".join(down))
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--branch")
@@ -262,6 +297,7 @@ def main() -> int:
     ap.add_argument("--wait", action="store_true")
     ap.add_argument("--log", metavar="JOB_NAME_PART")
     ap.add_argument("--record", action="store_true", help="copy this green run's times into tools/ci_times.json")
+    ap.add_argument("--record-checks", action="store_true", help="copy this green run's check counts into the record")
     args = ap.parse_args()
     end = time.time() + 90 * 60
     while True:
@@ -281,7 +317,9 @@ def main() -> int:
             time.sleep(30)
             continue
         code = show(run, args.log)
-        return record(run) if args.record and run["status"] == "completed" else code
+        if run["status"] == "completed" and (args.record or args.record_checks):
+            return max(record(run) if args.record else 0, record_checks(run) if args.record_checks else 0)
+        return code
 
 
 if __name__ == "__main__":

@@ -1,0 +1,5 @@
+{
+ "note": "the number of checks each public test file must pass (task 0047, tools/ci_checks.py) \u2013 from a green run: python3 tools/ci_status.py --run <id> --record-checks",
+ "seeding": true,
+ "files": {}
+}

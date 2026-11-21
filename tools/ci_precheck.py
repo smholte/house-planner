@@ -8,6 +8,10 @@ Checks (the run stops here when one fails):
     and live in the private repository)
   - the app's version (APP_VERSION in src/util.js) can be read, with the '__BUILD__' placeholder
   - every test file is in exactly one group (tools/ci_groups.py)
+  - every test file has its number of checks in tools/ci_checks.json; on GitHub, a number this push lowers has a
+    "Fewer checks: test_x.py – why" line in a commit message (task 0047, tools/ci_checks.py)
+  - every action in the app (button, menu entry …) has a test or is on the not-yet-tested list of tests/features.json
+    (task 0047, tools/ui_inventory.py --check)
 Mode (a line "MODE: …" in the log, which tools/ci_status.py shows):
   full   everything: the build and the test groups
   docs   only notes changed (*.md, *.txt, docs/) since a commit whose run was green: the build and the web check only
@@ -24,6 +28,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ci_groups  # noqa: E402
+import ci_checks  # noqa: E402
+import ui_inventory  # noqa: E402
 
 ROOT = ci_groups.ROOT
 WORKFLOW = 'tests.yml'
@@ -67,6 +73,17 @@ def checks() -> list[str]:
     grouped = [f for g in ci_groups.matrix() for f in g['files'].split()]
     if sorted(grouped) != files:
         bad.append('the test groups do not hold every test file exactly once')
+    rec = ci_checks.load(ci_checks.PUBLIC_RECORD)
+    if not rec:
+        bad.append('tools/ci_checks.json (the number of checks of every test file) is missing or not JSON')
+    elif not rec.get('seeding'):
+        names = {os.path.basename(f) for f in files}
+        for n in sorted(names - set(rec.get('files', {}))):
+            bad.append(f'tests/{n} has no number of checks in tools/ci_checks.json: add "{n}": <its count> (the CI_CHECKS '
+                       'line at the end of its output)')
+        for n in sorted(set(rec.get('files', {})) - names):
+            bad.append(f'tools/ci_checks.json names {n}, which is not a test file any more: take it out')
+    bad += ['features: ' + x for x in ui_inventory.check(ROOT)]
     return bad
 
 
@@ -131,6 +148,13 @@ def main() -> int:
         m = re.search(r'([\w.-]+/[\w.-]+?)(?:\.git)?$', url)
         repo = m.group(1) if m else ''
     sha = os.environ.get('GITHUB_SHA') or git('rev-parse', 'HEAD')
+    if args.github:
+        low = ci_checks.check_lowered(repo, 'tools/ci_checks.json', ci_checks.load(ci_checks.PUBLIC_RECORD), sha,
+                                      os.environ.get('GITHUB_REF', ''), args.before)
+        for b in low:
+            print(f'::error title=precheck::{b}')
+        if low:
+            return 1
     mode, why = pick_mode(repo, sha, os.environ.get('GITHUB_REF', ''), os.environ.get('GITHUB_EVENT_NAME', ''))
     if os.environ.get('GITHUB_EVENT_NAME') == 'workflow_dispatch' and mode != 'full':
         mode, why = 'full', 'started by hand: everything'

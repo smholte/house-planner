@@ -35,6 +35,13 @@ def _serve():
 _serve()
 
 RESULTS = []
+# every test file ends with one fixed line of its count of checks, however it ends (task 0047): tools/ci_run.py and
+# tools/house.py read it and fail a file that checks less than its number in tools/ci_checks.json / house/tests/checks.json
+def _count_line():
+    bad = sum(1 for _, ok in RESULTS if not ok)
+    print('CI_CHECKS ' + json.dumps({'passed': len(RESULTS) - bad, 'failed': bad}), flush=True)
+import atexit as _atexit
+_atexit.register(_count_line)
 def check(name, ok, detail=''):
     RESULTS.append((name, bool(ok)))
     print(('PASS ' if ok else 'FAIL ') + name + ('' if ok else '   ' + str(detail)))

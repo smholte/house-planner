@@ -112,3 +112,22 @@ documents …) are in the private tests (`house/tests/`, task 0007b), which run 
 | test_round38.py | The Renato sofa elements (30: shapes inside their size, cushions, legs, 2D symbol, triangles, heights and widths as the sheet); Add furniture's Renato tab, adding one; phone: the tab; the Pixel 10's safe pictures (PowerVR with OpenGL ES; switched on: no mipmaps or anisotropy, own settings kept); no 3D at all: the browser's reason and Try again; the web version has the elements |
 | test_round3.py | third round: wall corners without double faces (original and plans, every storey), the hedge's height, grown trees / shrubs / hedge and species from the name, the houses around in 3D, moving and turning furniture in 3D (ring, undo), walking out through every outside door, mouse look (direction, smoothing, inverted), the attic's roof underside, closed reveals round windows and doors, the High preset (View menu, Settings, 4096 shadows, sky light, normal maps and relief, contact shadows every frame, no shader errors), phone dark (no High, lighter trees), PC dark High |
 | test_doors_fill.py | solid door and window parts of the model (boxes face outwards, old shells turned), thresholds under outside doors through the whole wall, the cavity closed beside the doors, the floor through an opening between two rooms and under inside doors, handles on both sides, the 2D sheet under the walls, the Garden button at the top of the View menu (2D and 3D), a house opening on Planned; phone dark |
+| test_cover_menus.py | task 0047, gaps closed: every ⋯ entry that opens a window (Versions, New version, save points, the exports, kitchen parts, documents, task board, drawings, PDF plans, storeys, rename, undo history) opens, fits and closes; Help labels; the top bar's project name, Save point and Home view; the projects page's Settings / Trash / Backup, a card's Rename / Duplicate / Move to trash, Hide; the 3D view cube's menu (top, front, set / go to / reset the home view); PC light and phone dark |
+
+## Check counts, the features list and the guard (task 0047)
+
+**Check counts.** Every test file ends with one fixed line, printed by `common.py` however the file ends:
+`CI_CHECKS {"passed": N, "failed": M}`. `tools/ci_run.py` (and the private `tools/house.py test`) fail a file that
+ends without it, has a failed check (also when it forgot `sys.exit(summary())`), or passes fewer checks than its number
+in `tools/ci_checks.json` (private: `house/tests/checks.json`). More is fine – the run says "raise it". A new test file
+adds its number in the same commit (the precheck says so). Lowering a number needs a line in the commit message:
+`Fewer checks: test_x.py – why`. A green run's counts: `python3 tools/ci_status.py --run <id> --record-checks`.
+
+**What the app offers.** `python3 tools/ui_inventory.py` finds every action in `src/` (buttons, menu and ⋯ entries,
+tools, fields with an id) by a stable id (`#id`, `[data-tool=x]`, else the English text = its i18n key: `btn:…`,
+`menu:…`) and the public test files that press it (by that id or text, by the button's own class, or a comment
+`# covers: #btn-x, menu:Some entry`). `tests/features.json` (`--write`) is the list, with **not_yet_tested** (today's
+gaps: lane, size, task) and **no_stable_id** (buttons whose text is made at run time: a follow-up gives them an id).
+
+**The guard** (the precheck, `--check`): a new action with no test fails the run – add a test that presses it, or put
+it on not_yet_tested with a task number. An action on that list that gets a test must leave it (the list only shrinks).
