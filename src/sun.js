@@ -562,16 +562,16 @@ Object.assign(app, {
     const sec = h('div', { class: 'insp-sec', id: 'place-sec' }, h('div', { class: 'eyebrow' }, t('Place of the house')));
     const msg = h('p', { class: 'note-muted', id: 'place-msg', 'aria-live': 'polite' });
     if (!pl.set) sec.appendChild(h('p', { class: 'note-muted', id: 'place-none' }, t('No place set – the sun is worked out for the middle of the Netherlands.')));
-    const set = (la, lo) => { if (isFinite(la) && isFinite(lo)) this.setPlace(la, lo, pl.tz || ''); };
+    const set = (la, lo) => { const c = this.placeNow(); this.setPlace(la ?? c.lat, lo ?? c.lon, c.tz || ''); };
     sec.appendChild(h('div', { class: 'field-row' },
-      this.numField(t('Latitude (degrees)'), 'f-lat', pl.lat, '°', val => set(val, pl.lon), { dec: 5, disabled: ro, min: -90, max: 90 }),
-      this.numField(t('Longitude (degrees)'), 'f-lon', pl.lon, '°', val => set(pl.lat, val), { dec: 5, disabled: ro, min: -180, max: 180 })));
+      this.numField(t('Latitude (degrees)'), 'f-lat', pl.lat, '°', val => set(val, null), { dec: 5, disabled: ro, min: -90, max: 90 }),
+      this.numField(t('Longitude (degrees)'), 'f-lon', pl.lon, '°', val => set(null, val), { dec: 5, disabled: ro, min: -180, max: 180 })));
     const link = h('input', { type: 'text', id: 'f-place-link', class: 'input', placeholder: t('Paste a map link or "52.09, 5.12"'), disabled: ro, 'aria-label': t('Map link') });
     const take = () => {
       const r = parsePlace(link.value);
       if (!r) { msg.textContent = t('That link has no place I can read. Paste the address of a map page that shows a place (Google Maps, OpenStreetMap, Apple Maps), or type the numbers.'); msg.classList.add('bad'); return; }
       if (r.short) { msg.textContent = t('A short link does not hold the place. Open it, and paste the address the browser shows then – or type the numbers.'); msg.classList.add('bad'); return; }
-      this.setPlace(r.lat, r.lon, pl.tz || '');
+      this.setPlace(r.lat, r.lon, this.placeNow().tz || '');
       this.toast(t('Place set from the link.'));
     };
     link.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); take(); } });
