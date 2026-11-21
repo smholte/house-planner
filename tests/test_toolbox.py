@@ -147,7 +147,7 @@ def answer(pg, tmp, job_id, bake=True, scene_tweak=None):
 def files_test():
     src = (ROOT / 'src' / 'toolbox-folder.js').read_text(encoding='utf-8')
     first, rest = src.split('\n', 1)
-    check('src/toolbox-folder.js: its first line names the tag and commit', 'tag v0.1' in first and 'aa75e85' in first, first)
+    check('src/toolbox-folder.js: its first line names the tag and commit', 'tag v0.1.1' in first and 'cc0356c' in first, first)
     check('… and the rest is the tag\'s web/toolbox-folder.js byte for byte', rest == (TBF / 'web' / 'toolbox-folder.js').read_text(encoding='utf-8'))
     check('… with its MIT notice (tests/toolbox/LICENSE)', 'MIT' in (TBF / 'LICENSE').read_text())
     types = json.loads((TBF / 'types.json').read_text())['types']
