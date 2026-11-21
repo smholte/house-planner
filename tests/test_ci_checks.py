@@ -33,6 +33,10 @@ for name, body in (('test_ok.py', "check('one', True)\ncheck('two', True)\nsys.e
                    ('test_crash.py', "check('one', True)\nraise SystemExit(3)\n"),
                    ('test_noexit.py', "check('one', True)\ncheck('two', False)\nsummary()\n")):
     open(os.path.join(tmp, name), 'w').write(f"import sys\nsys.path.insert(0, {os.path.dirname(os.path.abspath(__file__))!r})\nfrom common import *\n" + body)
+open(os.path.join(tmp, 'test_hang.py'), 'w').write("import time\nprint('PASS before the hang', flush=True)\ntime.sleep(60)\n")
+t0 = __import__('time').time(); hang = ci_checks.run_file(os.path.join(tmp, 'test_hang.py'), timeout=3, echo=False)
+check('a test file that hangs without printing: stopped at its time limit, judged failed', hang == ('timeout', None) and __import__('time').time() - t0 < 20
+      and not ci_checks.judge('test_hang.py', *hang, {'files': {'test_hang.py': 1}})[0], hang)
 res = {n: ci_checks.run_file(os.path.join(tmp, n), timeout=120, echo=False) for n in ('test_ok.py', 'test_crash.py', 'test_noexit.py')}
 check('a test file: its CI_CHECKS line is read', res['test_ok.py'] == (0, {'passed': 2, 'failed': 0}), res['test_ok.py'])
 check('a test file that stops half-way: the count of what ran, and its exit code', res['test_crash.py'] == (3, {'passed': 1, 'failed': 0}), res['test_crash.py'])

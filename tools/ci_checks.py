@@ -22,7 +22,6 @@ import os
 import re
 import subprocess
 import sys
-import time
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 PUBLIC_RECORD = os.path.join(TOOLS, 'ci_checks.json')
@@ -46,30 +45,35 @@ def save(path: str, rec: dict) -> None:
 
 
 def run_file(path: str, env: dict | None = None, timeout: int = 30 * 60, echo: bool = True) -> tuple[object, dict | None]:
-    """(exit code or 'timeout', {'passed', 'failed'} from the file's CI_CHECKS line or None). The output is shown live."""
-    counts = None
+    """(exit code or 'timeout', {'passed', 'failed'} from the file's CI_CHECKS line or None). The output is shown live;
+    the time limit holds also when the file prints nothing more (a hung browser): the output is read in a thread."""
+    import threading
+    found = []
     pr = subprocess.Popen([sys.executable, path], cwd=os.path.dirname(path), env=env, stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace', bufsize=1)
-    end = time.time() + timeout
-    try:
+
+    def read():
         for line in pr.stdout:
             if echo:
                 sys.stdout.write(line)
+                sys.stdout.flush()
             if line.startswith(LINE):
                 try:
-                    counts = json.loads(line[len(LINE):])
+                    found.append(json.loads(line[len(LINE):]))
                 except ValueError:
                     pass
-            if time.time() > end:
-                raise subprocess.TimeoutExpired(path, timeout)
-        code = pr.wait(timeout=max(1, end - time.time()))
+    th = threading.Thread(target=read, daemon=True)
+    th.start()
+    try:
+        code = pr.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
         pr.kill()
         pr.wait()
-        print(f'TIMEOUT after {timeout // 60} min')
-        return 'timeout', counts
-    sys.stdout.flush()
-    return code, counts
+        th.join(5)
+        print(f'TIMEOUT after {timeout // 60} min', flush=True)
+        return 'timeout', (found[-1] if found else None)
+    th.join(30)
+    return code, (found[-1] if found else None)
 
 
 def judge(name: str, code, counts: dict | None, record: dict) -> tuple[bool, str]:

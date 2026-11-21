@@ -3,7 +3,7 @@
  "files": {
   "test_backup.py": 22,
   "test_budget.py": 21,
-  "test_ci_checks.py": 25,
+  "test_ci_checks.py": 26,
   "test_cover_menus.py": 140,
   "test_docs_lib.py": 22,
   "test_doors.py": 16,
