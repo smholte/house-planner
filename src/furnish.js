@@ -449,6 +449,7 @@ Object.assign(app, {
         info && !info.lib && !ro ? h('button', { class: 'btn sm', onclick: () => this.modelSettingsDialog(this.project.models[info.rec.id]) }, icon('gear'), t('Model settings')) : null));
       if (!info && (f.model || '').startsWith('l:')) sec.appendChild(h('p', { class: 'note-muted lib-missing' }, t('This model is in the model library, which is not on this device yet: it shows as a plain box. Load the library in Settings → Library.')));
       else if (!info) sec.appendChild(h('p', { class: 'note-muted' }, t('The model of this piece is missing (deleted from your models).')));
+      if (info && info.credit) sec.appendChild(h('p', { class: 'note-muted model-credit' }, t('Model from {source}, free to use ({licence}).', { source: info.credit.source, licence: info.credit.licence })));
     }
     const row2 = [];
     // (below zero: lower it into the floor – for a model whose underside is not where its shape starts)

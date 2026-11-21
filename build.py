@@ -507,7 +507,8 @@ shutil.copytree(app_dir, web_dir, ignore=shutil.ignore_patterns('lib'))
 # its list or in any of its files
 web_lib = make_lib(os.path.join(web_dir, 'lib'))
 if web_lib:
-    assert not any(it.get('private') or it['kind'] in ('model', 'doc') for it in web_lib['items']), 'a private model or document in the web version\'s library'
+    # (models only the free ones of the public library – Poly Haven, CC0, task 0051 –: never a private model or document)
+    assert not any(it.get('private') or it['kind'] == 'doc' or (it['kind'] == 'model' and it.get('licence') != 'CC0') for it in web_lib['items']), 'a private model or document in the web version\'s library'
     assert not [p for p in BL.check(os.path.join(web_dir, 'lib'), public=False) if 'licence' not in p], BL.check(os.path.join(web_dir, 'lib'), public=False)
     for it in web_lib['items']:
         assert it['kind'] == 'code' or str(it.get('licence', '')).startswith(BL.PUBLIC_LICENCES), 'the web version\'s library: not CC0 / CC BY: ' + it['id']

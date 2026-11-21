@@ -53,7 +53,7 @@ const MODEL_MAX_BYTES = 25 * 1024 * 1024;
 /** the rooms of the library's models (the room column of contents.csv), in this order under Library */
 const LIB_ROOMS = [
   ['living-room', 'Living room'], ['dining', 'Dining room'], ['kitchen', 'Kitchen'], ['bedroom', 'Bedroom'], ['office', 'Office'],
-  ['bathroom', 'Bathroom'], ['outside', 'Outside'], ['switches-sockets', 'Switches and sockets'], ['floors-materials', 'Floors and materials'],
+  ['bathroom', 'Bathroom'], ['outside', 'Outside'], ['lighting', 'Lighting'], ['decor', 'Decoration'], ['switches-sockets', 'Switches and sockets'], ['floors-materials', 'Floors and materials'],
 ];
 const libRoomLabel = k => (LIB_ROOMS.find(r => r[0] === k) || [k, String(k || 'Other').replace(/[-_]+/g, ' ').replace(/^./, c => c.toUpperCase())])[1];
 /** the models of the asset libraries on this device (the owner's), by room order then name */
@@ -123,6 +123,8 @@ function modelInfo(key) {
     const it = libItem(key);
     if (!it || it.kind !== 'model') return null;
     return it._info || (it._info = { key, lib: true, asset: true, name: it.name, cat: it.cat || 'other', room: it.cat || 'other', size: it.size, flags: it.flags || {}, o: it.o || [], u: it.u || [], color: it.color || '#B7B2A8',
+      // (the free models of the public library say where they are from; the owner's own files don't)
+      credit: !it.private && it.licence ? { source: String(it.source || '').replace(/\s*\(.*$/, ''), licence: it.licence } : null,
       thumb: (it.files || []).find(v => v.thumb) || null });
   }
   if (key.startsWith('u:')) {

@@ -1,6 +1,6 @@
 // Models for the asset library (task 0009), called by build.py:  node tools/glb-pack.mjs < jobs.json
 //   jobs: [{ in, out }] – each .glb made lighter for phones: shared parts once (dedup), unused parts out (prune),
-//   pictures as WebP at most 1024 px, geometry packed with meshopt (EXT_meshopt_compression: the app unpacks it with
+//   pictures as WebP at most 1024 px (job.px: another limit), geometry packed with meshopt (EXT_meshopt_compression: the app unpacks it with
 //   three.js' MeshoptDecoder). The shape is not simplified. Prints per model one JSON line: { out, bytes, size [w, d, h]
 //   in metres as the model is (y up), o / u: the top-view outline for the 2D symbol (src/outline.js, as the Kenney
 //   models) }.
@@ -55,7 +55,7 @@ for (const j of jobs) {
   const unit = new Float32Array(t.length);
   for (let i = 0; i < t.length; i += 3) { unit[i] = (t[i] - mn[0]) / sz[0] - 0.5; unit[i + 1] = (t[i + 1] - mn[1]) / sz[1]; unit[i + 2] = (t[i + 2] - mn[2]) / sz[2] - 0.5; }
   const ol = meshOutline(unit, sz[0], sz[2]);
-  await doc.transform(dedup(), prune(), textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [1024, 1024] }), meshopt({ encoder: MeshoptEncoder, level: 'medium' }));
+  await doc.transform(dedup(), prune(), textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [j.px || 1024, j.px || 1024] }), meshopt({ encoder: MeshoptEncoder, level: 'medium' }));
   const bin = await io.writeBinary(doc);
   fs.writeFileSync(j.out, bin);
   console.log(JSON.stringify({ out: j.out, bytes: bin.length, tris: t.length / 9, size: [sz[0], sz[2], sz[1]].map(v => +v.toFixed(4)), o: ol.o, u: ol.u }));

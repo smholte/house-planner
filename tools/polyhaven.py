@@ -19,21 +19,30 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIST = os.path.join(ROOT, 'build', 'polyhaven.json')
 API = 'https://api.polyhaven.com'
 UA = {'User-Agent': 'house-planner-library-build (offline house planning app; one-off fetch)'}
-MAX_TRIS, MAX_MODELS, MAX_SOURCE_KB = 100_000, 160, 12_000
+MAX_TRIS, MAX_MODELS, MAX_SOURCE_KB, MAX_POLYCOUNT = 100_000, 160, 12_000, 60_000
 
-# a model is taken when one of its categories / tags is in INCLUDE and none is in EXCLUDE (words, lower case)
-INCLUDE = {'furniture', 'lighting', 'decorative', 'plants', 'plant', 'houseplant', 'potted', 'seating', 'tables', 'storage', 'lamp', 'sofa',
-           'chair', 'bed', 'shelf', 'rug', 'vase', 'mirror', 'curtain', 'cabinet', 'household', 'appliance', 'kitchen', 'bathroom'}
-EXCLUDE = {'weapon', 'weapons', 'vehicle', 'vehicles', 'car', 'military', 'gun', 'sci-fi', 'scifi', 'ruins', 'damaged', 'broken', 'industrial',
-           'food', 'creature', 'character', 'skull', 'bone', 'rock', 'rocks', 'tree', 'trees', 'building', 'buildings', 'props-outdoor'}
-# Add furniture → Library groups (src/models.js LIB_ROOMS): first word hit wins
+# chosen from the full list of 522 (21 Nov 2026): a model is taken when one of its categories is in INCLUDE and none is in
+# EXCLUDE (the "collection: …" tags say nothing about the thing itself), minus the ids in LEAVE_OUT (things nobody furnishes
+# a house with, and what is heavy for little use)
+INCLUDE = {'furniture', 'seating', 'table', 'shelves', 'bed', 'lighting', 'decorative', 'potted plants', 'vases', 'wall decoration', 'appliances'}
+EXCLUDE = {'industrial', 'tools', 'weapons', 'firearms', 'structures', 'buildings', 'rocks', 'ships', 'creature', 'rigged', 'trees',
+           'ground cover', 'food', 'instrument', 'electronics', 'books'}
+LEAVE_OUT = {'katana_stand_01', 'sungka_board', 'sungka_board_02', 'chess_set', 'treasure_chest', 'rubber_duck_toy', 'garden_hose_wall_mounted_01',
+             'lightbulb_01', 'lightbulb_led', 'pull_chain_light_socket', 'CashRegister_01', 'CoffeeCart_01', 'wooden_spoon', 'garden_gnome',
+             'lambis_shell', 'carved_wooden_elephant', 'horse_head', 'bull_head', 'lion_head', 'horse_statue_01', 'concrete_cat_statue',
+             'bronze_ray_statue', 'bronze_shark_statue', 'bronze_whale_statue', 'gothic_statue', 'marble_bust_01', 'dartboard',
+             'vintage_suitcase', 'standing_chalkboard_01', 'wine_bottles_01', 'tea_set_01', 'brass_goblets', 'SchoolDesk_01', 'SchoolChair_01',
+             'BarberShopChair_01', 'modular_street_seating', 'chinese_commode', 'vintage_telephone_wall_clock', 'ceiling_fan'}
+# Add furniture → Library groups (src/models.js LIB_ROOMS), by the model's own words: first rule that fits wins
 ROOMS = [
-    ('bathroom', {'bath', 'bathtub', 'toilet', 'sink', 'shower', 'towel', 'washbasin'}),
-    ('kitchen', {'kitchen', 'fridge', 'stove', 'oven', 'kettle', 'toaster', 'pan', 'pot', 'cutlery', 'bar stool', 'barstool'}),
-    ('bedroom', {'bed', 'nightstand', 'wardrobe', 'dresser', 'bedside', 'crib'}),
-    ('office', {'office', 'desk', 'computer', 'monitor', 'laptop', 'typewriter'}),
-    ('dining', {'dining', 'chair', 'stool', 'tableware', 'plate', 'bowl', 'glass', 'wine'}),
-    ('outside', {'garden', 'outdoor', 'bench', 'parasol', 'bbq', 'planter', 'trashcan', 'fence'}),
+    ('decor', {'clock', 'mirror', 'picture', 'vase', 'vases'}, {}),
+    ('lighting', {'lighting'}, {}),
+    ('bedroom', {'bed', 'nightstand', 'dresser', 'commode'}, {}),
+    ('office', {'office'}, {}),
+    ('outside', {'picnic', 'outdoor', 'planter', 'gallinera', 'bench', 'plastic'}, {}),
+    ('kitchen', {'appliances', 'pot', 'pan', 'jug', 'bowl', 'plate', 'stove', 'kettle', 'microwave', 'basket', 'masonry'}, {}),
+    ('dining', {'dining', 'bar', 'stool', 'chair', 'table'}, {'coffee', 'side', 'console', 'tea', 'nightstand', 'arm', 'lounge', 'rocking', 'green', 'ottoman', 'chandelier'}),
+    ('decor', {'decorative', 'vases', 'wall decoration', 'potted plants', 'vase', 'picture', 'mirror', 'clock', 'pillows'}, {}),
 ]
 
 
@@ -41,18 +50,21 @@ def get(url):
     return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60).read()
 
 
-def words(a):
-    out = set()
-    for key in ('categories', 'tags'):
-        out |= {str(x).lower() for x in a.get(key, [])}
-    out |= {w for w in re.split(r'[\s_\-]+', (a.get('name', '') or '').lower()) if w}
-    return out
+def cats(a):
+    return {str(c).lower() for c in a.get('categories', []) if not str(c).startswith('collection')}
+
+
+def words(aid, a):
+    """the model's own words: the parts of its id (also ClassicNightstand_01 -> classic, nightstand) and its categories, except
+    the broad ones that every piece of furniture has"""
+    toks = {w for w in re.sub(r'([a-z])([A-Z])', r'\1_\2', aid).lower().split('_') if w and not w.isdigit()}
+    return toks | (cats(a) - {'furniture', 'seating', 'table', 'shelves'})
 
 
 def room_of(aid, a):
-    w = words(a) | set(aid.lower().split('_'))
-    for room, keys in ROOMS:
-        if w & keys:
+    w = words(aid, a)
+    for room, keys, no in ROOMS:
+        if w & keys and not w & set(no):
             return room
     return 'living-room'
 
@@ -61,11 +73,15 @@ def choose(assets):
     """(chosen: [(id, asset)], left out: { id: reason })"""
     ok, out = [], {}
     for aid, a in assets.items():
-        w = words(a)
-        if not (w & INCLUDE):
-            out[aid] = 'not a house model (' + ', '.join(sorted(a.get('categories', []))) + ')'
-        elif w & EXCLUDE:
-            out[aid] = 'left out: ' + ', '.join(sorted(w & EXCLUDE))
+        c = cats(a)
+        if aid in LEAVE_OUT:
+            out[aid] = 'left out by hand (not for a house, or heavy for little use)'
+        elif not c & INCLUDE:
+            out[aid] = 'not a house model (' + ', '.join(sorted(c)) + ')'
+        elif c & EXCLUDE:
+            out[aid] = 'left out: ' + ', '.join(sorted(c & EXCLUDE))
+        elif (a.get('polycount') or 0) > MAX_POLYCOUNT:
+            out[aid] = f"{a['polycount']} faces – over {MAX_POLYCOUNT}"
         else:
             ok.append((aid, a))
     ok.sort(key=lambda x: -x[1].get('download_count', 0))
@@ -99,7 +115,7 @@ def fetch(work):
             os.makedirs(os.path.dirname(p), exist_ok=True)
             open(p, 'wb').write(get(url))
         got[aid] = {'name': a.get('name', aid), 'categories': a.get('categories', []), 'tags': a.get('tags', []),
-                    'authors': sorted((a.get('authors') or {}).keys()), 'room': room_of(aid, a), 'source_kb': round(kb)}
+                    'authors': sorted((a.get('authors') or {}).keys()), 'dims': [round(x / 1000, 3) for x in (a.get('dimensions') or [0, 0, 0])], 'room': room_of(aid, a), 'source_kb': round(kb)}
         print(f'  {aid}: {kb:.0f} kB')
     json.dump({'got': got, 'out': out}, open(os.path.join(work, 'chosen.json'), 'w'), indent=1)
 
@@ -113,7 +129,9 @@ def do_import(work):
     jobs, tmp = [], os.path.join(work, 'packed')
     os.makedirs(tmp, exist_ok=True)
     for aid in ch['got']:
-        jobs.append({'in': os.path.join(work, 'src', aid, aid + '.gltf'), 'out': os.path.join(tmp, aid + '.glb')})
+        # (pictures: 1024 px on a big piece of furniture, 512 px on small things – a phone's memory is what counts)
+        big = max(ch['got'][aid]['dims']) > 0.8
+        jobs.append({'in': os.path.join(work, 'src', aid, aid + '.gltf'), 'out': os.path.join(tmp, aid + '.glb'), 'px': 1024 if big else 512})
     r = subprocess.run(['node', os.path.join(ROOT, 'tools', 'glb-pack.mjs')], input=json.dumps(jobs), capture_output=True, text=True, cwd=ROOT)
     assert r.returncode == 0, r.stderr[-1500:]
     packed = {}
