@@ -108,8 +108,8 @@ with sync_playwright() as p:
     word = wm['items'][0]['maps']['color'][0]['f'].split('.')[-2]    # (a hash: only in the library's list)
     check('the house-word check looks into the library (build.py: a word in its list or files stops the build)',
           BL.words_in(weblib, [word]) and not BL.words_in(weblib, ['NotAWordOfAnyHouse']) and 'BL.words_in(os.path.join(web_dir' in open(os.path.join(ROOT, 'build.py')).read())
-    check('the web version\'s library: public only – no model of the owner, every item CC0 / CC BY (or the KTX2 reader\'s code)',
-          wm['name'] == 'public' and not [i for i in wm['items'] if i['kind'] == 'model' or i.get('private')] and
+    check('the web version\'s library: public only – no model of the owner (only the free Poly Haven ones, CC0, task 0051), every item CC0 / CC BY (or the KTX2 reader\'s code)',
+          wm['name'] == 'public' and not [i for i in wm['items'] if i.get('private') or (i['kind'] == 'model' and not (i['id'].startswith('l:ph-') and i['licence'] == 'CC0'))] and
           all(i['kind'] == 'code' or i['licence'].startswith(('CC0', 'CC BY')) for i in wm['items']), [i['id'] for i in wm['items'] if i['kind'] == 'model'])
     sw = open(os.path.join(ROOT, 'dist', 'web', 'sw.js')).read()
     check('the service worker leaves lib/ alone (the app keeps it; an update does not download it again), no textures.json',
