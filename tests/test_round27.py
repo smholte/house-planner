@@ -35,8 +35,8 @@ with sync_playwright() as p:
     pg.evaluate("() => %s.home()" % V); settle(pg)
     h0 = pg.evaluate(AE)
     # (the owner's house by day measures light enough to stay at 1 – 1.1; the made-up overview, more lawn and ditch, a little
-    #  darker: about 1.25 – in both the exposure is (0.054 ÷ the light)^0.5 between 1 and 1.8)
-    kr = by_house(pg, (1.0, 1.3), (1.0, 1.1))
+    #  darker: about 1.25 – 1.33 by runner and day of the year – in both the exposure is (0.054 ÷ the light)^0.5 between 1 and 1.8)
+    kr = by_house(pg, (1.0, 1.4), (1.0, 1.1))
     kf = min(1.8, max(1.0, (0.054 / max(h0['L'], 1e-6)) ** 0.5))
     check(f'the overview of the house by day: measured, the exposure as it was ({kr[0]} – {kr[1]})', h0['on'] and h0['L'] > 0 and kr[0] <= h0['k'] <= kr[1] and abs(h0['k'] - kf) < 0.03 and abs(h0['exp'] - h0['k']) < 1e-3, (h0, kf))
     pg.evaluate(ROOF); settle(pg, 7000)
