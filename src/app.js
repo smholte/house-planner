@@ -1,5 +1,10 @@
 /* ───────────── app.js — the controller: screens, views, editing, undo ───────────── */
 
+/** the other Fresing tools (More tools in the top bar of the projects page): [name, address, short line]. A new tool = one line. */
+const FRESING_TOOLS = [
+  ['Fresing Render', 'https://smholte.github.io/CAD-render-animation/', 'Pictures and videos from STEP models'],
+];
+
 const app = new (class App extends Emitter {
   constructor() {
     super();
@@ -143,7 +148,10 @@ const app = new (class App extends Emitter {
     lbl('#btn-import', 'upload', 'Import house file').onclick = () => this.importFlow();
     lbl('#btn-example', 'home', 'Open example house').onclick = () => this.openExample();
     if (typeof EXAMPLE_HOUSE === 'undefined') { $('#btn-example').hidden = true; if ($('#intro-example')) $('#intro-example').hidden = true; }
-    $('#btn-hide-intro').onclick = () => { Settings.set('introDismissed', true); $('#intro').hidden = true; };
+    $('#btn-hide-intro').onclick = () => this.setIntro(false);
+    $('#btn-show-intro').onclick = () => this.setIntro(true);
+    lbl('#btn-example-home', 'home', 'Open example house').onclick = () => this.openExample();
+    this.fresingBar();
     lbl('#btn-trash', 'trash', 'Trash').onclick = () => this.trashSheet();
     lbl('#btn-backup', 'download', 'Back up everything').onclick = () => this.exportAll();
     lbl('#btn-settings', 'settings', 'Settings').onclick = () => this.settingsSheet();
@@ -204,10 +212,28 @@ const app = new (class App extends Emitter {
     $('#home').hidden = false;
     document.title = 'House Planner';
     try { localStorage.removeItem('house-planner.last'); } catch (e) { /* ignore */ }
-    $('#intro').hidden = !!this.settings.introDismissed;
+    this.setIntro(!this.settings.introDismissed, true);
     await this.renderProjectList();
     this.renderStorageNote();
     this.renderAppVersion();
+  }
+
+  /** the four getting-started steps of the projects page: shown or hidden (kept in Settings, task 0049). Hidden, a small
+   *  "Show the getting-started steps" link takes their place and the example gets its button beside New project. */
+  setIntro(show, quiet) {
+    if (!quiet) Settings.set('introDismissed', !show);
+    $('#intro').hidden = !show;
+    $('#intro-back').hidden = show;
+    $('#btn-example-home').hidden = show || typeof EXAMPLE_HOUSE === 'undefined';
+  }
+
+  /** the Fresing top bar of the projects page (task 0049): More tools lists the other Fresing tools, one line each */
+  fresingBar() {
+    const ul = $('#fmore-list');
+    ul.textContent = '';
+    for (const [name, url, note] of FRESING_TOOLS) ul.appendChild(h('li', null, h('a', { href: url, target: '_blank', rel: 'noopener' }, name, h('span', null, note))));
+    $('#fbar-help').onclick = () => this.helpOverlay();
+    document.addEventListener('click', e => { const d = $('#fmore'); if (d.open && !d.contains(e.target)) d.open = false; });
   }
 
   /** the app's version at the bottom of the projects page (APP_VERSION, util.js): which one this device runs */
