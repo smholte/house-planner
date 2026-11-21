@@ -88,10 +88,12 @@ def run(p, phone, theme):
     pg.click('#b-place-here'); pg.wait_for_function("() => Math.abs(window.__hp.placeOf(window.__hp.app.project).lat - 63.43) < 1e-4", timeout=20000)
     check(f'{tag}: Use where I am now (allowed) sets the place', near(pg.evaluate(PLACE), 63.43, 10.39), pg.evaluate(PLACE))
     # refused
-    ctx.clear_permissions()
-    pg.evaluate("() => window.__hp.app.select({ type: 'plot' })"); pg.wait_for_timeout(500)
-    pg.click('#b-place-here'); pg.wait_for_function("() => /not allowed|could not|cannot/.test((document.querySelector('#place-msg') || {}).textContent || '')", timeout=20000)
-    check(f'{tag}: Use where I am now (refused) says so and keeps the place', near(pg.evaluate(PLACE), 63.43, 10.39) and pg.is_visible('#place-msg'), pg.inner_text('#place-msg'))
+    # (the browser's answer "not allowed" / "no position" is played back: a real refusal may stay pending in a test browser)
+    for code, word in ((1, 'not allowed'), (2, 'could not find')):
+        pg.evaluate("(c) => { navigator.geolocation.getCurrentPosition = (ok, err) => setTimeout(() => err({ code: c }), 50); }", code)
+        pg.evaluate("() => window.__hp.app.select({ type: 'plot' })"); pg.wait_for_timeout(500)
+        pg.click('#b-place-here'); pg.wait_for_function("(w) => ((document.querySelector('#place-msg') || {}).textContent || '').includes(w)", arg=word, timeout=20000)
+        check(f'{tag}: Use where I am now ({word}) says so and keeps the place', near(pg.evaluate(PLACE), 63.43, 10.39), pg.inner_text('#place-msg'))
     # the export for Fresing Render
     rec = pg.evaluate("""() => { const a = window.__hp.app; const d = a.hpsceneDefaults(); d.seasons = { summer: { on: true, date: '2026-06-21' }, winter: { on: true, date: '2026-12-21' } };
       const r = a.hpsRecipe(d, { tpm: 1, byGroup: {}, pageSize: 1024 }, { storeys: [], groups: ['house'] }, false);
