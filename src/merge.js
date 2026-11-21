@@ -118,6 +118,7 @@ function mergeChanges(mine, theirs) {
     if (cuts && cuts.length && !same(cuts, y)) add(t('Section cuts'), t('Section cuts: {k}', { k: k.split('|')[0] === 'storey' ? stName(theirs, k.split('|')[1]) || k : t('whole house') }), y ? 'changed' : 'new', !y || pNewer, m => { m.slices = m.slices || {}; m.slices[k] = clone(cuts); });
   }
   if (theirs.site && !same(theirs.site, mine.site)) add(t('Plot and garden'), t('Plot, levels, water and north'), mine.site ? 'changed' : 'new', !mine.site || pNewer, m => { m.site = clone(theirs.site); });
+  if (theirs.place && !same(theirs.place, mine.place)) add(t('Place of the house'), t('Latitude, longitude and time zone'), mine.place ? 'changed' : 'new', !mine.place || pNewer, m => { m.place = clone(theirs.place); });
   return out;
 }
 

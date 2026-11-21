@@ -8,15 +8,99 @@
 const SUN_YEAR = 2026;
 const COMPASS = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'];
 
+/** the Dutch rule, kept as the fallback of the clock below */
 function dstOffsetNL(dateUTC) {
   const y = dateUTC.getUTCFullYear();
   const lastSunday = m => { const d = new Date(Date.UTC(y, m + 1, 0, 1)); d.setUTCDate(d.getUTCDate() - d.getUTCDay()); return d; };
   return dateUTC >= lastSunday(2) && dateUTC < lastSunday(9) ? 2 : 1;
 }
-/** a day of the year (1 … 365) and minutes on the clock in the Netherlands → the moment (UTC) */
-function sunMoment(doy, minutes) {
+
+/* ── the place of the house and the clock there ──
+   A place is { lat, lon, tz } (tz: a time zone name such as "Europe/Oslo", or "UTC+5.5"; empty = guessed from the place).
+   The clock the app shows is the clock at the house: the browser's own time zone data (Intl) gives the offset and summer
+   time of the zone for any date, offline. */
+const PLACE_DEFAULT = { lat: 52.1, lon: 5.1 };
+/** the main towns of Europe with their zones – a place takes the zone of the nearest one (borders are not drawn) */
+const ZONE_TOWNS = [
+  ['Europe/Amsterdam', 52.4, 4.9], ['Europe/Brussels', 50.85, 4.35], ['Europe/Berlin', 52.5, 13.4], ['Europe/Oslo', 59.9, 10.75],
+  ['Europe/Stockholm', 59.3, 18.1], ['Europe/Copenhagen', 55.7, 12.6], ['Europe/London', 51.5, -0.1], ['Europe/Dublin', 53.3, -6.3],
+  ['Europe/Paris', 48.9, 2.35], ['Europe/Madrid', 40.4, -3.7], ['Europe/Lisbon', 38.7, -9.1], ['Europe/Rome', 41.9, 12.5],
+  ['Europe/Vienna', 48.2, 16.4], ['Europe/Zurich', 47.4, 8.5], ['Europe/Warsaw', 52.2, 21], ['Europe/Prague', 50.1, 14.4],
+  ['Europe/Helsinki', 60.2, 25], ['Europe/Oslo', 69.65, 18.96], ['Europe/Oslo', 63.4, 10.4], ['Europe/Oslo', 60.4, 5.3], ['Europe/Oslo', 58.15, 8],
+  ['Europe/Stockholm', 67.85, 20.2], ['Europe/Stockholm', 57.7, 11.97], ['Europe/Helsinki', 66.5, 25.7], ['Europe/London', 57.5, -4.2], ['Europe/Madrid', 41.4, 2.15], ['Europe/Paris', 43.3, 5.4], ['Europe/Athens', 38, 23.7], ['Atlantic/Reykjavik', 64.1, -21.9], ['Europe/Istanbul', 41, 29],
+];
+/** the zone of a place: its own choice, else the nearest town of Europe (within 1,800 km), else a fixed offset from the longitude */
+function guessZone(lat, lon) {
+  let best = null, bd = 1e9;
+  for (const [z, la, lo] of ZONE_TOWNS) {
+    const dx = (lon - lo) * Math.cos((lat + la) / 2 * Math.PI / 180), dy = lat - la, d = Math.hypot(dx, dy) * 111;
+    if (d < bd) { bd = d; best = z; }
+  }
+  if (bd <= 1800) return best;
+  const o = Math.round(lon / 15);
+  return 'UTC' + (o < 0 ? '-' : '+') + Math.abs(o);
+}
+const zoneOf = pl => (pl && pl.tz) || (pl && pl.lat != null && pl.lon != null ? guessZone(pl.lat, pl.lon) : 'Europe/Amsterdam');
+const _zoneFmt = {};
+/** minutes the zone is ahead of UTC at the moment ms (UTC) */
+function zoneOffsetMin(tz, ms) {
+  const m = /^UTC([+-]\d+(?:\.\d+)?)$/.exec(tz);
+  if (m) return Math.round(+m[1] * 60);
+  try {
+    const f = _zoneFmt[tz] || (_zoneFmt[tz] = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }));
+    const o = {};
+    for (const x of f.formatToParts(new Date(ms))) o[x.type] = +x.value;
+    return Math.round((Date.UTC(o.year, o.month - 1, o.day, o.hour % 24, o.minute, o.second) - Math.floor(ms / 1000) * 1000) / 60000);
+  } catch (e) { return dstOffsetNL(new Date(ms)) * 60; }
+}
+/** a clock time at the place (written as if it were UTC, in ms) → the moment (ms, UTC) */
+function localToUtc(pl, localMs) {
+  const tz = zoneOf(pl);
+  const u1 = localMs - zoneOffsetMin(tz, localMs - 3 * 3600000) * 60000;
+  return localMs - zoneOffsetMin(tz, u1) * 60000;
+}
+const offsetWords = min => (min < 0 ? '-' : '+') + String(Math.floor(Math.abs(min) / 60)).padStart(2, '0') + ':' + String(Math.abs(min) % 60).padStart(2, '0');
+/** the place of a project: its own (p.place), else the site plan's (a house's own site), else none (the middle of the Netherlands) */
+function placeOf(p) {
+  const pl = p && p.place, s = p && p.site;
+  if (pl && isFinite(pl.lat) && isFinite(pl.lon)) return { lat: pl.lat, lon: pl.lon, tz: pl.tz || '', set: true, fromSite: false };
+  if (s && isFinite(s.lat) && isFinite(s.lon) && (s.from || !(s.lat === PLACE_DEFAULT.lat && s.lon === PLACE_DEFAULT.lon))) return { lat: s.lat, lon: s.lon, tz: s.tz || '', set: true, fromSite: !!s.from };
+  return { ...PLACE_DEFAULT, tz: '', set: false, fromSite: false };
+}
+/** the clock at the place right now, in minutes since midnight */
+function clockNow(pl) { const ms = Date.now(); return Math.floor(((ms + zoneOffsetMin(zoneOf(pl), ms) * 60000) / 60000) % 1440 + 1440) % 1440; }
+/** a day of the year (1 … 365) and minutes on the clock at the place (the Netherlands without one) → the moment (UTC) */
+function sunMoment(doy, minutes, pl) {
   const local = Date.UTC(SUN_YEAR, 0, 1) + (doy - 1) * 86400000 + minutes * 60000;
-  return new Date(local - dstOffsetNL(new Date(local - 2 * 3600000)) * 3600000);
+  return new Date(localToUtc(pl, local));
+}
+/** what the app reads from a pasted map link or coordinates: { lat, lon }, { short: true } (a link that only names a map), or null */
+function parsePlace(text) {
+  let s = String(text || '').trim();
+  if (!s) return null;
+  try { s = decodeURIComponent(s.replace(/\+/g, ' ')); } catch (e) { /* keep as it is */ }
+  const num = '(-?\\d{1,3}(?:\\.\\d+)?)';
+  const ok = (la, lo) => { la = +la; lo = +lo; return isFinite(la) && isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180 ? { lat: la, lon: lo } : null; };
+  const pairs = [
+    new RegExp('!3d' + num + '!4d' + num),                                   // Google: the pin
+    new RegExp('[?&#](?:mlat)=' + num + '.*?[&]mlon=' + num),                // OpenStreetMap: a marker
+    new RegExp('#map=\\d+(?:\\.\\d+)?/' + num + '/' + num),                    // OpenStreetMap: the view
+    new RegExp('[?&](?:ll|q|query|sll|coordinate|center|destination|daddr|saddr)=' + num + '\\s*,\\s*' + num),   // Google, Apple
+    new RegExp('@' + num + ',' + num),                                       // Google: the view
+    new RegExp('/place/' + num + ',' + num),
+    new RegExp('^geo:' + num + ',' + num),
+    new RegExp('^\\(?\\s*' + num + '\\s*[,; ]\\s*' + num + '\\s*\\)?$'),             // plain "52.09, 5.12"
+  ];
+  for (const re of pairs) { const m = re.exec(s); if (m) { const r = ok(m[1], m[2]); if (r) return r; } }
+  // degrees, minutes, seconds as Google shows them: 52°05'26.5"N 5°07'17.0"E
+  const dms = /(\d{1,3})\s*°\s*(\d{1,2})\s*['′]\s*(\d{1,2}(?:\.\d+)?)?\s*["″]?\s*([NS])[\s,;]+(\d{1,3})\s*°\s*(\d{1,2})\s*['′]\s*(\d{1,2}(?:\.\d+)?)?\s*["″]?\s*([EW])/i.exec(s);
+  if (dms) {
+    const f = (d, m, sec, h) => (+d + +m / 60 + (+sec || 0) / 3600) * (/[SW]/i.test(h) ? -1 : 1);
+    const r = ok(f(dms[1], dms[2], dms[3], dms[4]), f(dms[5], dms[6], dms[7], dms[8]));
+    if (r) return r;
+  }
+  if (/^https?:\/\/(maps\.app\.goo\.gl|goo\.gl|g\.co|bit\.ly|apple\.co|maps\.apple\.com\/p\/)/i.test(s) || /^https?:\/\/\S+$/.test(s)) return { short: true };
+  return null;
 }
 /** where the sun is: azimuth (degrees from north, clockwise) and elevation above the horizon (NOAA formulas) */
 function sunPosition(lat, lon, date) {
@@ -43,8 +127,8 @@ function fmtDoy(doy) { const d = new Date(Date.UTC(SUN_YEAR, 0, doy)); return d.
 const fmtClock = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(Math.round(m % 60)).padStart(2, '0');
 /** sunrise and sunset on the clock (minutes), to 5 minutes */
 function sunTimes(site, doy) {
-  const lat = (site && site.lat) || 52.1, lon = (site && site.lon) || 5.1;
-  const up = m => sunPosition(lat, lon, sunMoment(doy, m)).el > -0.83;
+  const lat = site && site.lat != null ? site.lat : PLACE_DEFAULT.lat, lon = site && site.lon != null ? site.lon : PLACE_DEFAULT.lon;
+  const up = m => sunPosition(lat, lon, sunMoment(doy, m, site)).el > -0.83;
   let rise = null, set = null, prev = null;
   for (let m = 180; m <= 1380; m += 5) {
     const u = up(m);
@@ -95,10 +179,12 @@ Object.assign(app, {
   },
   /** the sun now set in the sun bar, at this house */
   sunNow() {
-    const site = this.project && this.project.site;
+    const pl = this.placeNow();
     const { day, time } = this.sunSettings();
-    return sunPosition((site && site.lat) || 52.1, (site && site.lon) || 5.1, sunMoment(day, time));
+    return sunPosition(pl.lat, pl.lon, sunMoment(day, time, pl));
   },
+  /** the place of the open house (placeOf) */
+  placeNow() { return placeOf(this.project); },
   sunSpec() { return this.settings.light === 'sun' ? { sun: this.sunNow(), siteSun: this.project.site || null } : {}; },
   updateSun() {
     const s = this.sunNow();
@@ -128,7 +214,7 @@ Object.assign(app, {
     const play = h('button', { class: 'btn sm icon', id: 'sun-play', 'aria-label': t('Play the day'), title: t('Play the day') }, icon('play'));
     play.onclick = () => {
       if (this._sunAnim) { cancelAnimationFrame(this._sunAnim); this._sunAnim = null; play.replaceChildren(icon('play')); return; }
-      const { rise, set } = sunTimes(site, this.settings.sunDay);
+      const { rise, set } = sunTimes(this.placeNow(), this.settings.sunDay);
       let m = Math.max(rise || 300, +timeIn.value >= (set || 1320) - 10 ? (rise || 300) : +timeIn.value);
       let last = performance.now();
       play.replaceChildren(icon('pause'));
@@ -150,7 +236,8 @@ Object.assign(app, {
       play,
       h('span', { class: 'sun-readout', id: 'sun-readout' }, this.sunWords(this.sunNow())),
       h('span', { class: 'hint hide-xs', id: 'sun-times' }, this.sunTimesWords(day)),
-      h('button', { class: 'btn sm', id: 'sun-hours', onclick: () => this.sunHoursSheet() }, icon('table'), t('Sun hours')));
+      h('button', { class: 'btn sm', id: 'sun-hours', onclick: () => this.sunHoursSheet() }, icon('table'), t('Sun hours')),
+      h('button', { class: 'btn sm', id: 'sun-place', title: t('Place of the house'), onclick: () => this.placeDialog() }, icon('pin'), h('span', { class: 'hide-xs' }, t('Location'))));
     const label = () => {
       const f = bar.classList.contains('folded');
       fold.setAttribute('aria-expanded', String(!f));
@@ -162,7 +249,7 @@ Object.assign(app, {
     return bar;
   },
   sunTimesWords(day) {
-    const tm = sunTimes(this.project && this.project.site, day);
+    const tm = sunTimes(this.placeNow(), day);
     return tm.rise ? t('Sunrise {a}, sunset {b}', { a: fmtClock(tm.rise), b: fmtClock(tm.set) }) : '';
   },
   /** the day (1 … 365) and the time (minutes): the sun, the bar's sliders and words follow */
@@ -232,12 +319,12 @@ Object.assign(app, {
       for (let H = 4; H <= 23; H++) hours.appendChild(h('button', { type: 'button', class: 'tp-btn', 'aria-pressed': String(H === hr), 'data-h': String(H), onclick: () => set(H, mi) }, String(H).padStart(2, '0')));
       for (let M = 0; M < 60; M += 5) mins.appendChild(h('button', { type: 'button', class: 'tp-btn', 'aria-pressed': String(M === mi), 'data-m': String(M), disabled: hr >= 23 && M > 0, onclick: () => set(hr, M) }, ':' + String(M).padStart(2, '0')));
     };
-    const tm = sunTimes(this.project && this.project.site, this.settings.sunDay), now = new Date();
+    const tm = sunTimes(this.placeNow(), this.settings.sunDay);
     const quick = (lab, m) => m == null ? null : h('button', { type: 'button', class: 'chip', onclick: () => { const c = clamp(Math.round(m / 5) * 5, 240, 1380); set(Math.floor(c / 60), c % 60); } }, lab);
     const body = h('div', { class: 'dpick tpick' }, head,
       h('div', { class: 'tp-cap' }, t('Hour')), hours,
       h('div', { class: 'tp-cap' }, t('Minutes')), mins,
-      h('div', { class: 'dp-quick' }, quick(t('Now'), now.getHours() * 60 + now.getMinutes()), quick(t('Sunrise'), tm.rise), quick(t('Sun highest'), tm.rise != null && tm.set != null ? (tm.rise + tm.set) / 2 : null), quick(t('Sunset'), tm.set)));
+      h('div', { class: 'dp-quick' }, quick(t('Now'), clockNow(this.placeNow())), quick(t('Sunrise'), tm.rise), quick(t('Sun highest'), tm.rise != null && tm.set != null ? (tm.rise + tm.set) / 2 : null), quick(t('Sunset'), tm.set)));
     paint();
     const ok = await UI.dialog({ title: t('Choose the time'), body, enterKey: true, dismissValue: false,
       actions: [{ label: t('Cancel'), value: false }, { label: t('OK'), value: true, kind: 'primary' }] });
@@ -248,7 +335,7 @@ Object.assign(app, {
   /** for one day: the half hours of sun in each room (through the windows) and the hours of sun in the garden */
   async computeSunHours(doy, opts = {}) {
     const p = this.project, site = p.site;
-    const lat = (site && site.lat) || 52.1, lon = (site && site.lon) || 5.1;
+    const pl = this.placeNow(), lat = pl.lat, lon = pl.lon;
     const dv = this.drawingScene(null, false, true);
     if (!dv) return null;
     dv.group.updateMatrixWorld(true);
@@ -309,7 +396,7 @@ Object.assign(app, {
       dv.scene.overrideMaterial = depthMat;
       r.setClearColor(0xffffff, 1);
       for (let m = 4 * 60; m <= 22 * 60 + 30; m += 30) {
-        const s = sunPosition(lat, lon, sunMoment(doy, m));
+        const s = sunPosition(lat, lon, sunMoment(doy, m, pl));
         if (s.el < 1.5) { steps.push({ m, up: false }); continue; }
         const dir = sunVector(site, s);
         cam.position.copy(center).addScaledVector(dir, radius * 2);
@@ -360,7 +447,7 @@ Object.assign(app, {
         if (f >= 0.05) { R.hours += 0.5; const last = R.periods[R.periods.length - 1]; if (last && last[1] === st2.m) last[1] = st2.m + 30; else R.periods.push([st2.m, st2.m + 30]); }
       }
     }
-    return { doy, rooms, garden, steps, upSteps: upSteps.length, times: sunTimes(site, doy) };
+    return { doy, rooms, garden, steps, upSteps: upSteps.length, times: sunTimes(pl, doy) };
   },
 
   async sunHoursSheet() {
@@ -434,5 +521,78 @@ Object.assign(app, {
       box.append(h('div', { class: 'eyebrow' }, t('Sun in the garden')), h('p', { class: 'note-muted' }, t('Hours of direct sun at 30 cm above the ground; the garden gets {h} hours on average.', { h: avg.toFixed(1).replace('.', ',') })), cv, legend);
     }
     return box;
+  },
+});
+
+/* ── Site → Place: typed, "where I am now", a pasted map link, and the clock zone ── */
+Object.assign(app, {
+  /** set (or clear) the place of the house: one undo step; the sun, sun hours, exposure and the export follow */
+  setPlace(lat, lon, tz) {
+    if (!this.canEdit()) { this.lockedNotice(); return; }
+    this.mutate(pr => { pr.place = { lat: Math.round(clamp(lat, -90, 90) * 1e5) / 1e5, lon: Math.round(clamp(lon, -180, 180) * 1e5) / 1e5 }; if (tz) pr.place.tz = tz; }, { project: true, keepInspector: false });
+    this.afterPlace();
+  },
+  setPlaceZone(tz) {
+    if (!this.canEdit()) { this.lockedNotice(); return; }
+    this.mutate(pr => { const pl = placeOf(pr); pr.place = { lat: pl.lat, lon: pl.lon }; if (tz) pr.place.tz = tz; }, { project: true, keepInspector: false });
+    this.afterPlace();
+  },
+  afterPlace() {
+    this.updateSun();
+    const w = $('#sun-times'); if (w) w.textContent = this.sunTimesWords(this.settings.sunDay);
+  },
+  /** "Use where I am now": the device's location (asks the person) */
+  usePlaceHere(msgEl) {
+    const say = (m, bad) => { if (msgEl) { msgEl.textContent = m; msgEl.classList.toggle('bad', !!bad); } else this.toast(m); };
+    if (!navigator.geolocation) { say(t('This device cannot tell where it is. Type the place or paste a map link.'), true); return; }
+    say(t('Asking the device where it is …'));
+    navigator.geolocation.getCurrentPosition(
+      pos => { this.setPlace(pos.coords.latitude, pos.coords.longitude); this.toast(t('Place set from this device.')); },
+      err => say(err && err.code === 1 ? t('The device did not give its location (not allowed). Allow it in the browser, or type the place or paste a map link.') : t('The device could not find where it is. Type the place or paste a map link.'), true),
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 });
+  },
+  /** the zones to choose from: the ones the browser knows, else a short list */
+  zoneChoices() {
+    try { if (Intl.supportedValuesOf) return Intl.supportedValuesOf('timeZone'); } catch (e) { /* the short list */ }
+    return ZONE_TOWNS.map(z => z[0]);
+  },
+  /** the Place section (in the Site panel, and in the sun bar's dialog) */
+  placeSection() {
+    const ro = !this.canEdit(), pl = this.placeNow();
+    const sec = h('div', { class: 'insp-sec', id: 'place-sec' }, h('div', { class: 'eyebrow' }, t('Place of the house')));
+    const msg = h('p', { class: 'note-muted', id: 'place-msg', 'aria-live': 'polite' });
+    if (!pl.set) sec.appendChild(h('p', { class: 'note-muted', id: 'place-none' }, t('No place set – the sun is worked out for the middle of the Netherlands.')));
+    const set = (la, lo) => { if (isFinite(la) && isFinite(lo)) this.setPlace(la, lo, pl.tz || ''); };
+    sec.appendChild(h('div', { class: 'field-row' },
+      this.numField(t('Latitude (degrees)'), 'f-lat', pl.lat, '°', val => set(val, pl.lon), { dec: 5, disabled: ro, min: -90, max: 90 }),
+      this.numField(t('Longitude (degrees)'), 'f-lon', pl.lon, '°', val => set(pl.lat, val), { dec: 5, disabled: ro, min: -180, max: 180 })));
+    const link = h('input', { type: 'text', id: 'f-place-link', class: 'input', placeholder: t('Paste a map link or "52.09, 5.12"'), disabled: ro, 'aria-label': t('Map link') });
+    const take = () => {
+      const r = parsePlace(link.value);
+      if (!r) { msg.textContent = t('That link has no place I can read. Paste the address of a map page that shows a place (Google Maps, OpenStreetMap, Apple Maps), or type the numbers.'); msg.classList.add('bad'); return; }
+      if (r.short) { msg.textContent = t('A short link does not hold the place. Open it, and paste the address the browser shows then – or type the numbers.'); msg.classList.add('bad'); return; }
+      this.setPlace(r.lat, r.lon, pl.tz || '');
+      this.toast(t('Place set from the link.'));
+    };
+    link.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); take(); } });
+    sec.appendChild(h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Map link')), h('div', { class: 'row' }, link, h('button', { class: 'btn sm', id: 'b-place-link', type: 'button', disabled: ro, onclick: take }, t('Use link')))));
+    sec.appendChild(h('div', { class: 'actions' }, h('button', { class: 'btn sm', id: 'b-place-here', type: 'button', disabled: ro, onclick: () => this.usePlaceHere(msg) }, icon('pin'), t('Use where I am now'))));
+    // the clock at the place
+    const tz = zoneOf(pl), auto = !pl.tz;
+    const sel = h('select', { class: 'select', id: 'f-zone', disabled: ro, 'aria-label': t('Time zone') }, h('option', { value: '' }, t('Automatic: {z}', { z: guessZone(pl.lat, pl.lon).replace(/_/g, ' ') })));
+    for (const z of this.zoneChoices()) sel.appendChild(h('option', { value: z }, z.replace(/_/g, ' ')));
+    sel.value = auto ? '' : tz;
+    sel.addEventListener('change', () => this.setPlaceZone(sel.value));
+    sec.appendChild(h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Time zone')), sel));
+    sec.appendChild(h('p', { class: 'note-muted', id: 'place-clock' }, t('The times of the sun are the clock at the house: {z}, now {o} from UTC.', { z: tz.replace(/_/g, ' '), o: offsetWords(zoneOffsetMin(tz, Date.now())) })));
+    sec.appendChild(msg);
+    sec.appendChild(h('p', { class: 'note-muted' }, t('The place gives the sun in 3D, the sun hours, the exposure, the photo render and the export for Fresing Render. The weather is not looked up.')));
+    if (pl.fromSite) sec.appendChild(h('p', { class: 'note-muted' }, t('This place comes from the site plan. A place you set here is used instead.')));
+    return sec;
+  },
+  /** the sun bar's way to the same section */
+  placeDialog() {
+    const body = h('div', { class: 'place-dlg' }, this.placeSection());
+    UI.dialog({ title: t('Place of the house'), body, dismissValue: false, actions: [{ label: t('Close'), value: true, kind: 'primary' }] });
   },
 });

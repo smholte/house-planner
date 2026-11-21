@@ -595,6 +595,7 @@ Object.assign(app, {
     sec.appendChild(h('p', { class: 'note-muted' }, t('North is the direction of the arrow in the corner of the plan; 0° is up.')));
     if (site.from) sec.appendChild(h('p', { class: 'note-muted' }, site.from));
     el.appendChild(sec);
+    el.appendChild(this.placeSection());
     // what covers the plot, and the garden in numbers
     if (gd) {
       const g2 = h('div', { class: 'insp-sec' }, h('div', { class: 'eyebrow' }, t('The garden in this version')));

@@ -12382,5 +12382,97 @@
  "This house is open in another window: send it from the window that saves it.": [
   "Dit huis is open in een ander venster: stuur het vanuit het venster dat het opslaat.",
   "Dette huset er åpent i et annet vindu: send det fra vinduet som lagrer det."
+ ],
+ "A short link does not hold the place. Open it, and paste the address the browser shows then – or type the numbers.": [
+  "Een korte link bevat de plaats niet. Open hem en plak het adres dat de browser dan toont – of typ de getallen.",
+  "En kort lenke inneholder ikke stedet. Åpne den og lim inn adressen nettleseren da viser – eller skriv tallene."
+ ],
+ "Asking the device where it is …": [
+  "Het apparaat vragen waar het is …",
+  "Spør enheten hvor den er …"
+ ],
+ "Automatic: {z}": [
+  "Automatisch: {z}",
+  "Automatisk: {z}"
+ ],
+ "Latitude (degrees)": [
+  "Breedtegraad (graden)",
+  "Breddegrad (grader)"
+ ],
+ "Latitude, longitude and time zone": [
+  "Breedtegraad, lengtegraad en tijdzone",
+  "Breddegrad, lengdegrad og tidssone"
+ ],
+ "Location": [
+  "Locatie",
+  "Sted"
+ ],
+ "Longitude (degrees)": [
+  "Lengtegraad (graden)",
+  "Lengdegrad (grader)"
+ ],
+ "Map link": [
+  "Kaartlink",
+  "Kartlenke"
+ ],
+ "No place set – the sun is worked out for the middle of the Netherlands.": [
+  "Geen plaats ingesteld – de zon wordt berekend voor het midden van Nederland.",
+  "Ikke noe sted satt – solen regnes ut for midt i Nederland."
+ ],
+ "Paste a map link or \"52.09, 5.12\"": [
+  "Plak een kaartlink of \"52,09, 5,12\"",
+  "Lim inn en kartlenke eller \"52.09, 5.12\""
+ ],
+ "Place of the house": [
+  "Plaats van het huis",
+  "Husets sted"
+ ],
+ "Place set from the link.": [
+  "Plaats ingesteld uit de link.",
+  "Sted satt fra lenken."
+ ],
+ "Place set from this device.": [
+  "Plaats ingesteld met dit apparaat.",
+  "Sted satt fra denne enheten."
+ ],
+ "That link has no place I can read. Paste the address of a map page that shows a place (Google Maps, OpenStreetMap, Apple Maps), or type the numbers.": [
+  "In die link staat geen plaats die ik kan lezen. Plak het adres van een kaartpagina die een plek toont (Google Maps, OpenStreetMap, Apple Kaarten), of typ de getallen.",
+  "Den lenken har ikke noe sted jeg kan lese. Lim inn adressen til en kartside som viser et sted (Google Maps, OpenStreetMap, Apple Maps), eller skriv tallene."
+ ],
+ "The device could not find where it is. Type the place or paste a map link.": [
+  "Het apparaat kon niet vinden waar het is. Typ de plaats of plak een kaartlink.",
+  "Enheten fant ikke ut hvor den er. Skriv stedet eller lim inn en kartlenke."
+ ],
+ "The device did not give its location (not allowed). Allow it in the browser, or type the place or paste a map link.": [
+  "Het apparaat gaf zijn locatie niet (niet toegestaan). Sta het toe in de browser, of typ de plaats of plak een kaartlink.",
+  "Enheten ga ikke fra seg posisjonen (ikke tillatt). Tillat det i nettleseren, eller skriv stedet eller lim inn en kartlenke."
+ ],
+ "The place gives the sun in 3D, the sun hours, the exposure, the photo render and the export for Fresing Render. The weather is not looked up.": [
+  "De plaats bepaalt de zon in 3D, de zonuren, de belichting, de fotorender en de export voor Fresing Render. Het weer wordt niet opgezocht.",
+  "Stedet gir solen i 3D, soltimene, eksponeringen, fotorenderingen og eksporten til Fresing Render. Været slås ikke opp."
+ ],
+ "The times of the sun are the clock at the house: {z}, now {o} from UTC.": [
+  "De tijden van de zon zijn de klok bij het huis: {z}, nu {o} van UTC.",
+  "Tidene for solen er klokken ved huset: {z}, nå {o} fra UTC."
+ ],
+ "This device cannot tell where it is. Type the place or paste a map link.": [
+  "Dit apparaat kan niet zeggen waar het is. Typ de plaats of plak een kaartlink.",
+  "Denne enheten kan ikke si hvor den er. Skriv stedet eller lim inn en kartlenke."
+ ],
+ "This place comes from the site plan. A place you set here is used instead.": [
+  "Deze plaats komt uit de situatietekening. Een plaats die u hier instelt gaat voor.",
+  "Dette stedet kommer fra situasjonsplanen. Et sted du setter her brukes i stedet."
+ ],
+ "Time zone": [
+  "Tijdzone",
+  "Tidssone"
+ ],
+ "Use link": [
+  "Link gebruiken",
+  "Bruk lenke"
+ ],
+ "Use where I am now": [
+  "Gebruik waar ik nu ben",
+  "Bruk der jeg er nå"
  ]
 }

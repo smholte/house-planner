@@ -221,8 +221,8 @@ function hpbMomentSun(p, sceneId, mid, created) {
   const [Mo, D] = HPS_SEASONS[m[1]].date.split('-').map(Number), time = HPS_MOMENTS[m[2]].time[m[1]];
   const [hh, mm] = time.split(':').map(Number);
   const localMs = Date.UTC(year, Mo - 1, D, hh, mm);
-  const off = dstOffsetNL(new Date(localMs - 2 * 3600000));
-  const sun = sunPosition(site.lat ?? 52.1, site.lon ?? 5.1, new Date(localMs - off * 3600000));
+  const pl = placeOf(p);
+  const sun = sunPosition(pl.lat, pl.lon, new Date(localToUtc(pl, localMs)));
   return { az: sun.az, el: sun.el, season: m[1], time };
 }
 

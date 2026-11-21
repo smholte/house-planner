@@ -699,7 +699,7 @@ Object.assign(app, {
   /** scene.json's recipe from the dialog's choices */
   hpsRecipe(o, q, inc, lamps) {
     const p = this.project, site = p.site || {};
-    const lat = site.lat ?? 52.1, lon = site.lon ?? 5.1, north = [r6(Math.sin((site.north || 0) * Math.PI / 180)), r6(-Math.cos((site.north || 0) * Math.PI / 180))];
+    const pl = placeOf(p), lat = pl.lat, lon = pl.lon, north = [r6(Math.sin((site.north || 0) * Math.PI / 180)), r6(-Math.cos((site.north || 0) * Math.PI / 180))];
     const seasons = [], moments = [];
     for (const sk of ['summer', 'winter']) {
       const so = o.seasons[sk];
@@ -710,13 +710,12 @@ Object.assign(app, {
         if (!o.moments.includes(mk)) continue;
         const M = HPS_MOMENTS[mk], time = M.time[sk];
         const [Y, Mo, D] = so.date.split('-').map(Number), [hh, mm] = time.split(':').map(Number);
-        // Dutch time (the app's sun works in it): +01:00 in winter, +02:00 in summer
+        // the clock at the house's place (its zone and summer time)
         const localMs = Date.UTC(Y, Mo - 1, D, hh, mm);
-        const off = dstOffsetNL(new Date(localMs - 2 * 3600000));
-        const when = new Date(localMs - off * 3600000);
+        const when = new Date(localToUtc(pl, localMs)), off = Math.round((localMs - when.getTime()) / 60000);
         const sun = sunPosition(lat, lon, when);
         const d = planDir(site, sun.az), e = sun.el * Math.PI / 180;
-        moments.push({ id: `${sk}-${mk}`, label: t(M.label), season: sk, time, utc_offset: `+0${off}:00`,
+        moments.push({ id: `${sk}-${mk}`, label: t(M.label), season: sk, time, utc_offset: offsetWords(off),
           sun: { azimuth: Math.round(sun.az * 1000) / 1000 % 360, elevation: Math.round(sun.el * 1000) / 1000, direction: [r6(Math.cos(e) * d[0]), r6(Math.sin(e)), r6(Math.cos(e) * d[1])] },
           sky: { clouds: S.clouds, low_clouds: S.low, visibility: 40000 }, lamps: sun.el < 2 && lamps ? 'all' : 'none' });
       }
