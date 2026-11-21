@@ -747,5 +747,18 @@ Lengths are metres. Plan x to the right, y towards the back of the house.
                      piece's colour (userData.libMissing), the panel's note (furnish.js .lib-missing), 2D: the box symbol.
                      libAfterLoad (a library came or went). modelPackB64: a viewer copy made from a hosted version gets
                      the Kenney geometry inside (share.js viewerScript).
+    Poly Haven models (task 0051): 123 free models (CC0) as kind 'model' items 'l:ph-<id>' of build/library (files models/ph-<id>.<hash>.glb
+                     + .webp picture; source 'Poly Haven (polyhaven.com/a/<id>)'; cat = the room group, size / o / u as the
+                     owner's models), in the app folder's library, the library zip AND the web version (build.py allows a
+                     web model only when it is CC0 and not private). Made once, never by the app: tools/polyhaven.py
+                     (list / fetch / import; the choice = categories + LEAVE_OUT + ≤ 60,000 faces, ≤ 100,000 triangles
+                     packed, ≤ 4 m; pictures 1024 px on pieces over 0.8 m, else 512) run by .github/workflows/polyhaven.yml
+                     on GitHub (the chat machines cannot reach polyhaven.com): Actions → Fetch Poly Haven models → Run workflow
+                     (from a branch the file is not on main yet: a temporary push trigger, see the workflow's header) – commits
+                     build/library + build/polyhaven.json (the list: each model's room, size, triangles, bytes, and every
+                     model left out with its reason) back to the branch. tools/model-thumbs.py --library draws their
+                     catalogue pictures. tools/polyhaven.py --check (ci_precheck) = list and library agree, all CC0.
+                     Poly Haven's API terms ask for "Powered by Poly Haven" when an app uses the live API; we fetch once, and
+                     Settings → About says it anyway. tests/test_polyhaven.py.
     src/sw.js        leaves lib/ alone (the app keeps it in house-planner-lib; a new app version doesn't fetch it again).
     src/panels.js    Settings → Library (librarySettings: status per library, Load library…, Remove).

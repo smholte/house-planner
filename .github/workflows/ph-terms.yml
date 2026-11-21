@@ -1,0 +1,12 @@
+name: Poly Haven terms (temporary)
+on:
+  push:
+jobs:
+  terms:
+    if: contains(github.event.head_commit.message, '[ph terms]')
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          curl -sSL https://raw.githubusercontent.com/Poly-Haven/Public-API/main/ToS.md | head -80
+          echo ----; curl -sSL https://raw.githubusercontent.com/Poly-Haven/Public-API/main/README.md | grep -i -n "credit\|commercial\|attribution\|license\|terms" | head -20
+          echo ----; curl -sSL https://polyhaven.com/license | sed 's/<[^>]*>//g' | grep -v '^\s*$' | head -40

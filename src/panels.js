@@ -985,7 +985,7 @@ Object.assign(app, {
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, t('Backup')), this.backupSettings()),
       h('div', { class: 'field' }, h('span', { class: 'flabel' }, 'About'),
         h('p', null, 'House Planner works offline. Nothing is uploaded: your data only leaves this device when you export a file.'),
-        h('p', { class: 'note-muted' }, 'Built with three.js (MIT) and pdf.js (Apache 2.0). 3D furniture models: Furniture Kit by Kenney (www.kenney.nl), CC0. Font: Barlow (OFL).')));
+        h('p', { class: 'note-muted' }, 'Built with three.js (MIT) and pdf.js (Apache 2.0). 3D furniture models: Furniture Kit by Kenney (www.kenney.nl) and free models from Poly Haven (polyhaven.com – Powered by Poly Haven), CC0. Font: Barlow (OFL).')));
     await UI.dialog({ title: 'Settings', body, actions: [{ label: 'Done', value: null, kind: 'primary' }] });
   },
 

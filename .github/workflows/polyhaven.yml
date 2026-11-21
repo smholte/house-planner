@@ -1,21 +1,19 @@
 name: Fetch Poly Haven models
 
-# By hand only (task 0051): Actions → "Fetch Poly Haven models" → Run workflow, on the branch that should get the models
-# (once it is on main); from a branch a push whose commit message holds [fetch poly haven] starts it (a workflow that
-# is not on main yet cannot be started by hand).
+# By hand only (task 0051): Actions → "Fetch Poly Haven models" → Run workflow, on the branch that should get the models.
+# (While the file was only on a branch, a push whose commit message held [fetch poly haven] started it; that trigger is gone –
+# put it back for a run before the file is on main. [list only] in a message of such a push only printed the list.)
 # The chat machines cannot reach polyhaven.com, GitHub's runners can: this fetches the chosen models (CC0, glTF at 1K) once,
 # packs them (tools/glb-pack.mjs) into build/library, draws their catalogue pictures and commits the result to that branch.
 # It never runs with the normal Tests, and the app never calls Poly Haven.
 on:
   workflow_dispatch:
-  push:
 
 permissions:
   contents: write
 
 jobs:
   fetch:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[fetch poly haven]')
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -33,20 +31,16 @@ jobs:
       - name: List every Poly Haven model (for choosing)
         run: python3 tools/polyhaven.py list
       - name: Fetch from Poly Haven
-        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         run: python3 tools/polyhaven.py fetch /tmp/ph
       - name: Pack into the library
-        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         run: python3 tools/polyhaven.py import /tmp/ph
       - name: Catalogue pictures
-        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         run: |
           python3 build.py --no-house
           python3 tools/model-thumbs.py --library
           python3 tools/build-library.py --check
           python3 tools/polyhaven.py --check
       - name: Commit to this branch
-        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         run: |
           git config user.name "poly-haven-fetch"
           git config user.email "actions@users.noreply.github.com"
@@ -54,7 +48,6 @@ jobs:
           git commit -m "Task 0051: Poly Haven models fetched, packed and pictured (workflow run ${{ github.run_id }})" || echo "nothing new"
           git push origin HEAD:${{ github.ref_name }}
       - uses: actions/upload-artifact@v4
-        if: ${{ !contains(github.event.head_commit.message, '[list only]') }}
         with:
           name: polyhaven-fetch
           path: |

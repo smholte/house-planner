@@ -58,6 +58,10 @@ def checks() -> list[str]:
     bl = importlib.util.module_from_spec(spec); spec.loader.exec_module(bl)
     if os.path.isdir(os.path.join(ROOT, 'build', 'library')):
         bad += ['build/library: ' + x for x in bl.check()]
+    # the Poly Haven models (task 0051): the list and the library agree, every one CC0
+    spec = importlib.util.spec_from_file_location('polyhaven', os.path.join(ROOT, 'tools', 'polyhaven.py'))
+    ph = importlib.util.module_from_spec(spec); spec.loader.exec_module(ph)
+    bad += ph.check()
     bad += [f'{x}: a model file outside the public library (build/library)' for x in bl.stray_models(ROOT)]
     util = open(os.path.join(ROOT, 'src', 'util.js'), encoding='utf-8').read()
     m = re.search(r"APP_VERSION\s*=\s*\{\s*n:\s*(\d+),\s*date:\s*'([^']+)',\s*build:\s*'__BUILD__'", util)

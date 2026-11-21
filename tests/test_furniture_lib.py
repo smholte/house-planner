@@ -1,5 +1,5 @@
 """Add furniture: the library's models by room and "Import a model" (task 0028).
-PC light and phone dark (by touch), each: the public app has no Library tab (its library has no models); a library with
+PC light and phone dark (by touch), each: the public app has a Library tab (the free Poly Haven models, task 0051) (its library has no models); a library with
 a model in it (made here: the CC0 stove of tests/fixtures + a picture) brings the Library tab with a chip per room, the
 picture from the library, and places the model at its real size; Import a model – a .glb at a real width typed in,
 kept with the house (an asset like a photo), placed, saved, placed again (the same model, not a second copy), renamed,
@@ -47,17 +47,23 @@ def run(p, phone):
     press('#mode-switch button[data-mode="furnish"]'); pg.wait_for_timeout(800)
     pg.evaluate("() => { window.__hp.app.settings.pip = false; window.__hp.app.updatePip(); }")
     press('#toolrail button[data-tool="add"]'); pg.wait_for_selector('.cat-tabs button')
-    check(f'{tag}: the public app – no Library tab (no models in its library), no hint', not pg.locator('.cat-tabs button[data-cat="lib"]').count() and not pg.locator('.lib-hint').count())
+    # (task 0051: the public library has the free Poly Haven models – test_polyhaven.py; here: the tab is there, no hint, and the counts before)
+    pg.wait_for_selector('.cat-tabs button[data-cat="lib"]')
+    base = pg.evaluate("() => [...document.querySelectorAll('.lib-rooms .chip')].map(c => [c.dataset.room, +c.textContent.replace(/\\D+/g, '')])")
+    base = {k: n for k, n in base}
+    check(f'{tag}: the public app – a Library tab with the free models, no "load it" hint', base.get('all', 0) > 50 and not pg.locator('.lib-hint').count(), base)
     pg.keyboard.press('Escape'); pg.wait_for_timeout(400)
 
     # a library with a model: the Library tab, by room, its picture from the library
     pg.evaluate("""async (b64) => { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < u.length; i++) u[i] = bin.charCodeAt(i);
       await window.__hp.libLoadZip(new File([u], 'lib.zip')); window.__hp.libAfterLoad(); }""", base64.b64encode(open(test_lib_zip(), 'rb').read()).decode())
     press('#toolrail button[data-tool="add"]'); pg.wait_for_selector('.cat-tabs button[data-cat="lib"]')
-    chips = pg.evaluate("() => [...document.querySelectorAll('.lib-rooms .chip')].map(c => c.textContent)")
+    chips = pg.evaluate("() => { const o = {}; for (const c of document.querySelectorAll('.lib-rooms .chip')) o[c.dataset.room] = +c.textContent.replace(/\\D+/g, ''); return o; }")
+    pg.click('.lib-rooms .chip[data-room="kitchen"]'); pg.wait_for_timeout(400)
+    pg.locator('.model-card[data-model="l:test-stove"]').scroll_into_view_if_needed()
     pg.wait_for_function("() => { const i = document.querySelector('.model-card[data-model=\"l:test-stove\"] img'); return i && i.src.startsWith('blob:'); }", timeout=30000)
-    check(f'{tag}: a library with a model – Library tab first and open, chips All 1 · Kitchen 1, the picture from the library',
-          pg.evaluate("() => document.querySelector('.cat-tabs button').dataset.cat") == 'lib' and chips == ['All 1', 'Kitchen 1'], chips)
+    check(f'{tag}: a library with a model – Library tab first and open, the chips one more (All, Kitchen), the picture from the library',
+          pg.evaluate("() => document.querySelector('.cat-tabs button').dataset.cat") == 'lib' and chips['all'] == base['all'] + 1 and chips['kitchen'] == base.get('kitchen', 0) + 1, (chips, base))
     pg.screenshot(path=SHOTS + f'furniture-lib-{tag.lower()}.png')
     press('.model-card[data-model="l:test-stove"]'); pg.wait_for_timeout(800)
     it = pg.evaluate(ITEMS)[-1]
