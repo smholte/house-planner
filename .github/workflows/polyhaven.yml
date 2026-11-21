@@ -1,17 +1,21 @@
 name: Fetch Poly Haven models
 
-# By hand only (task 0051): Actions → "Fetch Poly Haven models" → Run workflow, on the branch that should get the models.
+# By hand only (task 0051): Actions → "Fetch Poly Haven models" → Run workflow, on the branch that should get the models
+# (once it is on main); from a branch a push whose commit message holds [fetch poly haven] starts it (a workflow that
+# is not on main yet cannot be started by hand).
 # The chat machines cannot reach polyhaven.com, GitHub's runners can: this fetches the chosen models (CC0, glTF at 1K) once,
 # packs them (tools/glb-pack.mjs) into build/library, draws their catalogue pictures and commits the result to that branch.
 # It never runs with the normal Tests, and the app never calls Poly Haven.
 on:
   workflow_dispatch:
+  push:
 
 permissions:
   contents: write
 
 jobs:
   fetch:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[fetch poly haven]')
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
