@@ -81,9 +81,12 @@ def editor_menu(p, phone, theme):
         pg.locator('.help-ov').click(position={'x': 5, 'y': 5}); pg.wait_for_timeout(400)
     check(f'{tag}: … and they go again', pg.locator('.help-ov').count() == 0)
     # covers: #btn-project-name, #btn-savepoint, #btn-fit
-    press(pg, phone, '#btn-project-name'); pg.wait_for_timeout(400)
-    check(f'{tag}: the project name in the top bar asks for a new name', pg.locator(DLG + ' #dlg-input').count() == 1)
-    close_dialog(pg)
+    if pg.is_visible('#btn-project-name'):
+        press(pg, phone, '#btn-project-name'); pg.wait_for_timeout(400)
+        check(f'{tag}: the project name in the top bar asks for a new name', pg.locator(DLG + ' #dlg-input').count() == 1)
+        close_dialog(pg)
+    else:
+        check(f'{tag}: the project name is left out of the narrow top bar (Rename project is in ⋯, tested above)', phone)
     if pg.is_visible('#btn-savepoint'):
         press(pg, phone, '#btn-savepoint'); pg.wait_for_timeout(400)
         check(f'{tag}: Save point asks for its name', pg.locator(DLG + ' #dlg-input').count() == 1, dialog_title(pg))
